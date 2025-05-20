@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog - Alma del Huila | Garzón, Huila{% endblock %}
+{% block meta_description %}Descubre historias fascinantes, consejos de viaje y la cultura de Garzón, Huila a través de nuestro blog oficial.{% endblock %}
+
+{% block body_class %}blog-page{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="blog-hero">
+    <div class="overlay"></div>
+    <div class="container position-relative z-index-1">
+        <div class="row justify-content-center">
+            <div class="col-md-10 text-center">
+                <h1 class="display-4 text-white mb-4" data-aos="fade-up">NUESTRO BLOG</h1>
+                <p class="lead text-white mb-4" data-aos="fade-up" data-aos-delay="100">Historias, consejos y experiencias auténticas de Garzón, Huila</p>
+                
+                <!-- Búsqueda de blog -->
+                <div class="search-box" data-aos="fade-up" data-aos-delay="200">
+                    <form action="{% url 'blog:post_search' %}" method="get">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" placeholder="Buscar en el blog...">
+                            <button type="submit" class="btn btn-secondary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="shape-bottom">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+            <path class="shape-fill" d="M0,6V0h1000v100L0,6z"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Categorías destacadas -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="categories-wrapper text-center">
+                    <h4 class="categories-title mb-4" data-aos="fade-up">EXPLORA NUESTRAS CATEGORÍAS</h4>
+                    <div class="categories-buttons" data-aos="fade-up" data-aos-delay="100">
+                        <a href="{% url 'blog:post_list' %}" class="btn {% if not categoria_actual %}btn-primary{% else %}btn-outline-primary{% endif %} mb-2">Todas</a>
+                        {% for cat in categorias %}
+                            <a href="{% url 'blog:categoria_posts' cat.slug %}" class="btn {% if categoria_actual.slug == cat.slug %}btn-primary{% else %}btn-outline-primary{% endif %} mb-2">{{ cat.nombre }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Posts Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                <!-- Featured Post (primer post) -->
+                {% if posts|length > 0 and not categoria_actual and not query %}
+                {% with featured_post=posts.0 %}
+                <div class="featured-post mb-5" data-aos="fade-up">
+                    <div class="card featured-card">
+                        <div class="row g-0">
+                            <div class="col-md-6">
+                                <div class="featured-img-container">
+                                    {% if featured_post.imagen_destacada %}
+                                    <img src="{{ featured_post.imagen_destacada.url }}" alt="{{ featured_post.titulo }}" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover;">
+                                    {% else %}
+                                    <img src="/static/img/placeholder.jpg" alt="{{ featured_post.titulo }}" class="img-fluid rounded-start h-100 w-100" style="object-fit: cover;">
+                                    {% endif %}
+                                    <div class="featured-overlay"></div>
+                                    <div class="featured-date">
+                                        <span class="day">{{ featured_post.fecha_publicacion|date:"d" }}</span>
+                                        <span class="month">{{ featured_post.fecha_publicacion|date:"M" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card-body d-flex flex-column h-100">
+                                    <div class="mb-2">
+                                        {% for categoria in featured_post.categorias.all %}
+                                        <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-badge text-decoration-none">{{ categoria.nombre }}</a>
+                                        {% endfor %}
+                                    </div>
+                                    <h2 class="card-title mb-3">{{ featured_post.titulo }}</h2>
+                                    <div class="card-text post-excerpt mb-3">
+                                        {{ featured_post.contenido|striptags|truncatewords:30 }}
+                                    </div>
+                                    <div class="post-meta text-muted mb-3">
+                                        <small><i class="far fa-user me-1"></i> {{ featured_post.autor.get_full_name|default:featured_post.autor.username }}</small>
+                                    </div>
+                                    <a href="{% url 'blog:post_detail' featured_post.slug %}" class="btn btn-primary mt-auto align-self-start">Leer más</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endwith %}
+                
+                <!-- Regular Posts -->
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    {% for post in posts|slice:"1:" %}
+                    <div class="col" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'1' }}00">
+                        <article class="card post-card h-100">
+                            <div class="post-card-img-container">
+                                {% if post.imagen_destacada %}
+                                <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}" class="card-img-top post-card-img">
+                                {% else %}
+                                <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}" class="card-img-top post-card-img">
+                                {% endif %}
+                                <div class="post-date">
+                                    <span class="day">{{ post.fecha_publicacion|date:"d" }}</span>
+                                    <span class="month">{{ post.fecha_publicacion|date:"M" }}</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-2">
+                                    {% for categoria in post.categorias.all %}
+                                    <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-badge text-decoration-none">{{ categoria.nombre }}</a>
+                                    {% endfor %}
+                                </div>
+                                <h3 class="card-title post-card-title">{{ post.titulo }}</h3>
+                                <div class="card-text post-excerpt">
+                                    {{ post.contenido|striptags|truncatewords:15 }}
+                                </div>
+                            </div>
+                            <div class="card-footer bg-white border-0">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="post-card-meta">
+                                        <small><i class="far fa-user me-1"></i> {{ post.autor.get_full_name|default:post.autor.username }}</small>
+                                    </div>
+                                    <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Leer más</a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        {% for post in posts %}
+                        <div class="col" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'1' }}00">
+                            <article class="card post-card h-100">
+                                <div class="post-card-img-container">
+                                    {% if post.imagen_destacada %}
+                                    <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}" class="card-img-top post-card-img">
+                                    {% else %}
+                                    <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}" class="card-img-top post-card-img">
+                                    {% endif %}
+                                    <div class="post-date">
+                                        <span class="day">{{ post.fecha_publicacion|date:"d" }}</span>
+                                        <span class="month">{{ post.fecha_publicacion|date:"M" }}</span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-2">
+                                        {% for categoria in post.categorias.all %}
+                                        <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-badge text-decoration-none">{{ categoria.nombre }}</a>
+                                        {% endfor %}
+                                    </div>
+                                    <h3 class="card-title post-card-title">{{ post.titulo }}</h3>
+                                    <div class="card-text post-excerpt">
+                                        {{ post.contenido|striptags|truncatewords:15 }}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-0">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div class="post-card-meta">
+                                            <small><i class="far fa-user me-1"></i> {{ post.autor.get_full_name|default:post.autor.username }}</small>
+                                        </div>
+                                        <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Leer más</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                <i class="fas fa-info-circle me-2"></i>
+                                {% if query %}
+                                    No se encontraron resultados para "<strong>{{ query }}</strong>". Prueba con otros términos de búsqueda.
+                                {% elif categoria_actual %}
+                                    No hay artículos disponibles en la categoría "<strong>{{ categoria_actual.nombre }}</strong>" por el momento.
+                                {% else %}
+                                    No hay artículos disponibles por el momento.
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <nav aria-label="Paginación" class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page=1" aria-label="Primera">
+                                    <span aria-hidden="true">&laquo;&laquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            
+                            <li class="page-item active">
+                                <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                            </li>
+                            
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?{% if query %}q={{ query }}&{% endif %}page={{ page_obj.paginator.num_pages }}" aria-label="Última">
+                                    <span aria-hidden="true">&raquo;&raquo;</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="blog-sidebar">
+                    <!-- Autor destacado -->
+                    <div class="sidebar-widget author-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">SOBRE NOSOTROS</h4>
+                        </div>
+                        <div class="author-box text-center">
+                            <img src="/static/img/escudo-garzon.png" alt="Alma del Huila" class="author-img mb-3">
+                            <h5 class="author-name">Alma del Huila</h5>
+                            <p class="author-bio">Portal turístico oficial de Garzón, creado para compartir la riqueza natural, cultural y gastronómica de nuestra tierra. Te invitamos a descubrir todos nuestros rincones mágicos.</p>
+                            <div class="social-links">
+                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Categorías -->
+                    <div class="sidebar-widget categories-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">CATEGORÍAS</h4>
+                        </div>
+                        <ul class="categories-list">
+                            {% for categoria in categorias %}
+                            <li class="category-item">
+                                <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-link">
+                                    <span class="category-name">{{ categoria.nombre }}</span>
+                                    <span class="category-count">{{ categoria.posts.count }}</span>
+                                </a>
+                            </li>
+                            {% empty %}
+                            <li class="category-item">
+                                <span class="text-muted">No hay categorías disponibles</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Posts populares -->
+                    <div class="sidebar-widget popular-posts-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">POSTS POPULARES</h4>
+                        </div>
+                        <div class="popular-posts">
+                            {% for post in posts|slice:":4" %}
+                            <div class="popular-post">
+                                <div class="popular-post-img">
+                                    {% if post.imagen_destacada %}
+                                    <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}">
+                                    {% else %}
+                                    <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}">
+                                    {% endif %}
+                                </div>
+                                <div class="popular-post-content">
+                                    <h5 class="popular-post-title">
+                                        <a href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a>
+                                    </h5>
+                                    <div class="popular-post-meta">
+                                        <span class="post-date">
+                                            <i class="far fa-calendar-alt me-1"></i> {{ post.fecha_publicacion|date:"d M Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Tags (si son implementados) -->
+                    <div class="sidebar-widget tags-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">ETIQUETAS</h4>
+                        </div>
+                        <div class="tags-cloud">
+                            <a href="#" class="tag">Naturaleza</a>
+                            <a href="#" class="tag">Gastronomía</a>
+                            <a href="#" class="tag">Historia</a>
+                            <a href="#" class="tag">Festivales</a>
+                            <a href="#" class="tag">Café</a>
+                            <a href="#" class="tag">Aventura</a>
+                            <a href="#" class="tag">Cultura</a>
+                            <a href="#" class="tag">Tradiciones</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 data-aos="fade-up">SUSCRÍBETE A NUESTRO BOLETÍN</h3>
+                <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Recibe las últimas noticias, eventos y promociones directamente en tu correo</p>
+                <form class="newsletter-form" data-aos="fade-up" data-aos-delay="200">
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Tu correo electrónico" required>
+                        <button class="btn btn-primary" type="submit">Suscribirse</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos específicos para blog */
+    .blog-hero {
+        position: relative;
+        background: url('/static/img/garzon-landscape.jpg') no-repeat center center;
+        background-size: cover;
+        padding: 8rem 0 6rem;
+        color: #fff;
+        z-index: 1;
+    }
+    
+    .blog-hero .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 104, 56, 0.8); /* Verde Huila con opacidad */
+        z-index: -1;
+    }
+    
+    .blog-hero .search-box {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .z-index-1 {
+        z-index: 1;
+    }
+    
+    .shape-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+    }
+    
+    .shape-bottom svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 70px;
+    }
+    
+    .shape-bottom .shape-fill {
+        fill: #FFFFFF;
+    }
+    
+    .categories-wrapper {
+        padding: 2rem 0;
+    }
+    
+    .categories-title {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+    
+    .categories-buttons .btn {
+        margin-right: 0.5rem;
+    }
+    
+    .featured-card {
+        overflow: hidden;
+        border: none;
+        box-shadow: var(--shadow);
+    }
+    
+    .featured-img-container {
+        position: relative;
+        height: 100%;
+        min-height: 300px;
+    }
+    
+    .featured-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+    }
+    
+    .featured-date {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background-color: var(--color-secondary);
+        color: var(--color-gray-900);
+        text-align: center;
+        padding: 10px 15px;
+        border-radius: var(--border-radius);
+        font-family: var(--font-primary);
+        box-shadow: var(--shadow);
+    }
+    
+    .featured-date .day {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .featured-date .month {
+        display: block;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .post-card-img-container {
+        position: relative;
+    }
+    
+    .post-date {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: var(--color-secondary);
+        color: var(--color-gray-900);
+        text-align: center;
+        padding: 8px 12px;
+        border-radius: var(--border-radius);
+        font-family: var(--font-primary);
+        box-shadow: var(--shadow);
+        z-index: 1;
+    }
+    
+    .post-date .day {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .post-date .month {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+    
+    .post-excerpt {
+        color: var(--color-gray-700);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Sidebar Widgets */
+    .blog-sidebar {
+        position: sticky;
+        top: 30px;
+    }
+    
+    .sidebar-widget {
+        background-color: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .widget-title-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .widget-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--color-gray-200);
+        text-transform: uppercase;
+    }
+    
+    .widget-title:after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background-color: var(--color-primary);
+    }
+    
+    /* Author Widget */
+    .author-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--color-primary);
+    }
+    
+    .author-name {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .author-bio {
+        color: var(--color-gray-700);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+    
+    .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: this_value;
+        background-color: var(--color-gray-200);
+        color: var(--color-gray-700);
+        border-radius: 50%;
+        transition: all var(--transition-fast);
+    }
+    
+    .social-link:hover {
+        background-color: var(--color-primary);
+        color: white;
+    }
+    
+    /* Categories Widget */
+    .categories-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .category-item {
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .category-item:last-child {
+        border-bottom: none;
+    }
+    
+    .category-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        color: var(--color-gray-800);
+        transition: color var(--transition-fast);
+    }
+    
+    .category-link:hover {
+        color: var(--color-primary);
+    }
+    
+    .category-count {
+        background-color: var(--color-primary);
+        color: white;
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+    }
+    
+    /* Popular Posts Widget */
+    .popular-post {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .popular-post:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .popular-post-img {
+        flex: 0 0 80px;
+        margin-right: 15px;
+    }
+    
+    .popular-post-img img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--border-radius);
+    }
+    
+    .popular-post-title {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        line-height: 1.3;
+    }
+    
+    .popular-post-title a {
+        color: var(--color-gray-900);
+        transition: color var(--transition-fast);
+    }
+    
+    .popular-post-title a:hover {
+        color: var(--color-primary);
+    }
+    
+    .popular-post-meta {
+        font-size: 0.8rem;
+        color: var(--color-gray-600);
+    }
+    
+    /* Tags Widget */
+    .tags-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .tag {
+        background-color: var(--color-gray-200);
+        color: var(--color-gray-700);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        transition: all var(--transition-fast);
+    }
+    
+    .tag:hover {
+        background-color: var(--color-primary);
+        color: white;
+    }
+    
+    /* Newsletter Section */
+    .newsletter-section {
+        background-color: var(--color-light);
+        border-top: 1px solid var(--color-gray-200);
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .newsletter-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 767.98px) {
+        .blog-hero {
+            padding: 6rem 0 4rem;
+        }
+        
+        .featured-img-container {
+            min-height: 220px;
+        }
+        
+        .post-card-img {
+            height: 180px;
+        }
+        
+        .sidebar-widget {
+            padding: 20px;
+        }
+    }
+</style>
+{% endblock %}

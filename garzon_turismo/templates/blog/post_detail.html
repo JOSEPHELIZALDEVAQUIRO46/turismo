@@ -1,0 +1,716 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.titulo }} - Blog - Alma del Huila{% endblock %}
+{% block meta_description %}{{ post.contenido|striptags|truncatewords:25 }}{% endblock %}
+
+{% block body_class %}blog-single{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="post-hero" {% if post.imagen_destacada %}style="background-image: url('{{ post.imagen_destacada.url }}');"{% endif %}>
+    <div class="overlay"></div>
+    <div class="container z-index-1 position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 text-center">
+                <div class="post-categories mb-3" data-aos="fade-up">
+                    {% for categoria in post.categorias.all %}
+                    <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-badge text-decoration-none">{{ categoria.nombre }}</a>
+                    {% endfor %}
+                </div>
+                <h1 class="display-4 text-white mb-4" data-aos="fade-up" data-aos-delay="100">{{ post.titulo }}</h1>
+                <div class="post-meta text-white mb-3" data-aos="fade-up" data-aos-delay="200">
+                    <span class="post-date me-3"><i class="far fa-calendar-alt me-1"></i> {{ post.fecha_publicacion|date:"d M Y" }}</span>
+                    <span class="post-author"><i class="far fa-user me-1"></i> {{ post.autor.get_full_name|default:post.autor.username }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="shape-bottom">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+            <path class="shape-fill" d="M0,6V0h1000v100L0,6z"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Post Content Section -->
+<section class="post-content-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Artículo -->
+                <article class="post-content bg-white p-4 p-md-5 rounded shadow-sm" data-aos="fade-up">
+                    <div class="content-body">
+                        {{ post.contenido|safe }}
+                    </div>
+                    
+                    <!-- Tags (si los implementamos) -->
+                    <div class="post-tags mt-5">
+                        <span class="post-tags-title">Etiquetas:</span>
+                        <a href="#" class="tag">Naturaleza</a>
+                        <a href="#" class="tag">Turismo</a>
+                        <a href="#" class="tag">Cultura</a>
+                    </div>
+                    
+                    <!-- Compartir en redes sociales -->
+                    <div class="post-share mt-5">
+                        <h5>COMPARTE ESTE ARTÍCULO</h5>
+                        <div class="share-buttons">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-social btn-facebook">
+                                <i class="fab fa-facebook-f me-2"></i> Facebook
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.titulo }}" target="_blank" class="btn btn-social btn-twitter">
+                                <i class="fab fa-twitter me-2"></i> Twitter
+                            </a>
+                            <a href="https://wa.me/?text={{ post.titulo }} {{ request.build_absolute_uri }}" target="_blank" class="btn btn-social btn-whatsapp">
+                                <i class="fab fa-whatsapp me-2"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- Autor -->
+                <div class="post-author-box mt-5 p-4 bg-white rounded shadow-sm" data-aos="fade-up">
+                    <div class="media d-flex">
+                        <img src="/static/img/author-avatar.jpg" alt="{{ post.autor.get_full_name|default:post.autor.username }}" class="author-avatar me-4">
+                        <div class="media-body">
+                            <h5 class="mt-0">{{ post.autor.get_full_name|default:post.autor.username }}</h5>
+                            <p class="author-bio">Redactor en Alma del Huila. Apasionado por contar historias sobre la cultura y belleza natural de Garzón, Huila.</p>
+                            <div class="social-links">
+                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Posts relacionados -->
+                {% if posts_relacionados %}
+                <div class="related-posts mt-5" data-aos="fade-up">
+                    <h3 class="section-title">ARTÍCULOS RELACIONADOS</h3>
+                    <div class="row row-cols-1 row-cols-md-3 g-4 mt-2">
+                        {% for post_rel in posts_relacionados %}
+                        <div class="col">
+                            <div class="card h-100">
+                                <div class="post-card-img-container">
+                                    {% if post_rel.imagen_destacada %}
+                                    <img src="{{ post_rel.imagen_destacada.url }}" class="card-img-top" alt="{{ post_rel.titulo }}" height="180" style="object-fit: cover;">
+                                    {% else %}
+                                    <img src="/static/img/placeholder.jpg" class="card-img-top" alt="{{ post_rel.titulo }}" height="180" style="object-fit: cover;">
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ post_rel.titulo }}</h5>
+                                    <p class="card-text small">{{ post_rel.contenido|striptags|truncatewords:10 }}</p>
+                                </div>
+                                <div class="card-footer bg-transparent border-0">
+                                    <a href="{% url 'blog:post_detail' post_rel.slug %}" class="btn btn-sm btn-primary">Leer más</a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Comentarios -->
+                <div class="post-comments mt-5" data-aos="fade-up">
+                    <h3 class="section-title">COMENTARIOS ({{ post.comentarios_core.filter.aprobado=True|length }})</h3>
+                    
+                    <!-- Lista de comentarios -->
+                    {% if post.comentarios_core.filter.aprobado=True %}
+                    <div class="comments-list mt-4">
+                        {% for comentario in post.comentarios_core.filter.aprobado=True %}
+                        <div class="comment-item p-4 bg-white rounded shadow-sm mb-4">
+                            <div class="comment-header d-flex justify-content-between align-items-center mb-3">
+                                <div class="comment-author">
+                                    <h5 class="mb-0">{{ comentario.nombre }}</h5>
+                                </div>
+                                <div class="comment-date">
+                                    <small class="text-muted">{{ comentario.created|date:"d M Y" }}</small>
+                                </div>
+                            </div>
+                            <div class="comment-content">
+                                <p>{{ comentario.contenido }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mt-4">
+                        <i class="fas fa-info-circle me-2"></i> Aún no hay comentarios. ¡Sé el primero en comentar!
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Formulario de comentarios -->
+                    <div class="comment-form-wrapper mt-5 p-4 bg-white rounded shadow-sm" data-aos="fade-up">
+                        <h4 class="comment-form-title mb-4">DEJA UN COMENTARIO</h4>
+                        <form method="post" action="{% url 'blog:post_comment' post.slug %}" class="comment-form">
+                            {% csrf_token %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_nombre" class="form-label">Nombre *</label>
+                                    <input type="text" class="form-control" id="id_nombre" name="nombre" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_email" class="form-label">Email *</label>
+                                    <input type="email" class="form-control" id="id_email" name="email" required>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label for="id_contenido" class="form-label">Comentario *</label>
+                                    <textarea class="form-control" id="id_contenido" name="contenido" rows="5" required></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <p class="text-muted small mb-3">Tu comentario será revisado antes de ser publicado. No se publicará tu dirección de correo electrónico.</p>
+                                    <button type="submit" class="btn btn-primary">Enviar comentario</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="blog-sidebar">
+                    <!-- Autor destacado -->
+                    <div class="sidebar-widget author-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">SOBRE NOSOTROS</h4>
+                        </div>
+                        <div class="author-box text-center">
+                            <img src="/static/img/escudo-garzon.png" alt="Alma del Huila" class="author-img mb-3">
+                            <h5 class="author-name">Alma del Huila</h5>
+                            <p class="author-bio">Portal turístico oficial de Garzón, creado para compartir la riqueza natural, cultural y gastronómica de nuestra tierra. Te invitamos a descubrir todos nuestros rincones mágicos.</p>
+                            <div class="social-links">
+                                <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Categorías -->
+                    <div class="sidebar-widget categories-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">CATEGORÍAS</h4>
+                        </div>
+                        <ul class="categories-list">
+                            {% for categoria in categorias %}
+                            <li class="category-item">
+                                <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-link">
+                                    <span class="category-name">{{ categoria.nombre }}</span>
+                                    <span class="category-count">{{ categoria.posts.count }}</span>
+                                </a>
+                            </li>
+                            {% empty %}
+                            <li class="category-item">
+                                <span class="text-muted">No hay categorías disponibles</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    
+                    <!-- Posts recientes -->
+                    <div class="sidebar-widget popular-posts-widget" data-aos="fade-up">
+                        <div class="widget-title-wrapper">
+                            <h4 class="widget-title">POSTS RECIENTES</h4>
+                        </div>
+                        <div class="popular-posts">
+                            {% for post_rec in posts_recientes %}
+                            <div class="popular-post">
+                                <div class="popular-post-img">
+                                    {% if post_rec.imagen_destacada %}
+                                    <img src="{{ post_rec.imagen_destacada.url }}" alt="{{ post_rec.titulo }}">
+                                    {% else %}
+                                    <img src="/static/img/placeholder.jpg" alt="{{ post_rec.titulo }}">
+                                    {% endif %}
+                                </div>
+                                <div class="popular-post-content">
+                                    <h5 class="popular-post-title">
+                                        <a href="{% url 'blog:post_detail' post_rec.slug %}">{{ post_rec.titulo }}</a>
+                                    </h5>
+                                    <div class="popular-post-meta">
+                                        <span class="post-date">
+                                            <i class="far fa-calendar-alt me-1"></i> {{ post_rec.fecha_publicacion|date:"d M Y" }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Banner promocional -->
+                    <div class="sidebar-widget promo-widget" data-aos="fade-up">
+                        <div class="promo-content p-4 text-center rounded" style="background-image: url('/static/img/promo-bg.jpg'); background-size: cover; background-position: center; position: relative;">
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 104, 56, 0.8); border-radius: inherit;"></div>
+                            <div class="position-relative" style="z-index: 1; padding: 20px 0;">
+                                <h5 class="text-white mb-3">DESCUBRE GARZÓN</h5>
+                                <p class="text-white mb-4">Explora nuestros atractivos turísticos y vive una experiencia inolvidable</p>
+                                <a href="{% url 'turismo:lugar_list' %}" class="btn btn-secondary">Explorar ahora</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h3 data-aos="fade-up">SUSCRÍBETE A NUESTRO BOLETÍN</h3>
+                <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Recibe las últimas noticias, eventos y promociones directamente en tu correo</p>
+                <form class="newsletter-form" data-aos="fade-up" data-aos-delay="200">
+                    <div class="input-group">
+                        <input type="email" class="form-control" placeholder="Tu correo electrónico" required>
+                        <button class="btn btn-primary" type="submit">Suscribirse</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Estilos para la página de detalle del post */
+    .post-hero {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        padding: 10rem 0 8rem;
+        color: #fff;
+        z-index: 1;
+        background-color: var(--color-primary); /* Color de respaldo si no hay imagen */
+    }
+    
+    .post-hero .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: -1;
+    }
+    
+    .z-index-1 {
+        z-index: 1;
+    }
+    
+    .shape-bottom {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+        z-index: 1;
+    }
+    
+    .shape-bottom svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 70px;
+    }
+    
+    .shape-bottom .shape-fill {
+        fill: #FFFFFF;
+    }
+    
+    .post-content {
+        font-family: var(--font-secondary);
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: var(--color-gray-800);
+    }
+    
+    .post-content p {
+        margin-bottom: 1.5rem;
+    }
+    
+    .post-content h2 {
+        color: var(--color-primary);
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .post-content h3 {
+        color: var(--color-primary);
+        margin-top: 2rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .post-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 2rem 0;
+        box-shadow: var(--shadow);
+    }
+    
+    .post-content blockquote {
+        margin: 2rem 0;
+        padding: 1.5rem 2rem;
+        background-color: rgba(0, 104, 56, 0.05);
+        border-left: 4px solid var(--color-primary);
+        border-radius: 4px;
+        font-style: italic;
+    }
+    
+    .post-content ul, .post-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+    
+    .post-content li {
+        margin-bottom: 0.5rem;
+    }
+    
+    .post-tags {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--color-gray-200);
+    }
+    
+    .post-tags-title {
+        font-weight: 600;
+        margin-right: 10px;
+    }
+    
+    .tag {
+        display: inline-block;
+        background-color: var(--color-gray-200);
+        color: var(--color-gray-700);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        transition: all var(--transition-fast);
+    }
+    
+    .tag:hover {
+        background-color: var(--color-primary);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .post-share {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--color-gray-200);
+    }
+    
+    .post-share h5 {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--color-primary);
+    }
+    
+    .share-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .btn-social {
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 30px;
+    }
+    
+    .btn-facebook {
+        background-color: #3b5998;
+        color: white;
+    }
+    
+    .btn-twitter {
+        background-color: #1da1f2;
+        color: white;
+    }
+    
+    .btn-whatsapp {
+        background-color: #25d366;
+        color: white;
+    }
+    
+    .btn-social:hover {
+        opacity: 0.9;
+        color: white;
+    }
+    
+    .post-author-box {
+        margin-top: 3rem;
+    }
+    
+    .author-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--color-primary);
+    }
+    
+    .author-bio {
+        color: var(--color-gray-700);
+        margin-bottom: 1rem;
+    }
+    
+    .social-links {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .social-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        background-color: var(--color-gray-200);
+        color: var(--color-gray-700);
+        border-radius: 50%;
+        transition: all var(--transition-fast);
+    }
+    
+    .social-link:hover {
+        background-color: var(--color-primary);
+        color: white;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--color-gray-200);
+        position: relative;
+    }
+    
+    .section-title:after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background-color: var(--color-primary);
+    }
+    
+    .related-posts .card {
+        transition: transform var(--transition), box-shadow var(--transition);
+    }
+    
+    .related-posts .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow);
+    }
+    
+    .comment-item {
+        transition: transform var(--transition-fast);
+    }
+    
+    .comment-item:hover {
+        transform: translateY(-3px);
+    }
+    
+    .comment-form-title {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+    
+    /* Sidebar Widgets - Mismo estilo que en post_list.html */
+    .blog-sidebar {
+        position: sticky;
+        top: 30px;
+    }
+    
+    .sidebar-widget {
+        background-color: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .widget-title-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+    
+    .widget-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--color-primary);
+        margin-bottom: 0;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--color-gray-200);
+        text-transform: uppercase;
+    }
+    
+    .widget-title:after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 50px;
+        height: 2px;
+        background-color: var(--color-primary);
+    }
+    
+    .author-img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--color-primary);
+    }
+    
+    .author-name {
+        margin-top: 15px;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .author-bio {
+        color: var(--color-gray-700);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+    
+    .categories-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .category-item {
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .category-item:last-child {
+        border-bottom: none;
+    }
+    
+    .category-link {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        color: var(--color-gray-800);
+        transition: color var(--transition-fast);
+    }
+    
+    .category-link:hover {
+        color: var(--color-primary);
+    }
+    
+    .category-count {
+        background-color: var(--color-primary);
+        color: white;
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 10px;
+    }
+    
+    .popular-post {
+        display: flex;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .popular-post:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .popular-post-img {
+        flex: 0 0 80px;
+        margin-right: 15px;
+    }
+    
+    .popular-post-img img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: var(--border-radius);
+    }
+    
+    .popular-post-title {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        line-height: 1.3;
+    }
+    
+    .popular-post-title a {
+        color: var(--color-gray-900);
+        transition: color var(--transition-fast);
+    }
+    
+    .popular-post-title a:hover {
+        color: var(--color-primary);
+    }
+    
+    .popular-post-meta {
+        font-size: 0.8rem;
+        color: var(--color-gray-600);
+    }
+    
+    /* Newsletter Section */
+    .newsletter-section {
+        background-color: var(--color-light);
+        border-top: 1px solid var(--color-gray-200);
+        border-bottom: 1px solid var(--color-gray-200);
+    }
+    
+    .newsletter-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 991.98px) {
+        .post-hero {
+            padding: 8rem 0 6rem;
+        }
+        
+        .blog-sidebar {
+            margin-top: 3rem;
+        }
+    }
+    
+    @media (max-width: 767.98px) {
+        .post-hero {
+            padding: 6rem 0 4rem;
+        }
+        
+        .post-content {
+            font-size: 1rem;
+        }
+        
+        .share-buttons {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .author-avatar {
+            width: 80px;
+            height: 80px;
+        }
+    }
+</style>
+{% endblock %}

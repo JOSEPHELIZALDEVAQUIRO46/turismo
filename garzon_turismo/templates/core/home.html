@@ -1,0 +1,1534 @@
+{% extends 'base.html' %}
+
+{% block title %}Alma del Huila - Garzón, Huila | Portal Turístico Oficial{% endblock %}
+{% block meta_description %}Descubre Garzón, Huila: tierra de oportunidades. Portal turístico oficial con información de lugares turísticos, rutas, gastronomía, eventos y mucho más.{% endblock %}
+
+{% block body_class %}home-page{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-slider swiper">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide hero-slide" style="background-image: url('/static/img/hero/catedral-garzon.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-aos="fade-up">GARZÓN, TIERRA DE OPORTUNIDADES</h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Descubre la magia de nuestro municipio</p>
+                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="{% url 'turismo:lugar_list' %}" class="btn btn-primary btn-lg">Explorar destinos</a>
+                        <a href="{% url 'turismo:ruta_list' %}" class="btn btn-outline-light btn-lg">Rutas turísticas</a>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide hero-slide" style="background-image: url('/static/img/hero/cafe-garzon.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-aos="fade-up">CAFÉ DE ALTA CALIDAD</h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Reconocido a nivel nacional e internacional</p>
+                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="{% url 'turismo:lugar_list' %}" class="btn btn-primary btn-lg">Conoce nuestra cultura cafetera</a>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-slide hero-slide" style="background-image: url('/static/img/hero/cascada-garzon.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title" data-aos="fade-up">NATURALEZA EXUBERANTE</h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Paisajes que cautivan al visitante</p>
+                    <div class="hero-buttons" data-aos="fade-up" data-aos-delay="200">
+                        <a href="{% url 'turismo:lugar_list' %}" class="btn btn-primary btn-lg">Descubrir lugares</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
+    
+    <!-- Scroll Down Indicator -->
+    <div class="scroll-down">
+        <a href="#welcome-section">
+            <i class="fas fa-chevron-down"></i>
+            <span>Descubre más</span>
+        </a>
+    </div>
+    
+    <!-- Wave Shape Divider -->
+    <div class="shape-divider">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
+            <path class="shape-fill" d="M0,6V0h1000v100L0,6z"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Welcome Section -->
+<section id="welcome-section" class="welcome-section section-padding">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right">
+                <div class="welcome-content">
+                    <div class="section-heading">
+                        <h2>BIENVENIDOS A GARZÓN</h2>
+                        <div class="heading-underline"></div>
+                    </div>
+                    <p class="lead mb-4">Descubre la joya turística del Huila, un municipio lleno de historia, tradición y belleza natural.</p>
+                    <p>Garzón, conocida como la "Capital Diocesana del Huila", es un lugar donde convergen la fe, la tradición cafetera y la amabilidad de su gente. Ubicado en el corazón del departamento del Huila, nuestro municipio te ofrece una experiencia única con su arquitectura colonial, paisajes naturales impresionantes y una gastronomía que deleitará tus sentidos.</p>
+                    <div class="welcome-features row mt-4">
+                        <div class="col-6 mb-4">
+                            <div class="welcome-feature">
+                                <div class="feature-icon">
+                                    <i class="fas fa-mountain"></i>
+                                </div>
+                                <h5>Naturaleza</h5>
+                                <p>Cascadas, ríos y montañas</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <div class="welcome-feature">
+                                <div class="feature-icon">
+                                    <i class="fas fa-coffee"></i>
+                                </div>
+                                <h5>Café</h5>
+                                <p>De calidad internacional</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <div class="welcome-feature">
+                                <div class="feature-icon">
+                                    <i class="fas fa-church"></i>
+                                </div>
+                                <h5>Cultura</h5>
+                                <p>Tradición y patrimonio</p>
+                            </div>
+                        </div>
+                        <div class="col-6 mb-4">
+                            <div class="welcome-feature">
+                                <div class="feature-icon">
+                                    <i class="fas fa-utensils"></i>
+                                </div>
+                                <h5>Gastronomía</h5>
+                                <p>Sabores auténticos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="{% url 'core:acerca_de' %}" class="btn btn-primary mt-3">Conoce más sobre Garzón</a>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="welcome-image-container">
+                    <div class="welcome-image">
+                        <img src="/static/img/plaza-garzon.jpg" alt="Plaza de Garzón" class="img-fluid rounded-3">
+                    </div>
+                    <div class="welcome-image-overlay">
+                        <div class="welcome-overlay-content">
+                            <h3>ALMA DEL HUILA</h3>
+                            <p>Un lugar para vivir experiencias inolvidables</p>
+                        </div>
+                    </div>
+                    <div class="welcome-image-decoration"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Destinations Section -->
+<section class="featured-destinations section-padding bg-light">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>DESTINOS DESTACADOS</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">Conoce los lugares más emblemáticos de Garzón</p>
+        </div>
+        
+        <div class="featured-destinations-slider swiper" data-aos="fade-up" data-aos-delay="100">
+            <div class="swiper-wrapper">
+                {% for lugar in lugares_destacados %}
+                <div class="swiper-slide">
+                    <div class="destination-card">
+                        <div class="destination-card-img">
+                            {% if lugar.imagen_principal %}
+                            <img src="{{ lugar.imagen_principal.url }}" alt="{{ lugar.nombre }}">
+                            {% else %}
+                            <img src="/static/img/placeholder.jpg" alt="{{ lugar.nombre }}">
+                            {% endif %}
+                            <div class="destination-card-tag">
+                                <span>{{ lugar.categoria.nombre }}</span>
+                            </div>
+                        </div>
+                        <div class="destination-card-content">
+                            <h3 class="destination-card-title">{{ lugar.nombre }}</h3>
+                            <div class="destination-card-excerpt">
+                                <p>{{ lugar.descripcion|truncatechars:100 }}</p>
+                            </div>
+                            <a href="{% url 'turismo:lugar_detail' lugar.slug %}" class="btn btn-sm btn-primary">Descubrir</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+        
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{% url 'turismo:lugar_list' %}" class="btn btn-primary">Ver todos los destinos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Routes Banner -->
+<section class="routes-banner" style="background-image: url('/static/img/ruta-cafe.jpg');">
+    <div class="routes-banner-overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center text-white">
+                <h2 class="display-5 mb-4" data-aos="fade-up">RUTAS TURÍSTICAS</h2>
+                <p class="lead mb-5" data-aos="fade-up" data-aos-delay="100">Descubre nuestros recorridos por los lugares más emblemáticos de Garzón, desde la cultura cafetera hasta la naturaleza exuberante.</p>
+                <a href="{% url 'turismo:ruta_list' %}" class="btn btn-light btn-lg" data-aos="fade-up" data-aos-delay="200">Explorar rutas</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Events Section -->
+<section class="events-section section-padding">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>PRÓXIMOS EVENTOS</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">No te pierdas nuestras festividades y celebraciones</p>
+        </div>
+        
+        <div class="row">
+            {% for evento in eventos_proximos %}
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <div class="event-card">
+                    <div class="event-card-img">
+                        {% if evento.imagen %}
+                        <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}">
+                        {% else %}
+                        <img src="/static/img/placeholder.jpg" alt="{{ evento.titulo }}">
+                        {% endif %}
+                        <div class="event-date">
+                            <span class="day">{{ evento.fecha_inicio|date:"d" }}</span>
+                            <span class="month">{{ evento.fecha_inicio|date:"M" }}</span>
+                        </div>
+                    </div>
+                    <div class="event-card-content">
+                        <h3 class="event-card-title">{{ evento.titulo }}</h3>
+                        <div class="event-card-meta">
+                            <span><i class="fas fa-map-marker-alt"></i> {{ evento.lugar }}</span>
+                            <span><i class="far fa-clock"></i> {{ evento.fecha_inicio|date:"H:i" }}</span>
+                        </div>
+                        <div class="event-card-excerpt">
+                            <p>{{ evento.descripcion|truncatechars:100 }}</p>
+                        </div>
+                        <a href="{% url 'turismo:evento_detail' evento.slug %}" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center">
+                <div class="alert alert-info" data-aos="fade-up">
+                    <i class="fas fa-info-circle me-2"></i> No hay eventos próximos programados. ¡Vuelve pronto para ver las novedades!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4" data-aos="fade-up">
+            <a href="{% url 'turismo:evento_list' %}" class="btn btn-primary">Ver todos los eventos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Establishments Section -->
+<section class="establishments-section section-padding bg-light">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>DÓNDE HOSPEDARSE Y COMER</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">Los mejores establecimientos para tu estadía</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6 mb-4" data-aos="fade-right">
+                <div class="establishments-type-card hotel-card" style="background-image: url('/static/img/hotel-garzon.jpg');">
+                    <div class="establishments-card-overlay"></div>
+                    <div class="establishments-card-content">
+                        <h3>HOTELES Y HOSPEDAJES</h3>
+                        <p>Encuentra el lugar perfecto para descansar</p>
+                        <a href="{% url 'turismo:establecimientos_tipo' 'hotel' %}" class="btn btn-light">Ver hoteles</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4" data-aos="fade-left">
+                <div class="establishments-type-card restaurant-card" style="background-image: url('/static/img/restaurante-garzon.jpg');">
+                    <div class="establishments-card-overlay"></div>
+                    <div class="establishments-card-content">
+                        <h3>RESTAURANTES Y CAFÉS</h3>
+                        <p>Disfruta de nuestra gastronomía local</p>
+                        <a href="{% url 'turismo:establecimientos_tipo' 'restaurante' %}" class="btn btn-light">Ver restaurantes</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-2">
+            <div class="col-md-4 mb-4" data-aos="fade-up">
+                <div class="establishment-card">
+                    <div class="establishment-card-tag hotel-tag">
+                        <i class="fas fa-hotel"></i> Hotel
+                    </div>
+                    <div class="establishment-card-img">
+                        <img src="/static/img/hotel-destacado.jpg" alt="Hotel destacado">
+                    </div>
+                    <div class="establishment-card-content">
+                        <h3 class="establishment-card-title">Hotel San Miguel</h3>
+                        <div class="establishment-card-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                        </div>
+                        <div class="establishment-card-location">
+                            <i class="fas fa-map-marker-alt"></i> Centro de Garzón
+                        </div>
+                        <div class="establishment-card-price">
+                            <span>Desde $$$</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="establishment-card">
+                    <div class="establishment-card-tag restaurant-tag">
+                        <i class="fas fa-utensils"></i> Restaurante
+                    </div>
+                    <div class="establishment-card-img">
+                        <img src="/static/img/restaurante-destacado.jpg" alt="Restaurante destacado">
+                    </div>
+                    <div class="establishment-card-content">
+                        <h3 class="establishment-card-title">Sabores del Huila</h3>
+                        <div class="establishment-card-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="establishment-card-location">
+                            <i class="fas fa-map-marker-alt"></i> Zona Colonial
+                        </div>
+                        <div class="establishment-card-price">
+                            <span>Desde $$</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="establishment-card">
+                    <div class="establishment-card-tag cafe-tag">
+                        <i class="fas fa-coffee"></i> Café
+                    </div>
+                    <div class="establishment-card-img">
+                        <img src="/static/img/cafe-destacado.jpg" alt="Café destacado">
+                    </div>
+                    <div class="establishment-card-content">
+                        <h3 class="establishment-card-title">Café Garzón</h3>
+                        <div class="establishment-card-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="establishment-card-location">
+                            <i class="fas fa-map-marker-alt"></i> Parque Principal
+                        </div>
+                        <div class="establishment-card-price">
+                            <span>Desde $</span>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3" data-aos="fade-up">
+            <a href="{% url 'turismo:establecimiento_list' %}" class="btn btn-primary">Ver todos los establecimientos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section section-padding">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>LO QUE DICEN NUESTROS VISITANTES</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">Experiencias auténticas en Garzón</p>
+        </div>
+        
+        <div class="testimonials-slider swiper" data-aos="fade-up">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="testimonial-text">
+                            <p>"Una experiencia inolvidable en Garzón. Disfruté muchísimo del recorrido por las fincas cafeteras, donde pude aprender sobre el proceso del café. La gastronomía es deliciosa y la gente muy amable. ¡Volveré con toda mi familia!"</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-author-img">
+                                <img src="/static/img/testimonials/user1.jpg" alt="María Rodríguez">
+                            </div>
+                            <div class="testimonial-author-info">
+                                <h5>María Rodríguez</h5>
+                                <span>Bogotá, Colombia</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                        <div class="testimonial-text">
+                            <p>"La Catedral de Garzón es impresionante, un lugar lleno de paz y espiritualidad. Las rutas naturales son espectaculares, especialmente las cascadas. El clima es perfecto y la hospitalidad de los garzoneños hace que te sientas como en casa."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-author-img">
+                                <img src="/static/img/testimonials/user2.jpg" alt="Carlos Mendoza">
+                            </div>
+                            <div class="testimonial-author-info">
+                                <h5>Carlos Mendoza</h5>
+                                <span>Medellín, Colombia</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="testimonial-text">
+                            <p>"Un verdadero tesoro escondido en el Huila. La arquitectura colonial, los parques, y la comida típica son extraordinarios. Probé el mejor café de mi vida y aprendí mucho sobre la cultura local. Sin duda, Garzón supera las expectativas."</p>
+                        </div>
+                        <div class="testimonial-author">
+                            <div class="testimonial-author-img">
+                                <img src="/static/img/testimonials/user3.jpg" alt="Ana Martínez">
+                            </div>
+                            <div class="testimonial-author-info">
+                                <h5>Ana Martínez</h5>
+                                <span>Cali, Colombia</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Blog Section -->
+<section class="blog-section section-padding bg-light">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>BLOG Y NOTICIAS</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">Las últimas historias de Garzón</p>
+        </div>
+        
+        <div class="row">
+            {% for post in posts_recientes %}
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <article class="blog-card">
+                    <div class="blog-card-img">
+                        {% if post.imagen_destacada %}
+                        <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}">
+                        {% else %}
+                        <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}">
+                        {% endif %}
+                        <div class="blog-card-date">
+                            <span class="day">{{ post.fecha_publicacion|date:"d" }}</span>
+                            <span class="month">{{ post.fecha_publicacion|date:"M" }}</span>
+                        </div>
+                    </div>
+                    <div class="blog-card-content">
+                        <div class="blog-card-category">
+                            {% for categoria in post.categorias.all|slice:":1" %}
+                            <a href="{% url 'blog:categoria_posts' categoria.slug %}">{{ categoria.nombre }}</a>
+                            {% endfor %}
+                        </div>
+                        <h3 class="blog-card-title">
+                            <a href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a>
+                        </h3>
+                        <div class="blog-card-excerpt">
+                            <p>{{ post.contenido|striptags|truncatewords:20 }}</p>
+                        </div>
+                        <div class="blog-card-meta">
+                            <span class="blog-card-author">
+                                <i class="far fa-user"></i> {{ post.autor.get_full_name|default:post.autor.username }}
+                            </span>
+                        </div>
+                        <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary mt-3">Leer más</a>
+                    </div>
+                </article>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4" data-aos="fade-up">
+            <a href="{% url 'blog:post_list' %}" class="btn btn-primary">Ver todos los artículos</a>
+        </div>
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section">
+    <div class="container-fluid p-0">
+        <div class="row g-0">
+            <div class="col-lg-4 map-info-col" data-aos="fade-right">
+                <div class="map-info-content">
+                    <div class="section-heading">
+                        <h2>EXPLORA NUESTRO MUNICIPIO</h2>
+                        <div class="heading-underline"></div>
+                    </div>
+                    <p class="lead">Descubre todos los rincones mágicos de Garzón</p>
+                    <p>Nuestro mapa interactivo te ayudará a ubicar los lugares turísticos, establecimientos y eventos que podrás visitar durante tu estadía en Garzón.</p>
+                    
+                    <div class="map-features">
+                        <div class="map-feature">
+                            <div class="map-feature-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="map-feature-text">
+                                <h5>Atractivos turísticos</h5>
+                                <p>Descubre los puntos más emblemáticos</p>
+                            </div>
+                        </div>
+                        <div class="map-feature">
+                            <div class="map-feature-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <div class="map-feature-text">
+                                <h5>Rutas recomendadas</h5>
+                                <p>Planifica tu recorrido</p>
+                            </div>
+                        </div>
+                        <div class="map-feature">
+                            <div class="map-feature-icon">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                            <div class="map-feature-text">
+                                <h5>Hospedaje y restaurantes</h5>
+                                <p>Encuentra donde alojarte y comer</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'turismo:mapa' %}" class="btn btn-primary">Ver mapa completo</a>
+                </div>
+            </div>
+            <div class="col-lg-8 map-container" data-aos="fade-left">
+                <div id="home-map" class="home-map" data-marcadores="{{ marcadores_json }}"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Instagram Feed -->
+<section class="instagram-section section-padding">
+    <div class="container">
+        <div class="section-heading text-center mb-5" data-aos="fade-up">
+            <h2>SÍGUENOS EN INSTAGRAM</h2>
+            <div class="heading-underline mx-auto"></div>
+            <p class="section-subheading">@almadelhuila</p>
+        </div>
+        
+        <div class="instagram-feed" data-aos="fade-up">
+            <div class="row g-1">
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta1.jpg" alt="Instagram 1" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 125</span>
+                                <span><i class="far fa-comment"></i> 10</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta2.jpg" alt="Instagram 2" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 98</span>
+                                <span><i class="far fa-comment"></i> 7</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta3.jpg" alt="Instagram 3" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 185</span>
+                                <span><i class="far fa-comment"></i> 14</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta4.jpg" alt="Instagram 4" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 145</span>
+                                <span><i class="far fa-comment"></i> 12</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta5.jpg" alt="Instagram 5" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 167</span>
+                                <span><i class="far fa-comment"></i> 9</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta6.jpg" alt="Instagram 6" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 112</span>
+                                <span><i class="far fa-comment"></i> 8</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta7.jpg" alt="Instagram 7" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 137</span>
+                                <span><i class="far fa-comment"></i> 11</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-md-4 col-6">
+                    <a href="#" class="instagram-item">
+                        <img src="/static/img/instagram/insta8.jpg" alt="Instagram 8" class="img-fluid">
+                        <div class="instagram-overlay">
+                            <div class="instagram-meta">
+                                <i class="fab fa-instagram"></i>
+                                <span><i class="far fa-heart"></i> 154</span>
+                                <span><i class="far fa-comment"></i> 13</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4" data-aos="fade-up">
+            <a href="https://www.instagram.com/almadelhuila" target="_blank" class="btn btn-primary">
+                <i class="fab fa-instagram me-2"></i> Seguir en Instagram
+            </a>
+        </div>
+    </div>
+ </section>
+ 
+ <!-- Contact CTA -->
+ <section class="contact-cta" style="background-image: url('/static/img/contact-bg.jpg');">
+    <div class="contact-cta-overlay"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center text-white">
+                <h2 class="mb-4" data-aos="fade-up">¿NECESITAS MÁS INFORMACIÓN?</h2>
+                <p class="lead mb-5" data-aos="fade-up" data-aos-delay="100">Nuestro equipo está listo para ayudarte a planificar tu viaje a Garzón. Contáctanos para obtener información personalizada.</p>
+                <a href="{% url 'contacto:contacto' %}" class="btn btn-light btn-lg" data-aos="fade-up" data-aos-delay="200">Contáctanos</a>
+            </div>
+        </div>
+    </div>
+ </section>
+ 
+ <!-- Newsletter -->
+ <section class="newsletter-section section-padding">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mx-auto text-center">
+                <div class="newsletter-content" data-aos="fade-up">
+                    <h3>SUSCRÍBETE A NUESTRO BOLETÍN</h3>
+                    <p class="mb-4">Recibe las últimas noticias, eventos y promociones de Garzón directamente en tu correo electrónico.</p>
+                    <form class="newsletter-form">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Tu correo electrónico" required>
+                            <button class="btn btn-primary" type="submit">Suscribirse</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+ </section>
+
+ {% endblock %}
+ 
+
+ {% block extra_css %}
+ <style>
+    /* Estilos específicos para la página de inicio */
+    :root {
+        --color-primary: #006838; /* Verde Huila */
+        --color-secondary: #F9E300; /* Amarillo */
+        --color-primary-light: #008B46;
+        --color-primary-dark: #005028;
+    }
+    
+    /* Hero Section */
+    .hero-section {
+        position: relative;
+        height: 100vh;
+        min-height: 600px;
+        overflow: hidden;
+    }
+    
+    .hero-slide {
+        position: relative;
+        height: 100vh;
+        min-height: 600px;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    
+    .hero-slide::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+    }
+    
+    .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: white;
+        width: 80%;
+        max-width: 800px;
+        z-index: 2;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        font-weight: 400;
+        margin-bottom: 2rem;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .scroll-down {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 2;
+        text-align: center;
+    }
+    
+    .scroll-down a {
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    
+    .scroll-down a:hover {
+        color: var(--color-secondary);
+    }
+    
+    .scroll-down i {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    .shape-divider {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow: hidden;
+        line-height: 0;
+        z-index: 2;
+    }
+    
+    .shape-divider svg {
+        position: relative;
+        display: block;
+        width: calc(100% + 1.3px);
+        height: 70px;
+    }
+    
+    .shape-divider .shape-fill {
+        fill: #FFFFFF;
+    }
+    
+    /* Welcome Section */
+    .section-padding {
+        padding: 5rem 0;
+    }
+    
+    .section-heading h2 {
+        font-family: var(--font-primary);
+        font-weight: 700;
+        font-size: 2.5rem;
+        text-transform: uppercase;
+        color: var(--color-primary);
+        margin-bottom: 1rem;
+    }
+    
+    .heading-underline {
+        height: 3px;
+        width: 80px;
+        background-color: var(--color-secondary);
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-subheading {
+        font-size: 1.2rem;
+        color: var(--color-gray-600);
+        margin-bottom: 2rem;
+    }
+    
+    .welcome-content {
+        padding-right: 2rem;
+    }
+    
+    .welcome-feature {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-color: var(--color-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 5px 15px rgba(0, 104, 56, 0.3);
+    }
+    
+    .welcome-feature h5 {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .welcome-feature p {
+        color: var(--color-gray-600);
+        font-size: 0.9rem;
+    }
+    
+    .welcome-image-container {
+        position: relative;
+        padding: 20px;
+    }
+    
+    .welcome-image {
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .welcome-image-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70%;
+        text-align: center;
+        color: white;
+        background-color: rgba(0, 104, 56, 0.85);
+        padding: 2rem;
+        border-radius: 10px;
+        z-index: 3;
+    }
+    
+    .welcome-overlay-content h3 {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+    }
+    
+    .welcome-image-decoration {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        border: 5px solid var(--color-secondary);
+        z-index: 1;
+    }
+    
+    /* Featured Destinations */
+    .destination-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        height: 100%;
+    }
+    
+    .destination-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .destination-card-img {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+    }
+    
+    .destination-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    
+    .destination-card:hover .destination-card-img img {
+        transform: scale(1.1);
+    }
+    
+    .destination-card-tag {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: var(--color-secondary);
+        color: var(--color-gray-900);
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 1;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    .destination-card-content {
+        padding: 1.5rem;
+    }
+    
+    .destination-card-title {
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+    
+    .destination-card-excerpt {
+        color: var(--color-gray-600);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Routes Banner */
+    .routes-banner {
+        position: relative;
+        padding: 8rem 0;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    
+    .routes-banner-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 104, 56, 0.7);
+    }
+    
+    /* Events Section */
+    .event-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .event-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .event-card-img {
+        position: relative;
+        height: 200px;
+    }
+    
+    .event-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .event-date {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: var(--color-secondary);
+        color: var(--color-gray-900);
+        text-align: center;
+        padding: 10px 15px;
+        border-radius: 5px;
+        font-family: var(--font-primary);
+    }
+    
+    .event-date .day {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .event-date .month {
+        display: block;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+    }
+    
+    .event-card-content {
+        padding: 1.5rem;
+    }
+    
+    .event-card-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .event-card-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        color: var(--color-gray-600);
+        font-size: 0.9rem;
+    }
+    
+    .event-card-excerpt {
+        color: var(--color-gray-600);
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    /* Establishments Section */
+    .establishments-type-card {
+        position: relative;
+        height: 300px;
+        border-radius: 10px;
+        overflow: hidden;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .establishments-card-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        transition: background 0.3s ease;
+    }
+    
+    .establishments-type-card:hover .establishments-card-overlay {
+        background: rgba(0, 104, 56, 0.7);
+    }
+    
+    .establishments-card-content {
+        position: relative;
+        z-index: 1;
+        color: white;
+        padding: 2rem;
+    }
+    
+    .establishments-card-content h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+    }
+    
+    .establishments-card-content p {
+        margin-bottom: 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .establishment-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .establishment-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .establishment-card-tag {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .hotel-tag {
+        background-color: #007BFF;
+        color: white;
+    }
+    
+    .restaurant-tag {
+        background-color: #DC3545;
+        color: white;
+    }
+    
+    .cafe-tag {
+        background-color: #6F4E37;
+        color: white;
+    }
+    
+    .establishment-card-img {
+        position: relative;
+        height: 200px;
+    }
+    
+    .establishment-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .establishment-card-content {
+        padding: 1.5rem;
+    }
+    
+    .establishment-card-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+    
+    .establishment-card-rating {
+        color: #FFD700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .establishment-card-location, .establishment-card-price {
+        color: var(--color-gray-600);
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Testimonials */
+    .testimonial-card {
+        background-color: white;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        height: 100%;
+    }
+    
+    .testimonial-rating {
+        color: #FFD700;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .testimonial-text {
+        margin-bottom: 1.5rem;
+        font-style: italic;
+        color: var(--color-gray-700);
+    }
+    
+    .testimonial-author {
+        display: flex;
+        align-items: center;
+    }
+    
+    .testimonial-author-img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 1rem;
+    }
+    
+    .testimonial-author-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .testimonial-author-info h5 {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .testimonial-author-info span {
+        color: var(--color-gray-600);
+        font-size: 0.9rem;
+    }
+    
+    /* Blog Section */
+    .blog-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        height: 100%;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .blog-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    .blog-card-img {
+        position: relative;
+        height: 200px;
+    }
+    
+    .blog-card-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .blog-card-date {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: var(--color-secondary);
+        color: var(--color-gray-900);
+        text-align: center;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-family: var(--font-primary);
+    }
+    
+    .blog-card-date .day {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
+    .blog-card-date .month {
+        display: block;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .blog-card-content {
+        padding: 1.5rem;
+    }
+    
+    .blog-card-category {
+        margin-bottom: 0.5rem;
+    }
+    
+    .blog-card-category a {
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+    
+    .blog-card-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        line-height: 1.3;
+    }
+    
+    .blog-card-title a {
+        color: var(--color-gray-900);
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+    
+    .blog-card-title a:hover {
+        color: var(--color-primary);
+    }
+    
+    .blog-card-excerpt {
+        color: var(--color-gray-600);
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .blog-card-meta {
+        color: var(--color-gray-600);
+        font-size: 0.85rem;
+    }
+    
+    /* Map Section */
+    .map-section {
+        position: relative;
+    }
+    
+    .map-info-col {
+        background-color: var(--color-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+    }
+    
+    .map-info-content {
+        padding: 3rem;
+        max-width: 500px;
+    }
+    
+    .map-info-content .section-heading h2 {
+        color: white;
+    }
+    
+    .map-info-content .heading-underline {
+        background-color: var(--color-secondary);
+    }
+    
+    .map-features {
+        margin: 2rem 0;
+    }
+    
+    .map-feature {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .map-feature-icon {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 1rem;
+    }
+    
+    .map-feature-text h5 {
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+    }
+    
+    .map-feature-text p {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+    
+    .home-map {
+        height: 500px;
+        width: 100%;
+    }
+    
+    /* Instagram Feed */
+    .instagram-feed {
+        margin-bottom: 2rem;
+    }
+    
+    .instagram-item {
+        position: relative;
+        display: block;
+        overflow: hidden;
+    }
+    
+    .instagram-item img {
+        transition: transform 0.5s ease;
+    }
+    
+    .instagram-item:hover img {
+        transform: scale(1.1);
+    }
+    
+    .instagram-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 104, 56, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .instagram-item:hover .instagram-overlay {
+        opacity: 1;
+    }
+    
+    .instagram-meta {
+        color: white;
+        text-align: center;
+    }
+    
+    .instagram-meta i.fab {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .instagram-meta span {
+        margin: 0 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    /* Contact CTA */
+    .contact-cta {
+        position: relative;
+        padding: 8rem 0;
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+    }
+    
+    .contact-cta-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+    }
+    
+    /* Newsletter */
+    .newsletter-content {
+        background-color: var(--color-primary);
+        color: white;
+        padding: 3rem;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 104, 56, 0.3);
+    }
+    
+    .newsletter-form {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    /* Swiper Customization */
+    .swiper-pagination-bullet {
+        width: 12px;
+        height: 12px;
+        background-color: var(--color-primary);
+    }
+    
+    .swiper-button-next, .swiper-button-prev {
+        color: var(--color-primary);
+    }
+    
+    
+    /* Responsive Adjustments */
+</style>
+{% endblock %}
+    
