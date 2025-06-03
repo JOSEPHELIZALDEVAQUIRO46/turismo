@@ -1,508 +1,223 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Resultados de búsqueda: {{ query }} - Blog - Alma del Huila{% endblock %}
-{% block meta_description %}Resultados de búsqueda para "{{ query }}" en el blog de Alma del Huila - Garzón, Huila.{% endblock %}
+{% block title %}Resultados de búsqueda: {{ query }} - Alma del Huila{% endblock %}
+{% block meta_description %}Resultados de búsqueda para "{{ query }}" en el blog de Alma del Huila, Garzón.{% endblock %}
 
-{% block body_class %}blog-search{% endblock %}
+{% block body_class %}blog-search-page{% endblock %}
 
-{% block content %}
-<!-- Hero Section -->
-<section class="search-hero">
-    <div class="overlay"></div>
-    <div class="container position-relative z-index-1">
-        <div class="row justify-content-center">
-            <div class="col-md-10 text-center">
-                <h1 class="display-5 text-white mb-4" data-aos="fade-up">RESULTADOS DE BÚSQUEDA</h1>
-                <p class="lead text-white mb-4" data-aos="fade-up" data-aos-delay="100">Mostrando resultados para: <span class="fw-bold">"{{ query }}"</span></p>
-                
-                <!-- Búsqueda de blog -->
-                <div class="search-box" data-aos="fade-up" data-aos-delay="200">
-                    <form action="{% url 'blog:post_search' %}" method="get">
-                        <div class="input-group">
-                            <input type="text" name="q" class="form-control" placeholder="Buscar en el blog..." value="{{ query }}">
-                            <button type="submit" class="btn btn-secondary">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="shape-bottom">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" preserveAspectRatio="none">
-            <path class="shape-fill" d="M0,6V0h1000v100L0,6z"></path>
-        </svg>
-    </div>
-</section>
-
-<!-- Resultados de búsqueda -->
-<section class="py-5">
+{% block breadcrumb %}
+<section class="breadcrumb-section">
     <div class="container">
-        <div class="row">
-            <!-- Main Content -->
-            <div class="col-lg-8">
-                {% if posts %}
-                <div class="search-results-header mb-4" data-aos="fade-up">
-                    <div class="alert alert-success">
-                        <i class="fas fa-check-circle me-2"></i>
-                        Se encontraron <strong>{{ posts|length }}</strong> resultados para tu búsqueda.
-                    </div>
-                </div>
-                
-                <!-- Resultados -->
-                <div class="row row-cols-1 row-cols-md-2 g-4">
-                    {% for post in posts %}
-                    <div class="col" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'1' }}00">
-                        <article class="card post-card h-100">
-                            <div class="post-card-img-container">
-                                {% if post.imagen_destacada %}
-                                <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}" class="card-img-top post-card-img">
-                                {% else %}
-                                <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}" class="card-img-top post-card-img">
-                                {% endif %}
-                                <div class="post-date">
-                                    <span class="day">{{ post.fecha_publicacion|date:"d" }}</span>
-                                    <span class="month">{{ post.fecha_publicacion|date:"M" }}</span>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-2">
-                                    {% for categoria in post.categorias.all %}
-                                    <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-badge text-decoration-none">{{ categoria.nombre }}</a>
-                                    {% endfor %}
-                                </div>
-                                <h3 class="card-title post-card-title">{{ post.titulo }}</h3>
-                                <div class="card-text post-excerpt">
-                                    {{ post.contenido|striptags|truncatewords:15 }}
-                                </div>
-                            </div>
-                            <div class="card-footer bg-white border-0">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="post-card-meta">
-                                        <small><i class="far fa-user me-1"></i> {{ post.autor.get_full_name|default:post.autor.username }}</small>
-                                    </div>
-                                    <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Leer más</a>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <!-- Paginación -->
-                {% if is_paginated %}
-                <nav aria-label="Paginación" class="mt-5">
-                    <ul class="pagination justify-content-center">
-                        {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page=1" aria-label="Primera">
-                                <span aria-hidden="true">&laquo;&laquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}" aria-label="Anterior">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        {% endif %}
-                        
-                        <li class="page-item active">
-                            <span class="page-link">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-                        </li>
-                        
-                        {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}" aria-label="Siguiente">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="?q={{ query }}&page={{ page_obj.paginator.num_pages }}" aria-label="Última">
-                                <span aria-hidden="true">&raquo;&raquo;</span>
-                            </a>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
-                
-                {% else %}
-                <div class="search-results-header mb-5" data-aos="fade-up">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
-                        No se encontraron resultados para "<strong>{{ query }}</strong>".
-                    </div>
-                </div>
-                
-                <div class="search-tips mb-5" data-aos="fade-up">
-                    <h4 class="mb-3">Sugerencias para la búsqueda:</h4>
-                    <ul class="search-tips-list">
-                        <li>Verifica la ortografía de las palabras clave</li>
-                        <li>Intenta con palabras clave diferentes o más generales</li>
-                        <li>Utiliza menos palabras o términos más específicos</li>
-                        <li>Prueba con categorías específicas desde la barra lateral</li>
-                    </ul>
-                </div>
-                
-                <div class="random-posts mt-5" data-aos="fade-up">
-                    <h4 class="mb-4">Artículos que podrían interesarte</h4>
-                    <div class="row row-cols-1 row-cols-md-2 g-4">
-                        {% for post in posts_populares|slice:":4" %}
-                        <div class="col">
-                            <article class="card post-card h-100">
-                                <div class="post-card-img-container">
-                                    {% if post.imagen_destacada %}
-                                    <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}" class="card-img-top post-card-img">
-                                    {% else %}
-                                    <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}" class="card-img-top post-card-img">
-                                    {% endif %}
-                                </div>
-                                <div class="card-body">
-                                    <h3 class="card-title post-card-title">{{ post.titulo }}</h3>
-                                    <div class="card-text post-excerpt">
-                                        {{ post.contenido|striptags|truncatewords:15 }}
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-white border-0">
-                                    <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary">Leer más</a>
-                                </div>
-                            </article>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Volver al blog -->
-                <div class="back-to-blog text-center mt-5" data-aos="fade-up">
-                    <a href="{% url 'blog:post_list' %}" class="btn btn-outline-primary">
-                        <i class="fas fa-arrow-left me-2"></i> Volver al blog
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Sidebar -->
-            <div class="col-lg-4">
-                <div class="blog-sidebar">
-                    <!-- Categorías -->
-                    <div class="sidebar-widget categories-widget" data-aos="fade-up">
-                        <div class="widget-title-wrapper">
-                            <h4 class="widget-title">CATEGORÍAS</h4>
-                        </div>
-                        <ul class="categories-list">
-                            {% for categoria in categorias %}
-                            <li class="category-item">
-                                <a href="{% url 'blog:categoria_posts' categoria.slug %}" class="category-link">
-                                    <span class="category-name">{{ categoria.nombre }}</span>
-                                    <span class="category-count">{{ categoria.posts.count }}</span>
-                                </a>
-                            </li>
-                            {% empty %}
-                            <li class="category-item">
-                                <span class="text-muted">No hay categorías disponibles</span>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    
-                    <!-- Posts populares -->
-                    <div class="sidebar-widget popular-posts-widget" data-aos="fade-up">
-                        <div class="widget-title-wrapper">
-                            <h4 class="widget-title">POSTS POPULARES</h4>
-                        </div>
-                        <div class="popular-posts">
-                            {% for post in posts_populares %}
-                            <div class="popular-post">
-                                <div class="popular-post-img">
-                                    {% if post.imagen_destacada %}
-                                    <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}">
-                                    {% else %}
-                                    <img src="/static/img/placeholder.jpg" alt="{{ post.titulo }}">
-                                    {% endif %}
-                                </div>
-                                <div class="popular-post-content">
-                                    <h5 class="popular-post-title">
-                                        <a href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a>
-                                    </h5>
-                                    <div class="popular-post-meta">
-                                        <span class="post-date">
-                                            <i class="far fa-calendar-alt me-1"></i> {{ post.fecha_publicacion|date:"d M Y" }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    
-                    <!-- Banner de ayuda -->
-                    <div class="sidebar-widget help-widget" data-aos="fade-up">
-                        <div class="widget-title-wrapper">
-                            <h4 class="widget-title">¿NECESITAS AYUDA?</h4>
-                        </div>
-                        <div class="help-content">
-                            <div class="text-center mb-4">
-                                <i class="fas fa-headset help-icon"></i>
-                            </div>
-                            <p class="text-center">¿No encuentras lo que buscas? Contáctanos y te ayudaremos a planificar tu visita a Garzón.</p>
-                            <a href="{% url 'contacto:contacto' %}" class="btn btn-primary d-block">Contáctanos</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Blog</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Resultados de búsqueda</li>
+            </ol>
+        </nav>
     </div>
 </section>
 {% endblock %}
 
-{% block extra_css %}
-<style>
-    /* Estilos específicos para búsqueda */
-    .search-hero {
-        position: relative;
-        background: url('/static/img/garzon-search-bg.jpg') no-repeat center center;
-        background-size: cover;
-        padding: 7rem 0 5rem;
-        color: #fff;
-        z-index: 1;
-    }
-    
-    .search-hero .overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 104, 56, 0.85); /* Verde Huila con opacidad */
-        z-index: -1;
-    }
-    
-    .z-index-1 {
-        z-index: 1;
-    }
-    
-    .shape-bottom {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        overflow: hidden;
-        line-height: 0;
-    }
-    
-    .shape-bottom svg {
-        position: relative;
-        display: block;
-        width: calc(100% + 1.3px);
-        height: 70px;
-    }
-    
-    .shape-bottom .shape-fill {
-        fill: #FFFFFF;
-    }
-    
-    .search-box {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .search-tips-list {
-        padding-left: 1.5rem;
-    }
-    
-    .search-tips-list li {
-        margin-bottom: 0.5rem;
-    }
-    
-    .post-card-img-container {
-        position: relative;
-    }
-    
-    .post-date {
-        position: absolute;
-        top: 15px;
-        left: 15px;
-        background-color: var(--color-secondary);
-        color: var(--color-gray-900);
-        text-align: center;
-        padding: 8px 12px;
-        border-radius: var(--border-radius);
-        font-family: var(--font-primary);
-        box-shadow: var(--shadow);
-        z-index: 1;
-    }
-    
-    .post-date .day {
-        display: block;
-        font-size: 1.25rem;
-        font-weight: 700;
-        line-height: 1;
-    }
-    
-    .post-date .month {
-        display: block;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-    
-    .post-card-img {
-        height: 220px;
-        object-fit: cover;
-    }
-    
-    .post-card-title {
-        font-size: 1.25rem;
-        font-weight: 600;
-        line-height: 1.3;
-    }
-    
-    .post-excerpt {
-        color: var(--color-gray-700);
-        margin-bottom: 1rem;
-        font-size: 0.95rem;
-    }
-    
-    /* Sidebar Widgets - mismo estilo que en las otras plantillas */
-    .blog-sidebar {
-        position: sticky;
-        top: 30px;
-    }
-    
-    .sidebar-widget {
-        background-color: #fff;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        padding: 25px;
-        margin-bottom: 30px;
-    }
-    
-    .widget-title-wrapper {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    
-    .widget-title {
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: var(--color-primary);
-        margin-bottom: 0;
-        padding-bottom: 10px;
-        border-bottom: 2px solid var(--color-gray-200);
-        text-transform: uppercase;
-    }
-    
-    .widget-title:after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        width: 50px;
-        height: 2px;
-        background-color: var(--color-primary);
-    }
-    
-    .categories-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .category-item {
-        border-bottom: 1px solid var(--color-gray-200);
-    }
-    
-    .category-item:last-child {
-        border-bottom: none;
-    }
-    
-    .category-link {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        color: var(--color-gray-800);
-        transition: color var(--transition-fast);
-    }
-    
-    .category-link:hover {
-        color: var(--color-primary);
-    }
-    
-    .category-count {
-        background-color: var(--color-primary);
-        color: white;
-        font-size: 0.75rem;
-        padding: 3px 8px;
-        border-radius: 10px;
-    }
-    
-    .popular-post {
-        display: flex;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid var(--color-gray-200);
-    }
-    
-    .popular-post:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-    
-    .popular-post-img {
-        flex: 0 0 80px;
-        margin-right: 15px;
-    }
-    
-    .popular-post-img img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: var(--border-radius);
-    }
-    
-    .popular-post-title {
-        font-size: 1rem;
-        margin-bottom: 5px;
-        line-height: 1.3;
-    }
-    
-    .popular-post-title a {
-        color: var(--color-gray-900);
-        transition: color var(--transition-fast);
-    }
-    
-    .popular-post-title a:hover {
-        color: var(--color-primary);
-    }
-    
-    .popular-post-meta {
-        font-size: 0.8rem;
-        color: var(--color-gray-600);
-    }
-    
-    /* Help Widget */
-    .help-icon {
-        font-size: 3rem;
-        color: var(--color-primary);
-        margin-bottom: 1rem;
-    }
-    
-    /* Responsive Styles */
-    @media (max-width: 767.98px) {
-        .search-hero {
-            padding: 6rem 0 4rem;
-        }
-        
-        .post-card-img {
-            height: 180px;
-        }
-        
-        .sidebar-widget {
-            padding: 20px;
-        }
-    }
-</style>
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <!-- Blog Content -->
+            <div class="col-lg-8">
+                <div class="section-header">
+                    <h1 class="section-title">Resultados de búsqueda</h1>
+                    <div class="search-query">
+                        Mostrando resultados para: <span>"{{ query }}"</span>
+                    </div>
+                </div>
+
+                {% if posts %}
+                    <div class="search-results">
+                        {% for post in posts %}
+                            <div class="search-result-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="search-result-img">
+                                            {% if post.imagen_destacada %}
+                                                <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}" class="img-fluid rounded">
+                                            {% else %}
+                                                <img src="{% static 'img/placeholder.jpg' %}" alt="{{ post.titulo }}" class="img-fluid rounded">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="search-result-content">
+                                            <h3 class="search-result-title">
+                                                <a href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a>
+                                            </h3>
+                                            <div class="search-result-meta">
+                                                <span>
+                                                    <i class="ph-user"></i> {{ post.autor.get_full_name|default:post.autor.username }}
+                                                </span>
+                                                <span>
+                                                    <i class="ph-calendar"></i> {{ post.fecha_publicacion|date:"d M, Y" }}
+                                                </span>
+                                                {% if post.categorias.all %}
+                                                <span>
+                                                    <i class="ph-tag"></i> 
+                                                    {% for categoria in post.categorias.all|slice:":1" %}
+                                                        <a href="{% url 'blog:categoria_posts' categoria.slug %}">{{ categoria.nombre }}</a>
+                                                    {% endfor %}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="search-result-excerpt">
+                                                {% with content=post.contenido|striptags %}
+                                                    {% if query in content %}
+                                                        {% with pos=content|lower|find:query|default:0 %}
+                                                            {% with start=pos|sub:40|default:0 %}
+                                                                {% with extract=content|slice:start|add:100 %}
+                                                                    {% if start > 0 %}...{% endif %}
+                                                                    {{ extract|highlight:query|safe }}
+                                                                    {% if extract|length < content|length %}...{% endif %}
+                                                                {% endwith %}
+                                                            {% endwith %}
+                                                        {% endwith %}
+                                                    {% else %}
+                                                        {{ content|truncatewords:25 }}
+                                                    {% endif %}
+                                                {% endwith %}
+                                            </div>
+                                            <a href="{% url 'blog:post_detail' post.slug %}" class="btn btn-sm btn-primary mt-3">Leer más</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if is_paginated %}
+                    <div class="pagination-container">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&page=1" aria-label="Primera">
+                                        <i class="ph-caret-double-left"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                                        <i class="ph-caret-left"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% for num in paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ num }}</span>
+                                    </li>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                                        <i class="ph-caret-right"></i>
+                                    </a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?q={{ query }}&page={{ paginator.num_pages }}" aria-label="Última">
+                                        <i class="ph-caret-double-right"></i>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="no-results">
+                        <div class="no-results-icon">
+                            <i class="ph-magnifying-glass"></i>
+                        </div>
+                        <h3 class="no-results-title">No se encontraron resultados para "{{ query }}"</h3>
+                        <p class="no-results-text">Lo sentimos, no hemos encontrado publicaciones que coincidan con tu búsqueda. Por favor, intenta con otros términos o explora nuestras categorías.</p>
+                        <a href="{% url 'blog:post_list' %}" class="btn btn-primary">Volver al blog</a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="blog-sidebar">
+                    <!-- Search Widget -->
+                    <div class="sidebar-widget">
+                        <h4 class="sidebar-title">Buscar</h4>
+                        <form action="{% url 'blog:post_search' %}" method="get" class="sidebar-search">
+                            <div class="input-group">
+                                <input type="text" name="q" class="form-control" placeholder="Buscar en el blog..." value="{{ query }}" required>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ph-magnifying-glass"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Categories Widget -->
+                    <div class="sidebar-widget">
+                        <h4 class="sidebar-title">Categorías</h4>
+                        <ul class="sidebar-categories">
+                            {% for categoria in categorias %}
+                                <li>
+                                    <a href="{% url 'blog:categoria_posts' categoria.slug %}">
+                                        {{ categoria.nombre }}
+                                        <span class="category-count">{{ categoria.posts.count }}</span>
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li>No hay categorías disponibles</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Recent Posts Widget -->
+                    <div class="sidebar-widget">
+                        <h4 class="sidebar-title">Publicaciones recientes</h4>
+                        {% for post in recent_posts|slice:":5" %}
+                            <div class="recent-post">
+                                <div class="recent-post-img">
+                                    {% if post.imagen_destacada %}
+                                        <img src="{{ post.imagen_destacada.url }}" alt="{{ post.titulo }}">
+                                    {% else %}
+                                        <img src="{% static 'img/placeholder.jpg' %}" alt="{{ post.titulo }}">
+                                    {% endif %}
+                                </div>
+                                <div class="recent-post-content">
+                                    <h6><a href="{% url 'blog:post_detail' post.slug %}">{{ post.titulo }}</a></h6>
+                                    <div class="recent-post-date">
+                                        <i class="ph-calendar"></i> {{ post.fecha_publicacion|date:"d M, Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <p>No hay publicaciones recientes</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Search Tips -->
+                    <div class="sidebar-widget">
+                        <h4 class="sidebar-title">Consejos de búsqueda</h4>
+                        <ul class="search-tips">
+                            <li>Intenta usar palabras clave específicas</li>
+                            <li>Busca términos relacionados con turismo, café, o lugares en Garzón</li>
+                            <li>Explora nuestras categorías para descubrir contenido relacionado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

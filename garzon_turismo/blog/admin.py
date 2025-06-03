@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import CategoriaBlog, Post, ComentarioBlog
+from .models import CategoriaBlog, Post 
+#ComentarioBlog
 
 @admin.register(CategoriaBlog)
 class CategoriaBlogAdmin(admin.ModelAdmin):

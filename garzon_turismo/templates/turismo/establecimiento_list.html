@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Establecimientos en Garzón - Alma del Huila{% endblock %}
+{% block meta_description %}Encuentra los mejores hoteles, restaurantes, cafés y bares en Garzón, Huila. Alojamiento y gastronomía para disfrutar tu visita.{% endblock %}
+
+{% block body_class %}establecimientos-page{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'turismo:lugar_list' %}">Turismo</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Establecimientos</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h1 class="section-title">Establecimientos</h1>
+            <p class="section-text">Descubre dónde alojarte, comer y disfrutar durante tu visita a Garzón. Hoteles, restaurantes, cafés y bares que harán de tu estancia una experiencia inolvidable.</p>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filter-section" data-aos="fade-up">
+            <form action="{% url 'turismo:establecimiento_list' %}" method="get" class="filter-form">
+                <div class="row">
+                    <div class="col-lg-3 col-md-4 mb-3">
+                        <label for="tipo" class="form-label">Tipo</label>
+                        {{ filtro_form.tipo }}
+                    </div>
+                    <div class="col-lg-3 col-md-4 mb-3">
+                        <label for="rango_precios" class="form-label">Rango de precios</label>
+                        {{ filtro_form.rango_precios }}
+                    </div>
+                    <div class="col-lg-4 col-md-4 mb-3">
+                        <label for="servicios" class="form-label">Servicios (separados por coma)</label>
+                        {{ filtro_form.servicios }}
+                    </div>
+                    <div class="col-lg-2 col-md-12 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="ph-funnel"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tipos de establecimientos -->
+        <div class="establishment-types" data-aos="fade-up">
+            <div class="row">
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="{% url 'turismo:establecimientos_tipo' 'hotel' %}" class="establishment-type-card {% if tipo_actual == 'hotel' %}active{% endif %}">
+                        <div class="establishment-type-icon">
+                            <i class="ph-bed"></i>
+                        </div>
+                        <h3 class="establishment-type-title">Hoteles</h3>
+                        <span class="establishment-type-count">{{ tipos.hotel|default:"0" }}</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="{% url 'turismo:establecimientos_tipo' 'restaurante' %}" class="establishment-type-card {% if tipo_actual == 'restaurante' %}active{% endif %}">
+                        <div class="establishment-type-icon">
+                            <i class="ph-fork-knife"></i>
+                        </div>
+                        <h3 class="establishment-type-title">Restaurantes</h3>
+                        <span class="establishment-type-count">{{ tipos.restaurante|default:"0" }}</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="{% url 'turismo:establecimientos_tipo' 'cafe' %}" class="establishment-type-card {% if tipo_actual == 'cafe' %}active{% endif %}">
+                        <div class="establishment-type-icon">
+                            <i class="ph-coffee"></i>
+                        </div>
+                        <h3 class="establishment-type-title">Cafés</h3>
+                        <span class="establishment-type-count">{{ tipos.cafe|default:"0" }}</span>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <a href="{% url 'turismo:establecimientos_tipo' 'bar' %}" class="establishment-type-card {% if tipo_actual == 'bar' %}active{% endif %}">
+                        <div class="establishment-type-icon">
+                            <i class="ph-beer-bottle"></i>
+                        </div>
+                        <h3 class="establishment-type-title">Bares</h3>
+                        <span class="establishment-type-count">{{ tipos.bar|default:"0" }}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if tipo_actual %}
+        <div class="type-description" data-aos="fade-up">
+            <h2>{{ tipo_actual_nombre }}</h2>
+            <p>Encuentra los mejores {{ tipo_actual_nombre|lower }} en Garzón.</p>
+        </div>
+        {% endif %}
+
+        <!-- Establecimientos -->
+        <div class="row">
+            {% for establecimiento in establecimientos %}
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <div class="establishment-card">
+                    <div class="establishment-img">
+                        {% if establecimiento.imagen %}
+                       <img src="{{ establecimiento.imagen.url }}" alt="{{ establecimiento.nombre }}">
+                        {% else %}
+                        <img src="{% static 'img/placeholder.jpg' %}" alt="{{ establecimiento.nombre }}">
+                        {% endif %}
+                        <span class="establishment-type">{{ establecimiento.get_tipo_display }}</span>
+                        <span class="establishment-price">{{ establecimiento.rango_precios }}</span>
+                    </div>
+                    <div class="establishment-content">
+                        <h3 class="establishment-title">
+                            <a href="{% url 'turismo:establecimiento_detail' establecimiento.slug %}">{{ establecimiento.nombre }}</a>
+                        </h3>
+                        <div class="establishment-rating">
+                            {% with rating=establecimiento.get_valoracion_promedio %}
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= rating %}
+                                <i class="ph-star-fill"></i>
+                                {% elif forloop.counter <= rating|add:0.5 %}
+                                <i class="ph-star-half-fill"></i>
+                                {% else %}
+                                <i class="ph-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="rating-text">{{ rating|floatformat:1 }} ({{ establecimiento.valoraciones.count }})</span>
+                            {% endwith %}
+                        </div>
+                        <div class="establishment-meta">
+                            {% if establecimiento.direccion %}
+                            <div class="establishment-meta-item">
+                                <i class="ph-map-pin"></i> {{ establecimiento.direccion|truncatechars:30 }}
+                            </div>
+                            {% endif %}
+                            {% if establecimiento.telefono %}
+                            <div class="establishment-meta-item">
+                                <i class="ph-phone"></i> {{ establecimiento.telefono }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% if establecimiento.get_servicios_list %}
+                        <div class="establishment-services">
+                            {% for servicio in establecimiento.get_servicios_list|slice:":3" %}
+                            <span class="service-tag">{{ servicio }}</span>
+                            {% endfor %}
+                            {% if establecimiento.get_servicios_list|length > 3 %}
+                            <span class="service-tag more">+{{ establecimiento.get_servicios_list|length|add:"-3" }}</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'turismo:establecimiento_detail' establecimiento.slug %}" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="ph-info"></i> No se encontraron establecimientos con los filtros seleccionados. Intenta con otros criterios de búsqueda.
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.rango_precios %}&rango_precios={{ request.GET.rango_precios }}{% endif %}{% if request.GET.servicios %}&servicios={{ request.GET.servicios }}{% endif %}" aria-label="Primera">
+                            <i class="ph-caret-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.rango_precios %}&rango_precios={{ request.GET.rango_precios }}{% endif %}{% if request.GET.servicios %}&servicios={{ request.GET.servicios }}{% endif %}" aria-label="Anterior">
+                            <i class="ph-caret-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.rango_precios %}&rango_precios={{ request.GET.rango_precios }}{% endif %}{% if request.GET.servicios %}&servicios={{ request.GET.servicios }}{% endif %}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.rango_precios %}&rango_precios={{ request.GET.rango_precios }}{% endif %}{% if request.GET.servicios %}&servicios={{ request.GET.servicios }}{% endif %}" aria-label="Siguiente">
+                            <i class="ph-caret-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ paginator.num_pages }}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.rango_precios %}&rango_precios={{ request.GET.rango_precios }}{% endif %}{% if request.GET.servicios %}&servicios={{ request.GET.servicios }}{% endif %}" aria-label="Última">
+                            <i class="ph-caret-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section section-light">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2 class="section-title">Ubica todos los establecimientos</h2>
+            <p class="section-text">Encuentra hoteles, restaurantes, cafés y bares en nuestro mapa interactivo</p>
+        </div>
+        <div class="map-container" data-aos="fade-up">
+            <a href="{% url 'turismo:mapa' %}" class="map-link">
+                <div class="map-preview">
+                    <img src="{% static 'img/mapa-preview.jpg' %}" alt="Mapa de Garzón" class="img-fluid">
+                    <div class="map-overlay">
+                        <div class="map-cta">
+                            <i class="ph-map-trifold"></i>
+                            <span>Ver mapa completo</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Eventos - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Descubre todos los eventos culturales, gastronómicos y turísticos que se realizan en Garzón, Huila. Agenda completa de actividades.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Eventos</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Header de Eventos -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-subtitle">Agenda Cultural</div>
+            <h1 class="section-title">Eventos en Garzón</h1>
+            <p class="section-text">Descubre la vibrante agenda cultural de Garzón con eventos, festivales, conciertos y actividades que celebran nuestra rica tradición e identidad.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Eventos Destacados -->
+{% if eventos_destacados %}
+<section class="section">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <h2 class="mb-4" data-aos="fade-up">Eventos Destacados</h2>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for evento in eventos_destacados %}
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
+                <div class="event-card featured">
+                    <div class="event-img">
+                        {% if evento.imagen %}
+                            <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ evento.titulo }}" class="img-fluid">
+                        {% endif %}
+                        
+                        <div class="event-date">
+                            <div class="event-date-day">{{ evento.fecha_inicio|date:"d" }}</div>
+                            <div class="event-date-month">{{ evento.fecha_inicio|date:"M" }}</div>
+                        </div>
+                        
+                        <div class="event-status">
+                            <span class="badge bg-warning">
+                                <i class="ph-star"></i> Destacado
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="event-content">
+                        <h5 class="event-title">
+                            <a href="{{ evento.get_absolute_url }}">{{ evento.titulo }}</a>
+                        </h5>
+                        
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="ph-clock"></i>
+                                {{ evento.fecha_inicio|date:"H:i" }}
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="ph-map-pin"></i>
+                                {{ evento.lugar|truncatechars:25 }}
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="ph-flag"></i>
+                                {{ evento.get_estado_display }}
+                            </div>
+                        </div>
+                        
+                        <p class="event-description">{{ evento.descripcion|truncatewords:20 }}</p>
+                        
+                        <div class="event-actions">
+                            <a href="{{ evento.get_absolute_url }}" class="btn btn-primary btn-sm">
+                                <i class="ph-arrow-right"></i> Ver Detalles
+                            </a>
+                            {% if not evento.ha_pasado %}
+                            <span class="event-countdown" data-date="{{ evento.fecha_inicio|date:'c' }}">
+                                {% if evento.get_dias_faltantes > 0 %}
+                                    Faltan {{ evento.get_dias_faltantes }} día{% if evento.get_dias_faltantes > 1 %}s{% endif %}
+                                {% else %}
+                                    ¡Hoy!
+                                {% endif %}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Filtros y Lista de Eventos -->
+<section class="section section-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3">
+                <!-- Sidebar de Filtros -->
+                <div class="filters-sidebar" data-aos="fade-right">
+                    <div class="sidebar-widget">
+                        <h5 class="widget-title">Filtrar Eventos</h5>
+                        
+                        <form method="get" action="{% url 'turismo:evento_list' %}" class="filter-form">
+                            <div class="form-group mb-3">
+                                <label for="{{ filtro_form.fecha_desde.id_for_label }}" class="form-label">Fecha Desde</label>
+                                {{ filtro_form.fecha_desde }}
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                <label for="{{ filtro_form.fecha_hasta.id_for_label }}" class="form-label">Fecha Hasta</label>
+                                {{ filtro_form.fecha_hasta }}
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="ph-funnel"></i> Filtrar
+                                </button>
+                                <a href="{% url 'turismo:evento_list' %}" class="btn btn-outline-secondary w-100 mt-2">
+                                    <i class="ph-x"></i> Limpiar
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <!-- Widget de Información -->
+                    <div class="sidebar-widget">
+                        <h5 class="widget-title">¿Organizas un Evento?</h5>
+                        <p class="mb-3">Si tienes un evento cultural, gastronómico o turístico en Garzón, compártelo con nosotros.</p>
+                        <a href="{% url 'contacto:contacto' %}" class="btn btn-outline-primary w-100">
+                            <i class="ph-plus"></i> Contactar
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-9">
+                <!-- Resultados -->
+                <div class="events-results">
+                    <div class="results-header" data-aos="fade-left">
+                        <h3>
+                            {% if request.GET.fecha_desde or request.GET.fecha_hasta %}
+                                Eventos Filtrados
+                            {% else %}
+                                Todos los Eventos
+                            {% endif %}
+                        </h3>
+                        <div class="results-info">
+                            <span class="results-count">
+                                {{ page_obj.paginator.count }} evento{% if page_obj.paginator.count != 1 %}s{% endif %} encontrado{% if page_obj.paginator.count != 1 %}s{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Lista de Eventos -->
+                    {% if eventos %}
+                    <div class="events-grid">
+                        {% for evento in eventos %}
+                        <div class="event-item" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="event-item-img">
+                                        {% if evento.imagen %}
+                                            <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="img-fluid">
+                                        {% else %}
+                                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ evento.titulo }}" class="img-fluid">
+                                        {% endif %}
+                                        
+                                        <div class="event-date-overlay">
+                                            <div class="event-date-day">{{ evento.fecha_inicio|date:"d" }}</div>
+                                            <div class="event-date-month">{{ evento.fecha_inicio|date:"M" }}</div>
+                                        </div>
+                                        
+                                        {% if evento.destacado %}
+                                        <div class="event-badge">
+                                            <span class="badge bg-warning">
+                                                <i class="ph-star"></i> Destacado
+                                            </span>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-8">
+                                    <div class="event-item-content">
+                                        <div class="event-status-badge">
+                                            {% if evento.esta_activo %}
+                                                <span class="badge bg-success">En Curso</span>
+                                            {% elif evento.ha_pasado %}
+                                                <span class="badge bg-secondary">Finalizado</span>
+                                            {% else %}
+                                                <span class="badge bg-info">Próximamente</span>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <h4 class="event-item-title">
+                                            <a href="{{ evento.get_absolute_url }}">{{ evento.titulo }}</a>
+                                        </h4>
+                                        
+                                        <div class="event-item-meta">
+                                            <div class="meta-item">
+                                                <i class="ph-calendar"></i>
+                                                {{ evento.fecha_inicio|date:"j F Y" }}
+                                            </div>
+                                            <div class="meta-item">
+                                                <i class="ph-clock"></i>
+                                                {{ evento.fecha_inicio|date:"H:i" }}
+                                            </div>
+                                            <div class="meta-item">
+                                                <i class="ph-map-pin"></i>
+                                                {{ evento.lugar }}
+                                            </div>
+                                            {% if evento.organizador %}
+                                            <div class="meta-item">
+                                                <i class="ph-users"></i>
+                                                {{ evento.organizador }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <p class="event-item-description">{{ evento.descripcion|truncatewords:25 }}</p>
+                                        
+                                        <div class="event-item-actions">
+                                            <a href="{{ evento.get_absolute_url }}" class="btn btn-primary">
+                                                <i class="ph-arrow-right"></i> Ver Detalles
+                                            </a>
+                                            {% if not evento.ha_pasado and evento.get_dias_faltantes > 0 %}
+                                            <span class="event-countdown-inline">
+                                                Faltan {{ evento.get_dias_faltantes }} día{% if evento.get_dias_faltantes > 1 %}s{% endif %}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Paginación -->
+                    {% if is_paginated %}
+                    <div class="pagination-wrapper" data-aos="fade-up">
+                        <nav aria-label="Paginación de eventos">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page=1{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}">
+                                            <i class="ph-caret-double-left"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}">
+                                            <i class="ph-caret-left"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                        <li class="page-item active">
+                                            <span class="page-link">{{ num }}</span>
+                                        </li>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ num }}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}">{{ num }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                                
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}">
+                                            <i class="ph-caret-right"></i>
+                                        </a>
+                                    </li>
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.fecha_desde %}&fecha_desde={{ request.GET.fecha_desde }}{% endif %}{% if request.GET.fecha_hasta %}&fecha_hasta={{ request.GET.fecha_hasta }}{% endif %}">
+                                            <i class="ph-caret-double-right"></i>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                    {% endif %}
+                    
+                    {% else %}
+                    <!-- No hay eventos -->
+                    <div class="no-results" data-aos="fade-up">
+                        <div class="no-results-content text-center">
+                            <i class="ph-calendar-x no-results-icon"></i>
+                            <h4>No se encontraron eventos</h4>
+                            <p>
+                                {% if request.GET.fecha_desde or request.GET.fecha_hasta %}
+                                    No hay eventos que coincidan con los filtros seleccionados. Intenta ajustar las fechas.
+                                {% else %}
+                                    Por el momento no hay eventos programados. ¡Vuelve pronto para ver las novedades!
+                                {% endif %}
+                            </p>
+                            {% if request.GET.fecha_desde or request.GET.fecha_hasta %}
+                            <a href="{% url 'turismo:evento_list' %}" class="btn btn-primary">
+                                <i class="ph-arrow-counter-clockwise"></i> Ver Todos los Eventos
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

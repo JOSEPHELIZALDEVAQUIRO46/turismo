@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Términos y Condiciones - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Conoce los términos y condiciones de uso del sitio web de Alma del Huila. Información legal sobre el uso de nuestros servicios y contenidos.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Términos y Condiciones</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section legal-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="legal-content" data-aos="fade-up">
+                    <div class="legal-header">
+                        <h1 class="legal-title">Términos y Condiciones de Uso</h1>
+                        <p class="legal-subtitle">Última actualización: {{ "now"|date:"d F Y" }}</p>
+                        <div class="legal-intro">
+                            <p>Bienvenido a {{ config.nombre_sitio|default:"Alma del Huila" }}. Estos términos y condiciones describen las reglas y regulaciones para el uso de nuestro sitio web. Al acceder y utilizar este sitio web, aceptas estos términos en su totalidad.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="legal-sections">
+                        {% if terminos_texto %}
+                            <div class="legal-section-content">
+                                {{ terminos_texto|linebreaks }}
+                            </div>
+                        {% else %}
+                        <!-- Contenido por defecto si no hay texto personalizado -->
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="100">
+                            <h3>1. Aceptación de los Términos</h3>
+                            <div class="section-content">
+                                <p>Al acceder y utilizar este sitio web, usted acepta estar sujeto a estos términos y condiciones de uso y acepta que es responsable del cumplimiento de todas las leyes locales aplicables. Si no está de acuerdo con alguno de estos términos, se le prohíbe acceder o utilizar este sitio.</p>
+                                <div class="highlight-box">
+                                    <i class="ph-warning"></i>
+                                    <p><strong>Importante:</strong> El uso continuado del sitio web constituye la aceptación de estos términos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="200">
+                            <h3>2. Uso del Sitio Web</h3>
+                            <div class="section-content">
+                                <h4>Uso Permitido</h4>
+                                <p>Este sitio web está destinado para:</p>
+                                <ul>
+                                    <li>Obtener información turística sobre Garzón, Huila</li>
+                                    <li>Consultar lugares de interés, eventos y servicios</li>
+                                    <li>Contactar con proveedores de servicios turísticos</li>
+                                    <li>Compartir experiencias y opiniones constructivas</li>
+                                </ul>
+                                
+                                <h4>Uso Prohibido</h4>
+                                <p>Está prohibido utilizar este sitio para:</p>
+                                <ul>
+                                    <li>Actividades ilegales o fraudulentas</li>
+                                    <li>Distribución de contenido ofensivo, difamatorio o discriminatorio</li>
+                                    <li>Ataques informáticos o intentos de comprometer la seguridad</li>
+                                    <li>Spam o distribución masiva de contenido no solicitado</li>
+                                    <li>Violación de derechos de propiedad intelectual</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="300">
+                            <h3>3. Contenido del Usuario</h3>
+                            <div class="section-content">
+                                <p>Al enviar contenido a nuestro sitio web (comentarios, valoraciones, fotos, etc.), usted garantiza que:</p>
+                                <ul>
+                                    <li>Es el propietario del contenido o tiene autorización para usarlo</li>
+                                    <li>El contenido no viola ningún derecho de terceros</li>
+                                    <li>El contenido es veraz y no engañoso</li>
+                                    <li>El contenido no contiene material ofensivo o inapropiado</li>
+                                </ul>
+                                
+                                <div class="highlight-box">
+                                    <i class="ph-info"></i>
+                                    <p><strong>Moderación:</strong> Nos reservamos el derecho de moderar, editar o eliminar cualquier contenido que no cumpla con estos términos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="400">
+                            <h3>4. Propiedad Intelectual</h3>
+                            <div class="section-content">
+                                <p>Todo el contenido de este sitio web, incluyendo pero no limitado a:</p>
+                                <ul>
+                                    <li>Textos, imágenes, videos y audio</li>
+                                    <li>Diseño gráfico y layout</li>
+                                    <li>Logotipos y marcas comerciales</li>
+                                    <li>Software y código fuente</li>
+                                </ul>
+                                <p>Está protegido por las leyes de derechos de autor y propiedad intelectual de Colombia e internacionales.</p>
+                                
+                                <h4>Uso Autorizado</h4>
+                                <p>Se permite el uso personal y no comercial del contenido para fines informativos y turísticos, citando siempre la fuente.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="500">
+                            <h3>5. Información de Terceros</h3>
+                            <div class="section-content">
+                                <p>Nuestro sitio web puede contener información sobre establecimientos, servicios y actividades proporcionada por terceros. En este sentido:</p>
+                                <ul>
+                                    <li>No garantizamos la exactitud, actualidad o completitud de dicha información</li>
+                                    <li>No somos responsables de las políticas o prácticas de terceros</li>
+                                    <li>Las transacciones se realizan directamente con los proveedores</li>
+                                    <li>Recomendamos verificar la información antes de tomar decisiones</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="600">
+                            <h3>6. Limitación de Responsabilidad</h3>
+                            <div class="section-content">
+                                <p>{{ config.nombre_sitio|default:"Alma del Huila" }} no será responsable por:</p>
+                                <div class="liability-grid">
+                                    <div class="liability-item">
+                                        <i class="ph-x-circle"></i>
+                                        <div>
+                                            <h5>Daños Directos</h5>
+                                            <p>Pérdidas económicas derivadas del uso del sitio</p>
+                                        </div>
+                                    </div>
+                                    <div class="liability-item">
+                                        <i class="ph-x-circle"></i>
+                                        <div>
+                                            <h5>Daños Indirectos</h5>
+                                            <p>Lucro cesante, daño emergente o perjuicios</p>
+                                        </div>
+                                    </div>
+                                    <div class="liability-item">
+                                        <i class="ph-x-circle"></i>
+                                        <div>
+                                            <h5>Interrupciones</h5>
+                                            <p>Fallos técnicos o indisponibilidad del servicio</p>
+                                        </div>
+                                    </div>
+                                    <div class="liability-item">
+                                        <i class="ph-x-circle"></i>
+                                        <div>
+                                            <h5>Terceros</h5>
+                                            <p>Acciones u omisiones de proveedores externos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="700">
+                            <h3>7. Disponibilidad del Servicio</h3>
+                            <div class="section-content">
+                                <p>Hacemos nuestro mejor esfuerzo para mantener el sitio web disponible 24/7, sin embargo:</p>
+                                <ul>
+                                    <li>Pueden ocurrir interrupciones por mantenimiento programado</li>
+                                    <li>Factores técnicos externos pueden afectar la disponibilidad</li>
+                                    <li>Nos reservamos el derecho de suspender el servicio temporalmente</li>
+                                    <li>No garantizamos un tiempo de actividad específico</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="800">
+                            <h3>8. Modificaciones</h3>
+                            <div class="section-content">
+                                <p>Nos reservamos el derecho de:</p>
+                                <ul>
+                                    <li>Modificar estos términos y condiciones en cualquier momento</li>
+                                    <li>Actualizar o cambiar el contenido del sitio web</li>
+                                    <li>Suspender o discontinuar cualquier funcionalidad</li>
+                                    <li>Cambiar la estructura o diseño del sitio</li>
+                                </ul>
+                                <p>Los cambios importantes serán notificados a través del sitio web.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="900">
+                            <h3>9. Ley Aplicable y Jurisdicción</h3>
+                            <div class="section-content">
+                                <p>Estos términos y condiciones se rigen por las leyes de la República de Colombia. Cualquier disputa relacionada con el uso de este sitio web será sometida a la jurisdicción de los tribunales competentes de Garzón, Huila, Colombia.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="1000">
+                            <h3>10. Contacto</h3>
+                            <div class="section-content">
+                                <p>Si tienes preguntas sobre estos términos y condiciones, puedes contactarnos:</p>
+                                <div class="contact-info">
+                                    {% if config.email_contacto %}
+                                    <div class="contact-item">
+                                        <i class="ph-envelope"></i>
+                                        <div>
+                                            <strong>Email:</strong>
+                                            <a href="mailto:{{ config.email_contacto }}">{{ config.email_contacto }}</a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if config.telefono_contacto %}
+                                    <div class="contact-item">
+                                        <i class="ph-phone"></i>
+                                        <div>
+                                            <strong>Teléfono:</strong>
+                                            <a href="tel:{{ config.telefono_contacto }}">{{ config.telefono_contacto }}</a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if config.direccion %}
+                                    <div class="contact-item">
+                                        <i class="ph-map-pin"></i>
+                                        <div>
+                                            <strong>Dirección:</strong>
+                                            {{ config.direccion }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="legal-footer" data-aos="fade-up">
+                        <div class="legal-actions">
+                            <a href="{% url 'core:home' %}" class="btn btn-primary">
+                                <i class="ph-house"></i> Volver al Inicio
+                            </a>
+                            <a href="{% url 'contacto:contacto' %}" class="btn btn-outline-primary">
+                                <i class="ph-envelope"></i> Contactar
+                            </a>
+                        </div>
+                        
+                        <div class="legal-note">
+                            <p><small>Estos términos y condiciones entran en vigor desde la fecha de su publicación y se actualizan periódicamente.</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ evento.titulo }} - Eventos - {{ block.super }}{% endblock %}
+
+{% block meta_description %}{{ evento.descripcion|truncatewords:30|striptags }}{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'turismo:evento_list' %}">Eventos</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ evento.titulo }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Hero del Evento -->
+<section class="section event-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if evento.imagen %}
+                <div class="event-hero-img mb-4" data-aos="fade-up">
+                    <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="img-fluid rounded">
+                </div>
+                {% endif %}
+                
+                <div class="event-hero-content" data-aos="fade-up" data-aos-delay="100">
+                    <div class="event-meta mb-3">
+                        <span class="badge bg-primary me-2">
+                            <i class="ph-calendar"></i> 
+                            {{ evento.fecha_inicio|date:"d M Y" }}
+                        </span>
+                        <span class="badge bg-secondary me-2">
+                            <i class="ph-clock"></i> 
+                            {{ evento.fecha_inicio|date:"H:i" }}
+                        </span>
+                        <span class="badge bg-info">
+                            <i class="ph-flag"></i>
+                            {{ evento.get_estado_display }}
+                        </span>
+                    </div>
+                    
+                    <h1 class="event-title mb-3">{{ evento.titulo }}</h1>
+                    
+                    <div class="event-info-grid">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-calendar-plus"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Fecha de Inicio</h6>
+                                        <p>{{ evento.fecha_inicio|date:"l, j F Y - H:i" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-calendar-x"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Fecha de Fin</h6>
+                                        <p>{{ evento.fecha_fin|date:"l, j F Y - H:i" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-map-pin"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Lugar</h6>
+                                        <p>{{ evento.lugar }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-timer"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Duración</h6>
+                                        <p>{{ evento.get_duracion_dias }} día{% if evento.get_duracion_dias > 1 %}s{% endif %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            {% if evento.organizador %}
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-users"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Organizador</h6>
+                                        <p>{{ evento.organizador }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if not evento.ha_pasado and evento.get_dias_faltantes > 0 %}
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="ph-hourglass"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Faltan</h6>
+                                        <p>{{ evento.get_dias_faltantes }} día{% if evento.get_dias_faltantes > 1 %}s{% endif %}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="event-sidebar">
+                    <!-- Estado del Evento -->
+                    <div class="sidebar-widget event-status-widget" data-aos="fade-left">
+                        <div class="event-status-content">
+                            {% if evento.esta_activo %}
+                                <div class="status-badge status-active">
+                                    <i class="ph-broadcast"></i>
+                                    <span>En Curso</span>
+                                </div>
+                                <p class="status-text">Este evento está sucediendo ahora</p>
+                            {% elif evento.ha_pasado %}
+                                <div class="status-badge status-finished">
+                                    <i class="ph-check-circle"></i>
+                                    <span>Finalizado</span>
+                                </div>
+                                <p class="status-text">Este evento ya ha terminado</p>
+                            {% else %}
+                                <div class="status-badge status-upcoming">
+                                    <i class="ph-clock"></i>
+                                    <span>Próximamente</span>
+                                </div>
+                                <p class="status-text">
+                                    {% if evento.get_dias_faltantes > 0 %}
+                                        Faltan {{ evento.get_dias_faltantes }} día{% if evento.get_dias_faltantes > 1 %}s{% endif %}
+                                    {% else %}
+                                        Comienza hoy
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Información de Contacto -->
+                    {% if evento.contacto %}
+                    <div class="sidebar-widget contact-widget" data-aos="fade-left" data-aos-delay="100">
+                        <h5 class="widget-title">Información de Contacto</h5>
+                        <div class="contact-content">
+                            {{ evento.contacto|linebreaks }}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Compartir -->
+                    <div class="sidebar-widget share-widget" data-aos="fade-left" data-aos-delay="200">
+                        <h5 class="widget-title">Compartir Evento</h5>
+                        <div class="share-buttons">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn facebook">
+                                <i class="ph-facebook-logo"></i>
+                                Facebook
+                            </a>
+                            <a href="https://twitter.com/intent/tweet?text={{ evento.titulo }}&url={{ request.build_absolute_uri }}" target="_blank" class="share-btn twitter">
+                                <i class="ph-twitter-logo"></i>
+                                Twitter
+                            </a>
+                            <a href="https://wa.me/?text={{ evento.titulo }} {{ request.build_absolute_uri }}" target="_blank" class="share-btn whatsapp">
+                                <i class="ph-whatsapp-logo"></i>
+                                WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Descripción del Evento -->
+<section class="section event-content">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="content-section" data-aos="fade-up">
+                    <h3>Acerca del Evento</h3>
+                    <div class="event-description">
+                        {{ evento.descripcion|linebreaks }}
+                    </div>
+                </div>
+                
+                {% if evento.programa %}
+                <div class="content-section" data-aos="fade-up" data-aos-delay="100">
+                    <h3>Programa</h3>
+                    <div class="event-program">
+                        {{ evento.programa|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Eventos Relacionados -->
+{% if eventos_relacionados %}
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Próximos Eventos</h2>
+            <p class="section-text">Descubre otros eventos que podrían interesarte</p>
+        </div>
+        
+        <div class="row">
+            {% for evento_rel in eventos_relacionados %}
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
+                <div class="event-card">
+                    <div class="event-img">
+                        {% if evento_rel.imagen %}
+                            <img src="{{ evento_rel.imagen.url }}" alt="{{ evento_rel.titulo }}" class="img-fluid">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ evento_rel.titulo }}" class="img-fluid">
+                        {% endif %}
+                        
+                        <div class="event-date">
+                            <div class="event-date-day">{{ evento_rel.fecha_inicio|date:"d" }}</div>
+                            <div class="event-date-month">{{ evento_rel.fecha_inicio|date:"M" }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="event-content">
+                        <h5 class="event-title">
+                            <a href="{{ evento_rel.get_absolute_url }}">{{ evento_rel.titulo }}</a>
+                        </h5>
+                        
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="ph-clock"></i>
+                                {{ evento_rel.fecha_inicio|date:"H:i" }}
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="ph-map-pin"></i>
+                                {{ evento_rel.lugar|truncatechars:20 }}
+                            </div>
+                        </div>
+                        
+                        <p class="event-description">{{ evento_rel.descripcion|truncatewords:15 }}</p>
+                        
+                        <a href="{{ evento_rel.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
+                            <i class="ph-arrow-right"></i> Ver Detalles
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}

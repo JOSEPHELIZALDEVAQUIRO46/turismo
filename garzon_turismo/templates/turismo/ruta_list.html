@@ -1,0 +1,476 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Rutas Turísticas - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Explora las mejores rutas turísticas de Garzón, Huila. Descubre recorridos únicos, senderos naturales y experiencias inolvidables en nuestra tierra cafetera.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Rutas Turísticas</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Header de Rutas -->
+<section class="section section-light py-5">
+    <div class="container">
+        <div class="section-header text-center" data-aos="fade-up">
+                                <div class="section-subtitle fw-semibold mb-2" style="color: #5DAD47;">Aventura y Descubrimiento</div>
+            <h1 class="section-title display-4 fw-bold mb-4">Rutas Turísticas de Garzón</h1>
+            <p class="section-text lead text-muted mx-auto" style="max-width: 700px;">Embárcate en increíbles aventuras a través de nuestras rutas cuidadosamente diseñadas. Desde caminatas familiares hasta desafíos para expertos, encuentra la ruta perfecta para tu próxima aventura.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Filtros de Rutas -->
+<section class="section py-4 bg-light">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="route-filters" data-aos="fade-up">
+                    <div class="filter-header text-center mb-4">
+                        <h4 class="mb-2">Filtra por Dificultad</h4>
+                        <p class="text-muted mb-0">Encuentra la ruta perfecta según tu nivel de experiencia</p>
+                    </div>
+                    
+                    <div class="filter-buttons d-flex flex-wrap justify-content-center gap-2">
+                        <button class="btn active filter-btn" data-filter="*" style="border-color: #5DAD47; color: #5DAD47; background-color: #5DAD47; color: white;">
+                            <i class="ph-list me-2"></i>
+                            <span>Todas las Rutas</span>
+                        </button>
+                        {% for key, value in dificultades.items %}
+                        <button class="btn filter-btn" data-filter=".dificultad-{{ key }}" style="border-color: #5DAD47; color: #5DAD47;">
+                            <i class="ph-{% if key == 'facil' %}smiley{% elif key == 'media' %}warning{% else %}fire{% endif %} me-2"></i>
+                            <span>{{ value }}</span>
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Lista de Rutas -->
+<section class="section py-5">
+    <div class="container">
+        <div class="row g-4" id="routesGrid">
+            {% for ruta in rutas %}
+            <div class="col-lg-6 col-xl-4 route-item dificultad-{{ ruta.dificultad }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
+                <div class="card route-card h-100 shadow-sm border-0">
+                    <!-- Imagen de la ruta con altura fija -->
+                    <div class="route-img position-relative" style="height: 220px; overflow: hidden;">
+                        {% if ruta.imagen_principal %}
+                            <img src="{{ ruta.imagen_principal.url }}" alt="{{ ruta.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
+                        {% else %}
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ ruta.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
+                        {% endif %}
+                        
+                        <!-- Badge de dificultad -->
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-{{ ruta.get_color_dificultad }} px-3 py-2 rounded-pill">
+                                {{ ruta.get_dificultad_display }}
+                            </span>
+                        </div>
+                        
+                        <!-- Overlay con estadísticas -->
+                        <div class="route-overlay position-absolute bottom-0 start-0 end-0 bg-gradient" style="background: linear-gradient(transparent, rgba(0,0,0,0.7)); padding: 20px 15px 15px;">
+                            <div class="route-stats d-flex justify-content-between text-white small">
+                                <div class="stat-item text-center">
+                                    <i class="ph-clock d-block mb-1"></i>
+                                    <span>{{ ruta.duracion_estimada }}</span>
+                                </div>
+                                <div class="stat-item text-center">
+                                    <i class="ph-path d-block mb-1"></i>
+                                    <span>{{ ruta.distancia }} km</span>
+                                </div>
+                                <div class="stat-item text-center">
+                                    <i class="ph-map-trifold d-block mb-1"></i>
+                                    <span>{{ ruta.get_puntos_ordenados.count }} puntos</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenido de la tarjeta -->
+                    <div class="card-body d-flex flex-column">
+                        <!-- Header con título y dificultad -->
+                        <div class="route-header mb-3">
+                            <h5 class="card-title mb-2">
+                                <a href="{{ ruta.get_absolute_url }}" class="text-decoration-none text-dark fw-bold">{{ ruta.nombre }}</a>
+                            </h5>
+                            
+                            <div class="difficulty-stars">
+                                {% for i in "12345" %}
+                                    {% if ruta.dificultad == 'facil' and forloop.counter <= 2 %}
+                                        <i class="ph-star-fill text-{{ ruta.get_color_dificultad }}"></i>
+                                    {% elif ruta.dificultad == 'media' and forloop.counter <= 3 %}
+                                        <i class="ph-star-fill text-{{ ruta.get_color_dificultad }}"></i>
+                                    {% elif ruta.dificultad == 'dificil' and forloop.counter <= 5 %}
+                                        <i class="ph-star-fill text-{{ ruta.get_color_dificultad }}"></i>
+                                    {% else %}
+                                        <i class="ph-star text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Metadatos en grid compacto -->
+                        <div class="route-meta mb-3">
+                            <div class="row g-2 small text-muted">
+                                <div class="col-6">
+                                    <i class="ph-timer me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta.duracion_estimada }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <i class="ph-path me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta.distancia }} km</strong>
+                                </div>
+                                <div class="col-6">
+                                    <i class="ph-flag me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta.get_dificultad_display }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <i class="ph-map-trifold me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta.get_puntos_ordenados.count }} puntos</strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Descripción -->
+                        <div class="route-description mb-3 flex-grow-1">
+                            <p class="card-text text-muted mb-0">{{ ruta.descripcion|truncatewords:20 }}</p>
+                        </div>
+                        
+                        <!-- Recorrido (inicio y fin) -->
+                        {% if ruta.get_primer_punto and ruta.get_ultimo_punto %}
+                        <div class="route-journey mb-3 p-2 bg-light rounded">
+                            <div class="d-flex align-items-center justify-content-between small">
+                                <div class="journey-point text-success">
+                                    <i class="ph-play-circle me-1"></i>
+                                    <span>{{ ruta.get_primer_punto.get_nombre_display|truncatechars:15 }}</span>
+                                </div>
+                                <div class="journey-line mx-2">
+                                    <span class="text-muted">• • •</span>
+                                </div>
+                                <div class="journey-point text-danger">
+                                    <i class="ph-stop-circle me-1"></i>
+                                    <span>{{ ruta.get_ultimo_punto.get_nombre_display|truncatechars:15 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Acciones -->
+                        <div class="route-actions d-flex gap-2 mt-auto">
+                            <a href="{{ ruta.get_absolute_url }}" class="btn flex-grow-1" style="background-color: #5DAD47; color: white; border-color: #5DAD47;">
+                                <i class="ph-arrow-right me-1"></i> Explorar
+                            </a>
+                            <button class="btn btn-outline-secondary btn-favorite" title="Agregar a favoritos">
+                                <i class="ph-heart"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-share" title="Compartir">
+                                <i class="ph-share-network"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5" data-aos="fade-up">
+                    <div class="mb-4">
+                        <i class="ph-path display-1 text-muted"></i>
+                    </div>
+                    <h4 class="mb-3">No hay rutas disponibles</h4>
+                    <p class="text-muted mb-4">Por el momento no tenemos rutas turísticas registradas. ¡Vuelve pronto para descubrir nuevas aventuras!</p>
+                    <a href="{% url 'contacto:contacto' %}" class="btn" style="background-color: #5DAD47; color: white; border-color: #5DAD47;">
+                        <i class="ph-plus me-2"></i> Sugerir una Ruta
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Información Adicional -->
+<section class="section py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up">
+                <div class="card border-0 h-100 text-center p-4">
+                    <div class="card-body">
+                        <div class="info-icon mb-3">
+                            <i class="ph-shield-check display-4 text-success"></i>
+                        </div>
+                        <h5 class="card-title">Seguridad Primero</h5>
+                        <p class="card-text text-muted">Todas nuestras rutas han sido evaluadas por expertos locales para garantizar tu seguridad y una experiencia memorable.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="card border-0 h-100 text-center p-4">
+                    <div class="card-body">
+                        <div class="info-icon mb-3">
+                            <i class="ph-users-three display-4" style="color: #5DAD47;"></i>
+                        </div>
+                        <h5 class="card-title">Guías Locales</h5>
+                        <p class="card-text text-muted">Contamos con guías certificados que conocen cada rincón de Garzón y te brindarán una experiencia auténtica.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="card border-0 h-100 text-center p-4">
+                    <div class="card-body">
+                        <div class="info-icon mb-3">
+                            <i class="ph-leaf display-4 text-success"></i>
+                        </div>
+                        <h5 class="card-title">Turismo Sostenible</h5>
+                        <p class="card-text text-muted">Promovemos el respeto por el medio ambiente y las comunidades locales en cada una de nuestras rutas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Llamada a la Acción -->
+<section class="section text-white py-5" style="background-color: #5DAD47;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="cta-content" data-aos="fade-up">
+                    <h3 class="display-5 fw-bold mb-3">¿Listo para tu próxima aventura?</h3>
+                    <p class="lead mb-4 text-white fw-semibold">Planifica tu visita a Garzón y descubre paisajes únicos, cultura cafetera auténtica y experiencias que te conectarán con la naturaleza.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{% url 'contacto:contacto' %}" class="btn btn-light btn-lg">
+                            <i class="ph-chat-circle me-2"></i> Contáctanos
+                        </a>
+                        <a href="{% url 'turismo:mapa' %}" class="btn btn-outline-light btn-lg">
+                            <i class="ph-map-pin me-2"></i> Ver Mapa
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros de rutas
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const routeItems = document.querySelectorAll('.route-item');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remover clase active de todos los botones
+            filterBtns.forEach(b => {
+                b.classList.remove('active');
+                b.style.backgroundColor = 'transparent';
+                b.style.color = '#5DAD47';
+                b.style.borderColor = '#5DAD47';
+            });
+            
+            // Agregar clase active al botón clickeado
+            this.classList.add('active');
+            this.style.backgroundColor = '#5DAD47';
+            this.style.color = 'white';
+            this.style.borderColor = '#5DAD47';
+            
+            const filter = this.getAttribute('data-filter');
+            
+            routeItems.forEach((item, index) => {
+                if (filter === '*' || item.classList.contains(filter.substring(1))) {
+                    item.style.display = 'block';
+                    item.style.opacity = '0';
+                    // Animación escalonada
+                    setTimeout(() => {
+                        item.style.transition = 'opacity 0.3s ease';
+                        item.style.opacity = '1';
+                        item.classList.add('aos-animate');
+                    }, index * 50);
+                } else {
+                    item.style.transition = 'opacity 0.2s ease';
+                    item.style.opacity = '0';
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 200);
+                }
+            });
+        });
+    });
+    
+    // Botones de favoritos
+    document.querySelectorAll('.btn-favorite').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const heart = this.querySelector('.ph-heart');
+            const isLiked = heart.classList.contains('ph-heart-fill');
+            
+            // Animación de click
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 100);
+            
+            if (isLiked) {
+                heart.className = 'ph-heart';
+                this.classList.remove('btn-danger');
+                this.classList.add('btn-outline-secondary');
+            } else {
+                heart.className = 'ph-heart-fill';
+                this.classList.remove('btn-outline-secondary');
+                this.style.backgroundColor = '#5DAD47';
+                this.style.borderColor = '#5DAD47';
+                this.style.color = 'white';
+                
+                // Efecto de partículas simple
+                createHeartEffect(this);
+            }
+        });
+    });
+    
+    // Botones de compartir
+    document.querySelectorAll('.btn-share').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const routeCard = this.closest('.route-card');
+            const routeTitle = routeCard.querySelector('.card-title a').textContent;
+            const routeUrl = routeCard.querySelector('.card-title a').href;
+            
+            if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                navigator.share({
+                    title: routeTitle,
+                    text: `Descubre esta increíble ruta turística en Garzón: ${routeTitle}`,
+                    url: routeUrl
+                }).catch(console.error);
+            } else {
+                // Fallback: copiar al portapapeles
+                navigator.clipboard.writeText(routeUrl).then(() => {
+                    // Feedback visual mejorado
+                    const originalIcon = this.querySelector('i');
+                    const originalClass = originalIcon.className;
+                    const originalText = this.getAttribute('title');
+                    
+                    originalIcon.className = 'ph-check text-success';
+                    this.setAttribute('title', '¡Enlace copiado!');
+                    this.style.backgroundColor = '#5DAD47';
+                    this.style.borderColor = '#5DAD47';
+                    this.style.color = 'white';
+                    
+                    setTimeout(() => {
+                        originalIcon.className = originalClass;
+                        this.setAttribute('title', originalText);
+                        this.style.backgroundColor = 'transparent';
+                        this.style.borderColor = '#6c757d';
+                        this.style.color = '#6c757d';
+                    }, 2000);
+                }).catch(() => {
+                    // Si falla el clipboard, mostrar modal con el enlace
+                    showShareModal(routeTitle, routeUrl);
+                });
+            }
+        });
+    });
+    
+    // Hover effects en las tarjetas
+    document.querySelectorAll('.route-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+            this.classList.add('shadow-lg');
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.classList.remove('shadow-lg');
+        });
+    });
+    
+    // Función para crear efecto de corazón
+    function createHeartEffect(button) {
+        const rect = button.getBoundingClientRect();
+        const heart = document.createElement('div');
+        heart.innerHTML = '♥';
+        heart.style.position = 'fixed';
+        heart.style.left = rect.left + rect.width / 2 + 'px';
+        heart.style.top = rect.top + 'px';
+        heart.style.color = '#5DAD47';
+        heart.style.fontSize = '20px';
+        heart.style.pointerEvents = 'none';
+        heart.style.zIndex = '9999';
+        heart.style.transition = 'all 0.8s ease-out';
+        
+        document.body.appendChild(heart);
+        
+        setTimeout(() => {
+            heart.style.transform = 'translateY(-30px)';
+            heart.style.opacity = '0';
+        }, 10);
+        
+        setTimeout(() => {
+            document.body.removeChild(heart);
+        }, 800);
+    }
+    
+    // Función para mostrar modal de compartir (fallback)
+    function showShareModal(title, url) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Compartir Ruta</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="small mb-2">${title}</p>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="${url}" readonly>
+                            <button class="btn btn-outline-secondary copy-url-btn" type="button">
+                                <i class="ph-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+        
+        // Botón copiar del modal
+        modal.querySelector('.copy-url-btn').addEventListener('click', function() {
+            const input = modal.querySelector('input');
+            input.select();
+            navigator.clipboard.writeText(input.value);
+            this.innerHTML = '<i class="ph-check"></i>';
+            setTimeout(() => {
+                this.innerHTML = '<i class="ph-copy"></i>';
+            }, 1000);
+        });
+        
+        // Limpiar modal cuando se cierre
+        modal.addEventListener('hidden.bs.modal', function() {
+            document.body.removeChild(modal);
+        });
+    }
+});
+</script>
+{% endblock %}

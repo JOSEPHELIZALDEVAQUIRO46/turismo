@@ -1,199 +1,394 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Alma del Huila - Garzón{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}Portal turístico oficial de Garzón, Huila. Descubre la riqueza cultural, natural y gastronómica de nuestra tierra.{% endblock %}">
+    
+    <!-- Title -->
+    <title>{% block title %}{{ config.nombre_sitio|default:"Alma del Huila - Garzón" }}{% endblock %}</title>
+    
+    <!-- Meta tags -->
+    <meta name="description" content="{% block meta_description %}{{ config.meta_description|default:'Descubre Garzón, Huila: tierra de oportunidades. Portal turístico oficial con información de lugares turísticos, rutas, gastronomía, eventos y mucho más.' }}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{{ config.meta_keywords|default:'turismo, Garzón, Huila, Colombia, café, naturaleza, cultura, gastronomía, eventos' }}{% endblock %}">
+    <meta name="author" content="{{ config.nombre_sitio|default:'Alma del Huila' }}">
     
     <!-- Favicon -->
-    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+    {% if config.favicon %}
+        <link rel="icon" type="image/x-icon" href="{{ config.favicon.url }}">
+    {% else %}
+        <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+    {% endif %}
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
-    <!-- Google Fonts: Oswald y Roboto -->
+    <!-- Phosphor Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/phosphor-icons@1.4.2/src/css/icons.min.css">
+    
+    <!-- Google Fonts - Oswald y Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <!-- Swiper Slider -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.css">
     
-    <!-- CSS personalizado -->
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <!-- AOS - Animate On Scroll -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
     
+    <!-- CSS Principal -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    <!-- CSS Específicos por página -->
     {% block extra_css %}{% endblock %}
 </head>
+
 <body class="{% block body_class %}{% endblock %}">
+    <!-- Loader -->
+    <div class="preloader">
+        <div class="loader">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header class="site-header" id="site-header">
-        <div class="top-bar bg-primary text-white py-2">
+    <header class="site-header">
+        <div class="top-bar">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-md-6">
-                        <div class="contact-info d-flex">
-                            <div class="me-3"><i class="fas fa-envelope me-2"></i>info@almadelhuila.com</div>
-                            <div><i class="fas fa-phone me-2"></i>+57 123 456 7890</div>
+                        <div class="top-info">
+                            {% if config.telefono_contacto %}
+                            <a href="tel:{{ config.telefono_contacto }}" class="top-link">
+                                <i class="ph-phone"></i> {{ config.telefono_contacto }}
+                            </a>
+                            {% endif %}
+                            {% if config.email_contacto %}
+                            <a href="mailto:{{ config.email_contacto }}" class="top-link">
+                                <i class="ph-envelope-simple"></i> {{ config.email_contacto }}
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6 text-md-end">
-                        <div class="social-links">
-                            <a href="#" class="me-2 text-white"><i class="fab fa-facebook-f"></i></a>
-                            <a href="#" class="me-2 text-white"><i class="fab fa-instagram"></i></a>
-                            <a href="#" class="me-2 text-white"><i class="fab fa-twitter"></i></a>
-                            <a href="#" class="me-2 text-white"><i class="fab fa-youtube"></i></a>
+                    <div class="col-md-6">
+                        <div class="top-social">
+                            {% if config.facebook %}
+                            <a href="{{ config.facebook }}" target="_blank" class="social-icon">
+                                <i class="ph-facebook-logo"></i>
+                            </a>
+                            {% endif %}
+                            {% if config.instagram %}
+                            <a href="{{ config.instagram }}" target="_blank" class="social-icon">
+                                <i class="ph-instagram-logo"></i>
+                            </a>
+                            {% endif %}
+                            {% if config.twitter %}
+                            <a href="{{ config.twitter }}" target="_blank" class="social-icon">
+                                <i class="ph-twitter-logo"></i>
+                            </a>
+                            {% endif %}
+                            {% if config.youtube %}
+                            <a href="{{ config.youtube }}" target="_blank" class="social-icon">
+                                <i class="ph-youtube-logo"></i>
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+
+        <nav class="navbar navbar-expand-lg">
             <div class="container">
                 <a class="navbar-brand" href="{% url 'core:home' %}">
-                    <div class="d-flex align-items-center">
-                        <img src="/static/img/escudo-garzon.png" alt="Escudo de Garzón" height="60">
-                        <div class="ms-3">
-                            <span class="d-block site-name">Alma del Huila</span>
-                            <small class="text-muted d-block tagline">Garzón, tierra de oportunidades</small>
-                        </div>
-                    </div>
+                    {% if config.logo %}
+                        <img src="{{ config.logo.url }}" alt="{{ config.nombre_sitio }}" class="logo">
+                    {% else %}
+                        <img src="{% static 'img/logo.png' %}" alt="Alma del Huila" class="logo">
+                    {% endif %}
+                    <span class="brand-text">{{ config.nombre_sitio|default:"Alma del Huila" }}</span>
                 </a>
                 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Inicio</a>
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">
+                                <i class="ph-house"></i> Inicio
+                            </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if 'lugar' in request.resolver_match.url_name %}active{% endif %}" href="#" id="lugaresDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Lugares
+                            <a class="nav-link dropdown-toggle {% if 'turismo' in request.resolver_match.app_name %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="ph-map-pin"></i> Turismo
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="lugaresDropdown">
-                                <li><a class="dropdown-item" href="{% url 'turismo:lugar_list' %}">Todos los lugares</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                {% for categoria in categorias_menu %}
-                                    <li><a class="dropdown-item" href="{% url 'turismo:lugares_categoria' categoria.slug %}">{{ categoria.nombre }}</a></li>
-                                {% endfor %}
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{% url 'turismo:lugar_list' %}"><i class="ph-mountains"></i> Lugares Turísticos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:establecimiento_list' %}"><i class="ph-buildings"></i> Dónde Alojarse</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:establecimiento_list' %}?tipo=restaurante"><i class="ph-coffee"></i> Dónde Comer</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:evento_list' %}"><i class="ph-calendar-plus"></i> Eventos</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:ruta_list' %}"><i class="ph-map-trifold"></i> Rutas</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:galeria' %}"><i class="ph-image"></i> Galería</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:mapa' %}"><i class="ph-map-pin"></i> Mapa Interactivo</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'ruta' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'turismo:ruta_list' %}">Rutas</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle {% if 'establecimiento' in request.resolver_match.url_name %}active{% endif %}" href="#" id="establecimientosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Establecimientos
+                            <a class="nav-link {% if 'blog' in request.resolver_match.app_name %}active{% endif %}" href="{% url 'blog:post_list' %}">
+                                <i class="ph-newspaper"></i> Blog
                             </a>
-                            <ul class="dropdown-menu" aria-labelledby="establecimientosDropdown">
-                                <li><a class="dropdown-item" href="{% url 'turismo:establecimiento_list' %}">Todos</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'turismo:establecimientos_tipo' 'hotel' %}">Hoteles</a></li>
-                                <li><a class="dropdown-item" href="{% url 'turismo:establecimientos_tipo' 'restaurante' %}">Restaurantes</a></li>
-                                <li><a class="dropdown-item" href="{% url 'turismo:establecimientos_tipo' 'cafe' %}">Cafés</a></li>
-                            </ul>
+                        </li>
+                        {% for pagina in paginas_menu %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.kwargs.slug == pagina.slug %}active{% endif %}" href="{% url 'core:pagina_estatica' pagina.slug %}">
+                                <i class="ph-file-text"></i> {{ pagina.titulo }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'contacto' in request.resolver_match.app_name %}active{% endif %}" href="{% url 'contacto:contacto' %}">
+                                <i class="ph-envelope-simple"></i> Contacto
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'evento' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'turismo:evento_list' %}">Eventos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'blog' %}active{% endif %}" href="{% url 'blog:post_list' %}">Blog</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.app_name == 'contacto' %}active{% endif %}" href="{% url 'contacto:contacto' %}">Contacto</a>
+                            <button class="search-toggle" id="searchToggle">
+                                <i class="ph-magnifying-glass"></i>
+                            </button>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
+        
+        <!-- Search Overlay -->
+        <div class="search-overlay" id="searchOverlay">
+            <div class="container">
+                <div class="search-header">
+                    <h3>Buscar</h3>
+                    <button class="search-close" id="searchClose">
+                        <i class="ph-x"></i>
+                    </button>
+                </div>
+                <form action="{% url 'turismo:turismo_search' %}" method="get" class="search-form">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="¿Qué quieres descubrir en Garzón?" required>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ph-magnifying-glass"></i> Buscar
+                        </button>
+                    </div>
+                </form>
+                <div class="search-suggestions">
+                    <p>Sugerencias populares:</p>
+                    <div class="suggestion-tags">
+                        <a href="{% url 'turismo:turismo_search' %}?q=café">Café</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=hotel">Hoteles</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=restaurante">Restaurantes</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=naturaleza">Naturaleza</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=catedral">Catedral</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </header>
 
-    <!-- Contenido principal -->
-    <main>
+    <!-- Breadcrumbs -->
+    {% block breadcrumb %}{% endblock %}
+
+    <!-- Main Content -->
+    <main class="site-main">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="site-footer bg-primary text-white py-5 mt-5">
+    <!-- CTA Newsletter -->
+    <section class="newsletter-cta">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <div class="footer-logo d-flex align-items-center mb-3">
-                        <img src="/static/img/escudo-garzon-blanco.png" alt="Escudo de Garzón" height="70">
-                        <div class="ms-3">
-                            <h5 class="mb-0">Alma del Huila</h5>
-                            <small>Turismo Garzón</small>
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h3 data-aos="fade-up">¡SUSCRÍBETE A NUESTRO BOLETÍN!</h3>
+                    <p data-aos="fade-up" data-aos-delay="100">Recibe las últimas novedades, eventos y promociones directamente en tu correo.</p>
+                    <form class="newsletter-form" data-aos="fade-up" data-aos-delay="200">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Tu correo electrónico" required>
+                            <button type="submit" class="btn btn-primary">Suscribirse</button>
                         </div>
-                    </div>
-                    <p>Descubre la belleza natural, cultural y gastronómica de Garzón, Huila a través de nuestro portal turístico.</p>
-                    <div class="social-links mt-3">
-                        <a href="#" class="text-white me-2"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white me-2"><i class="fab fa-youtube"></i></a>
-                    </div>
-                </div>
-                
-                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
-                    <h5>Enlaces rápidos</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'core:home' %}" class="text-white">Inicio</a></li>
-                        <li><a href="{% url 'turismo:lugar_list' %}" class="text-white">Lugares</a></li>
-                        <li><a href="{% url 'turismo:ruta_list' %}" class="text-white">Rutas</a></li>
-                        <li><a href="{% url 'turismo:establecimiento_list' %}" class="text-white">Establecimientos</a></li>
-                        <li><a href="{% url 'turismo:evento_list' %}" class="text-white">Eventos</a></li>
-                        <li><a href="{% url 'blog:post_list' %}" class="text-white">Blog</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
-                    <h5>Información</h5>
-                    <ul class="list-unstyled">
-                        <li><a href="{% url 'core:acerca_de' %}" class="text-white">Acerca de</a></li>
-                        <li><a href="{% url 'contacto:contacto' %}" class="text-white">Contacto</a></li>
-                        <li><a href="{% url 'core:terminos' %}" class="text-white">Términos y condiciones</a></li>
-                        <li><a href="{% url 'core:privacidad' %}" class="text-white">Política de privacidad</a></li>
-                    </ul>
-                </div>
-                
-                <div class="col-lg-3 col-md-6">
-                    <h5>Contacto</h5>
-                    <address>
-                        <p><i class="fas fa-map-marker-alt me-2"></i> Garzón, Huila, Colombia</p>
-                        <p><i class="fas fa-phone me-2"></i> +57 123 456 7890</p>
-                        <p><i class="fas fa-envelope me-2"></i> info@almadelhuila.com</p>
-                    </address>
+                    </form>
                 </div>
             </div>
-            
-            <hr class="border-light">
-            
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <p class="small mb-0">&copy; {% now "Y" %} Alma del Huila - Municipio de Garzón. Todos los derechos reservados.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-widgets">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-widget">
+                            <div class="footer-logo">
+                                {% if config.logo_footer %}
+                                    <img src="{{ config.logo_footer.url }}" alt="{{ config.nombre_sitio }}" class="img-fluid">
+                                {% elif config.logo %}
+                                    <img src="{{ config.logo.url }}" alt="{{ config.nombre_sitio }}" class="img-fluid">
+                                {% else %}
+                                    <img src="{% static 'img/logo-white.png' %}" alt="Alma del Huila" class="img-fluid">
+                                {% endif %}
+                            </div>
+                            <p>{{ config.descripcion_sitio|default:"Garzón, capital diocesana del Huila, te ofrece una experiencia única con su cultura cafetera, arquitectura colonial, paisajes naturales, gastronomía y la calidez de su gente."|truncatewords:30 }}</p>
+                            <div class="footer-social">
+                                {% if config.facebook %}
+                                <a href="{{ config.facebook }}" target="_blank"><i class="ph-facebook-logo"></i></a>
+                                {% endif %}
+                                {% if config.instagram %}
+                                <a href="{{ config.instagram }}" target="_blank"><i class="ph-instagram-logo"></i></a>
+                                {% endif %}
+                                {% if config.twitter %}
+                                <a href="{{ config.twitter }}" target="_blank"><i class="ph-twitter-logo"></i></a>
+                                {% endif %}
+                                {% if config.youtube %}
+                                <a href="{{ config.youtube }}" target="_blank"><i class="ph-youtube-logo"></i></a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-widget">
+                            <h4>Enlaces</h4>
+                            <ul class="footer-links">
+                                <li><a href="{% url 'core:home' %}">Inicio</a></li>
+                                <li><a href="{% url 'core:acerca_de' %}">Acerca de</a></li>
+                                <li><a href="{% url 'blog:post_list' %}">Blog</a></li>
+                                <li><a href="{% url 'contacto:contacto' %}">Contacto</a></li>
+                                {% if config.texto_privacidad %}
+                                <li><a href="{% url 'core:privacidad' %}">Privacidad</a></li>
+                                {% endif %}
+                                {% if config.texto_terminos %}
+                                <li><a href="{% url 'core:terminos' %}">Términos</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-widget">
+                            <h4>Turismo</h4>
+                            <ul class="footer-links">
+                                <li><a href="{% url 'turismo:lugar_list' %}">Lugares Turísticos</a></li>
+                                <li><a href="{% url 'turismo:establecimiento_list' %}">Alojamiento</a></li>
+                                <li><a href="{% url 'turismo:establecimiento_list' %}?tipo=restaurante">Gastronomía</a></li>
+                                <li><a href="{% url 'turismo:ruta_list' %}">Rutas Turísticas</a></li>
+                                <li><a href="{% url 'turismo:evento_list' %}">Eventos</a></li>
+                                <li><a href="{% url 'turismo:mapa' %}">Mapa</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-widget">
+                            <h4>Contacto</h4>
+                            <div class="contact-info">
+                                {% if config.direccion %}
+                                <div class="contact-item">
+                                    <i class="ph-map-pin"></i>
+                                    <p>{{ config.direccion }}</p>
+                                </div>
+                                {% endif %}
+                                {% if config.telefono_contacto %}
+                                <div class="contact-item">
+                                    <i class="ph-phone"></i>
+                                    <p><a href="tel:{{ config.telefono_contacto }}">{{ config.telefono_contacto }}</a></p>
+                                </div>
+                                {% endif %}
+                                {% if config.email_contacto %}
+                                <div class="contact-item">
+                                    <i class="ph-envelope-simple"></i>
+                                    <p><a href="mailto:{{ config.email_contacto }}">{{ config.email_contacto }}</a></p>
+                                </div>
+                                {% endif %}
+                                {% if config.horario_atencion %}
+                                <div class="contact-item">
+                                    <i class="ph-clock"></i>
+                                    <p>{{ config.horario_atencion }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="copyright">© {{ "now"|date:"Y" }} {{ config.nombre_sitio|default:"Alma del Huila" }}. Todos los derechos reservados.</p>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="footer-bottom-links">
+                            <a href="https://www.gov.co/" target="_blank">Portal de Gobierno</a>
+                            <a href="https://www.colombia.co/" target="_blank">Colombia.co</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
-    
-    <!-- Back to Top Button -->
-    <button id="back-to-top" class="btn back-to-top-btn">
-        <i class="fas fa-arrow-up"></i>
+
+    <!-- Back to Top -->
+    <button id="backToTop" class="back-to-top">
+        <i class="ph-arrow-up"></i>
     </button>
+
+    <!-- WhatsApp Float -->
+    {% if config.whatsapp %}
+    <a href="https://wa.me/{{ config.whatsapp }}?text=Hola, me gustaría obtener más información sobre Garzón." class="whatsapp-float" target="_blank">
+        <i class="ph-whatsapp-logo"></i>
+    </a>
+    {% endif %}
+
+    <!-- Scripts -->
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap 5.3 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Alpine.js (opcional para interactividad liviana) -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Swiper Slider -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@8/swiper-bundle.min.js"></script>
     
-    <!-- Custom JS -->
-    <script src="/static/js/main.js"></script>
+    <!-- AOS - Animate On Scroll -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
     
+    <!-- Main JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <!-- JavaScript específico por página -->
     {% block extra_js %}{% endblock %}
+    
+    <!-- Messages Django -->
+    {% if messages %}
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        {% for message in messages %}
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header {% if message.tags == 'error' %}bg-danger text-white{% elif message.tags == 'success' %}bg-success text-white{% elif message.tags == 'warning' %}bg-warning{% else %}bg-info text-white{% endif %}">
+                <i class="ph-{% if message.tags == 'error' %}warning{% elif message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}warning-circle{% else %}info{% endif %} me-2"></i>
+                <strong class="me-auto">
+                    {% if message.tags == 'error' %}Error{% elif message.tags == 'success' %}Éxito{% elif message.tags == 'warning' %}Advertencia{% else %}Información{% endif %}
+                </strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                {{ message }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <!-- Google Analytics -->
+    {% if config.google_analytics %}
+    {{ config.google_analytics|safe }}
+    {% endif %}
 </body>
 </html>

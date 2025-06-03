@@ -1,0 +1,305 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Acerca de Garzón - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Conoce la historia, cultura y tradiciones de Garzón, Huila. Descubre por qué somos la capital diocesana del departamento y tierra del mejor café de Colombia.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Acerca de Garzón</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Acerca de -->
+<section class="section about-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="about-hero-content" data-aos="fade-right">
+                    <div class="section-subtitle">Nuestra Historia</div>
+                    <h1 class="section-title">Garzón, Alma del Huila</h1>
+                    <p class="about-description">
+                        Garzón es mucho más que un municipio del Huila; es el corazón de una región rica en historia, cultura y tradiciones. 
+                        Como capital diocesana del departamento, somos custodios de un legado arquitectónico colonial único y de una tradición cafetera 
+                        que nos ha posicionado como productores del mejor café del mundo.
+                    </p>
+                    <div class="about-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">1563</div>
+                            <div class="stat-label">Año de Fundación</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">80K+</div>
+                            <div class="stat-label">Habitantes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">828</div>
+                            <div class="stat-label">msnm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="about-hero-img" data-aos="fade-left">
+                    <img src="{% static 'img/about-hero.jpg' %}" alt="Garzón, Huila" class="img-fluid rounded">
+                    <div class="about-badge">
+                        <i class="ph-crown"></i>
+                        <span>Capital Diocesana del Huila</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Historia -->
+<section class="section section-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="timeline-sidebar" data-aos="fade-right">
+                    <h3>Momentos Históricos</h3>
+                    <p>Descubre los eventos más importantes que han marcado la historia de nuestra querida Garzón.</p>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="history-timeline">
+                    <div class="timeline-item" data-aos="fade-up">
+                        <div class="timeline-year">1563</div>
+                        <div class="timeline-content">
+                            <h4>Fundación</h4>
+                            <p>Garzón fue fundada el 7 de octubre de 1563 por el capitán Juan de Borja, convirtiéndose en uno de los primeros asentamientos españoles en el Huila.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+                        <div class="timeline-year">1724</div>
+                        <div class="timeline-content">
+                            <h4>Catedral San Miguel Arcángel</h4>
+                            <p>Se inicia la construcción de nuestra majestuosa catedral, símbolo arquitectónico y espiritual de la ciudad que perdura hasta nuestros días.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                        <div class="timeline-year">1900</div>
+                        <div class="timeline-content">
+                            <h4>Época Cafetera</h4>
+                            <p>El café llega a Garzón transformando la economía local y estableciendo las bases de lo que sería nuestra reconocida tradición cafetera.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                        <div class="timeline-year">1950</div>
+                        <div class="timeline-content">
+                            <h4>Capital Diocesana</h4>
+                            <p>Garzón es designada como sede episcopal, consolidándose como centro religioso y administrativo del sur del Huila.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item" data-aos="fade-up" data-aos-delay="400">
+                        <div class="timeline-year">2018</div>
+                        <div class="timeline-content">
+                            <h4>Café de Alta Calidad</h4>
+                            <p>Los cafés especiales de Garzón obtienen reconocimiento mundial, posicionando a la región como productora de los mejores granos del planeta.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Características -->
+<section class="section">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Lo que nos hace únicos</h2>
+            <p class="section-text">Descubre las características que hacen de Garzón un destino especial</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-coffee"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Tradición Cafetera</h4>
+                        <p>Nuestros cafés especiales han conquistado paladares internacionales, siendo reconocidos entre los mejores del mundo por su sabor único y procesos artesanales.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-church"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Patrimonio Arquitectónico</h4>
+                        <p>Nuestra catedral y arquitectura colonial nos convierten en un testimonio vivo de la historia religiosa y cultural de Colombia.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-mountains"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Paisajes Naturales</h4>
+                        <p>Rodeados de montañas, ríos y paisajes cafeteros que ofrecen experiencias únicas de ecoturismo y aventura.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-users-three"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Gente Cálida</h4>
+                        <p>La hospitalidad y calidez de nuestros habitantes hacen que cada visitante se sienta como en casa desde el primer momento.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-fork-knife"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Gastronomía Típica</h4>
+                        <p>Sabores auténticos del Huila que fusionan tradición indígena, española y criolla en platos únicos e irresistibles.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ph-music-notes"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h4>Cultura y Tradiciones</h4>
+                        <p>Festivales, música tradicional y expresiones culturales que mantienen vivas nuestras raíces y tradiciones ancestrales.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Misión y Visión -->
+<section class="section section-primary">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4" data-aos="fade-right">
+                <div class="mission-card">
+                    <div class="mission-icon">
+                        <i class="ph-target"></i>
+                    </div>
+                    <h3>Nuestra Misión</h3>
+                    <p>Promover y difundir las riquezas turísticas, culturales y naturales de Garzón, posicionando nuestro municipio como un destino de clase mundial que preserve su identidad, tradiciones y patrimonio mientras ofrece experiencias auténticas e inolvidables a nuestros visitantes.</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4" data-aos="fade-left">
+                <div class="vision-card">
+                    <div class="vision-icon">
+                        <i class="ph-eye"></i>
+                    </div>
+                    <h3>Nuestra Visión</h3>
+                    <p>Ser reconocidos como el destino turístico más auténtico y sostenible del Huila, donde la excelencia en el café, la riqueza histórica, la belleza natural y la calidez humana se combinan para crear experiencias transformadoras que conecten a los visitantes con la esencia verdadera de Colombia.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Datos y Estadísticas -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Garzón en Números</h2>
+            <p class="section-text">Datos que reflejan nuestro crecimiento y desarrollo</p>
+        </div>
+        
+        <div class="row text-center">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up">
+                <div class="counter-card">
+                    <div class="counter-icon">
+                        <i class="ph-users"></i>
+                    </div>
+                    <div class="counter-number" data-target="80000">0</div>
+                    <div class="counter-label">Habitantes</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="counter-card">
+                    <div class="counter-icon">
+                        <i class="ph-coffee"></i>
+                    </div>
+                    <div class="counter-number" data-target="5000">0</div>
+                    <div class="counter-label">Productores de Café</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="counter-card">
+                    <div class="counter-icon">
+                        <i class="ph-map-pin"></i>
+                    </div>
+                    <div class="counter-number" data-target="50">0</div>
+                    <div class="counter-label">Atractivos Turísticos</div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="counter-card">
+                    <div class="counter-icon">
+                        <i class="ph-calendar"></i>
+                    </div>
+                    <div class="counter-number" data-target="460">0</div>
+                    <div class="counter-label">Años de Historia</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Llamada a la Acción -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="cta-content" data-aos="fade-up">
+                    <h3>¿Listo para conocer Garzón?</h3>
+                    <p class="mb-4">Te invitamos a descubrir todos los secretos y maravillas que nuestra hermosa ciudad tiene para ofrecerte. Desde experiencias gastronómicas únicas hasta paisajes que te quitarán el aliento.</p>
+                    <div class="cta-buttons">
+                        <a href="{% url 'turismo:lugar_list' %}" class="btn btn-primary btn-lg me-3">
+                            <i class="ph-compass"></i> Explorar Destinos
+                        </a>
+                        <a href="{% url 'contacto:contacto' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="ph-envelope"></i> Planifica tu Visita
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

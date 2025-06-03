@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Galería - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Explora nuestra galería fotográfica con las mejores imágenes de los lugares turísticos, eventos y paisajes de Garzón, Huila.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Galería</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Header de Galería -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-subtitle">Imágenes</div>
+            <h1 class="section-title">Galería Fotográfica</h1>
+            <p class="section-text">Descubre la belleza de Garzón a través de nuestra colección de fotografías que capturan la esencia de nuestra tierra, su gente y sus tradiciones.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Filtros de Galería -->
+<section class="section">
+    <div class="container">
+        <div class="gallery-filters" data-aos="fade-up">
+            <ul class="filter-list">
+                <li class="filter-item">
+                    <button class="filter-btn active" data-filter="*">
+                        <i class="ph-images"></i> Todas
+                    </button>
+                </li>
+                {% for categoria in categorias %}
+                <li class="filter-item">
+                    <button class="filter-btn" data-filter=".categoria-{{ categoria.slug }}">
+                        <i class="ph-mountain"></i> {{ categoria.nombre }}
+                    </button>
+                </li>
+                {% endfor %}
+                <li class="filter-item">
+                    <button class="filter-btn" data-filter=".eventos">
+                        <i class="ph-calendar"></i> Eventos
+                    </button>
+                </li>
+                <li class="filter-item">
+                    <button class="filter-btn" data-filter=".cultura">
+                        <i class="ph-buildings"></i> Cultura
+                    </button>
+                </li>
+                <li class="filter-item">
+                    <button class="filter-btn" data-filter=".naturaleza">
+                        <i class="ph-leaf"></i> Naturaleza
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- Galería de Imágenes -->
+<section class="section section-light">
+    <div class="container">
+        <div class="gallery-grid" id="galleryGrid">
+            {% for imagen in imagenes %}
+            <div class="gallery-item categoria-{{ imagen.lugar_turistico.categoria.slug }} {% cycle 'eventos' 'cultura' 'naturaleza' %}" data-aos="zoom-in" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
+                <div class="gallery-card">
+                    <div class="gallery-img">
+                        <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo|default:imagen.lugar_turistico.nombre }}" class="img-fluid" loading="lazy">
+                        <div class="gallery-overlay">
+                            <div class="gallery-content">
+                                <h5 class="gallery-title">{{ imagen.titulo|default:imagen.lugar_turistico.nombre }}</h5>
+                                <p class="gallery-category">{{ imagen.lugar_turistico.categoria.nombre }}</p>
+                                <div class="gallery-actions">
+                                    <button class="gallery-btn zoom-btn" data-bs-toggle="modal" data-bs-target="#imageModal" data-image="{{ imagen.imagen.url }}" data-title="{{ imagen.titulo|default:imagen.lugar_turistico.nombre }}" data-description="{{ imagen.lugar_turistico.descripcion|truncatewords:20 }}">
+                                        <i class="ph-magnifying-glass-plus"></i>
+                                    </button>
+                                    <a href="{{ imagen.lugar_turistico.get_absolute_url }}" class="gallery-btn info-btn">
+                                        <i class="ph-info"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gallery-info">
+                        <h6 class="gallery-name">{{ imagen.titulo|default:imagen.lugar_turistico.nombre }}</h6>
+                        <span class="gallery-location">
+                            <i class="ph-map-pin"></i> {{ imagen.lugar_turistico.categoria.nombre }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="pagination-wrapper" data-aos="fade-up">
+            <nav aria-label="Paginación de galería">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1">
+                                <i class="ph-caret-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="ph-caret-left"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">
+                                <i class="ph-caret-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">
+                                <i class="ph-caret-double-right"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Llamada a la Acción -->
+<section class="section">
+    <div class="container">
+        <div class="cta-gallery" data-aos="fade-up">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h3>¿Tienes fotos increíbles de Garzón?</h3>
+                    <p class="mb-3">Comparte tus mejores fotografías de lugares turísticos, eventos y paisajes de nuestra hermosa ciudad. Ayúdanos a mostrar la belleza de Garzón al mundo.</p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    <a href="{% url 'contacto:contacto' %}" class="btn btn-primary btn-lg">
+                        <i class="ph-camera"></i> Enviar Fotos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal para Ver Imagen -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Imagen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <img id="modalImage" src="" alt="" class="img-fluid w-100">
+                <div class="modal-image-info p-3">
+                    <h6 id="modalImageTitle"></h6>
+                    <p id="modalImageDescription" class="text-muted mb-0"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros de galería
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remover clase active de todos los botones
+            filterBtns.forEach(b => b.classList.remove('active'));
+            // Agregar clase active al botón clickeado
+            this.classList.add('active');
+            
+            const filter = this.getAttribute('data-filter');
+            
+            galleryItems.forEach(item => {
+                if (filter === '*' || item.classList.contains(filter.substring(1))) {
+                    item.style.display = 'block';
+                    item.classList.add('aos-animate');
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+    
+    // Modal de imagen
+    const imageModal = document.getElementById('imageModal');
+    if (imageModal) {
+        imageModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const imageSrc = button.getAttribute('data-image');
+            const title = button.getAttribute('data-title');
+            const description = button.getAttribute('data-description');
+            
+            const modalImage = document.getElementById('modalImage');
+            const modalTitle = document.getElementById('imageModalLabel');
+            const modalImageTitle = document.getElementById('modalImageTitle');
+            const modalImageDescription = document.getElementById('modalImageDescription');
+            
+            modalImage.src = imageSrc;
+            modalImage.alt = title;
+            modalTitle.textContent = title;
+            modalImageTitle.textContent = title;
+            modalImageDescription.textContent = description;
+        });
+    }
+});
+</script>
+{% endblock %}

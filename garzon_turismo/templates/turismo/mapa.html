@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mapa Interactivo - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Explora Garzón con nuestro mapa interactivo. Descubre lugares turísticos, hoteles, restaurantes y puntos de interés en un solo lugar.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Mapa Interactivo</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Header del Mapa -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-subtitle">Navegación</div>
+            <h1 class="section-title">Mapa Interactivo de Garzón</h1>
+            <p class="section-text">Explora todos los lugares turísticos, establecimientos y puntos de interés de Garzón en nuestro mapa interactivo. Planifica tu visita y descubre nuevos destinos.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Mapa y Controles -->
+<section class="section">
+    <div class="container-fluid px-0">
+        <div class="map-container">
+            <!-- Sidebar de Controles -->
+            <div class="map-sidebar">
+                <div class="map-controls">
+                    <h5 class="controls-title">
+                        <i class="ph-funnel"></i> Filtros
+                    </h5>
+                    
+                    <!-- Filtros por Categoría -->
+                    <div class="control-group">
+                        <h6 class="control-label">Lugares Turísticos</h6>
+                        <div class="control-options">
+                            <label class="control-checkbox">
+                                <input type="checkbox" class="map-filter" data-type="lugar" checked>
+                                <span class="checkmark"></span>
+                                <span class="control-text">
+                                    <i class="ph-mountains text-primary"></i> Todos los lugares
+                                </span>
+                            </label>
+                            {% for categoria in categorias %}
+                            <label class="control-checkbox">
+                                <input type="checkbox" class="map-filter categoria-filter" data-categoria="{{ categoria.slug }}" checked>
+                                <span class="checkmark"></span>
+                                <span class="control-text">{{ categoria.nombre }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Filtros por Establecimiento -->
+                    <div class="control-group">
+                        <h6 class="control-label">Establecimientos</h6>
+                        <div class="control-options">
+                            <label class="control-checkbox">
+                                <input type="checkbox" class="map-filter" data-type="establecimiento" checked>
+                                <span class="checkmark"></span>
+                                <span class="control-text">
+                                    <i class="ph-buildings text-success"></i> Todos los establecimientos
+                                </span>
+                            </label>
+                            {% for tipo_key, tipo_value in tipos_establecimiento.items %}
+                            <label class="control-checkbox">
+                                <input type="checkbox" class="map-filter tipo-filter" data-tipo="{{ tipo_key }}" checked>
+                                <span class="checkmark"></span>
+                                <span class="control-text">{{ tipo_value }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Controles de Vista -->
+                    <div class="control-group">
+                        <h6 class="control-label">Vista del Mapa</h6>
+                        <div class="map-view-controls">
+                            <button class="view-btn active" data-view="roadmap">
+                                <i class="ph-map"></i> Mapa
+                            </button>
+                            <button class="view-btn" data-view="satellite">
+                                <i class="ph-globe"></i> Satélite
+                            </button>
+                            <button class="view-btn" data-view="hybrid">
+                                <i class="ph-stack"></i> Híbrido
+                            </button>
+                            <button class="view-btn" data-view="terrain">
+                                <i class="ph-mountains"></i> Terreno
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Información -->
+                    <div class="control-group">
+                        <div class="map-legend">
+                            <h6 class="control-label">Leyenda</h6>
+                            <div class="legend-items">
+                                <div class="legend-item">
+                                    <div class="legend-marker lugar-marker"></div>
+                                    <span>Lugares Turísticos</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-marker establecimiento-marker"></div>
+                                    <span>Establecimientos</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-marker centro-marker"></div>
+                                    <span>Centro de Garzón</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Toggle Button -->
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="ph-caret-left"></i>
+                </button>
+            </div>
+            
+            <!-- Mapa -->
+            <div class="map-wrapper">
+                <div id="google-map" class="google-map" 
+                     data-lat="2.1976" 
+                     data-lng="-75.6276"
+                     data-zoom="14">
+                </div>
+                
+                <!-- Controles Flotantes -->
+                <div class="map-floating-controls">
+                    <button class="floating-btn" id="centerMap" title="Centrar en Garzón">
+                        <i class="ph-crosshair"></i>
+                    </button>
+                    <button class="floating-btn" id="fullscreenMap" title="Pantalla Completa">
+                        <i class="ph-arrows-out"></i>
+                    </button>
+                    <button class="floating-btn" id="shareLocation" title="Compartir Ubicación">
+                        <i class="ph-share"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Información de Ubicación -->
+<section class="section section-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="location-info" data-aos="fade-right">
+                    <h3>Cómo llegar a Garzón</h3>
+                    <p class="mb-4">Garzón se encuentra estratégicamente ubicado en el departamento del Huila, siendo un punto de conexión importante entre diferentes regiones del país.</p>
+                    
+                    <div class="transport-options">
+                        <div class="transport-item">
+                            <div class="transport-icon">
+                                <i class="ph-airplane"></i>
+                            </div>
+                            <div class="transport-content">
+                                <h5>Por Avión</h5>
+                                <p>El aeropuerto más cercano es el Benito Salas de Neiva, a aproximadamente 40 kilómetros de Garzón.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="transport-item">
+                            <div class="transport-icon">
+                                <i class="ph-bus"></i>
+                            </div>
+                            <div class="transport-content">
+                                <h5>Por Carretera</h5>
+                                <p>Conexiones directas desde Bogotá (4 horas), Cali (3 horas) y otras ciudades principales del país.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="transport-item">
+                            <div class="transport-icon">
+                                <i class="ph-car"></i>
+                            </div>
+                            <div class="transport-content">
+                                <h5>En Vehículo Particular</h5>
+                                <p>Acceso por la vía nacional que conecta con la Ruta del Café y otros destinos turísticos del Huila.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="location-stats" data-aos="fade-left">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h5>Datos de Ubicación</h5>
+                        </div>
+                        <div class="stat-items">
+                            <div class="stat-item">
+                                <i class="ph-map-pin"></i>
+                                <div class="stat-content">
+                                    <span class="stat-label">Coordenadas</span>
+                                    <span class="stat-value">2°11'51"N, 75°37'39"O</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="ph-mountain"></i>
+                                <div class="stat-content">
+                                    <span class="stat-label">Altitud</span>
+                                    <span class="stat-value">828 msnm</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="ph-thermometer"></i>
+                                <div class="stat-content">
+                                    <span class="stat-label">Temperatura</span>
+                                    <span class="stat-value">24°C promedio</span>
+                                </div>
+                            </div>
+                            <div class="stat-item">
+                                <i class="ph-users"></i>
+                                <div class="stat-content">
+                                    <span class="stat-label">Población</span>
+                                    <span class="stat-value">~80,000 hab.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Datos de marcadores desde Django
+const marcadores = {{ marcadores_json|safe }};
+
+// Variables del mapa
+let map;
+let markers = [];
+let infoWindow;
+
+// Inicializar mapa
+function initMap() {
+    // Configuración del mapa
+    const center = { lat: 2.1976, lng: -75.6276 };
+    
+    map = new google.maps.Map(document.getElementById('google-map'), {
+        zoom: 14,
+        center: center,
+        mapTypeId: 'roadmap',
+        styles: [
+            {
+                "featureType": "administrative",
+                "elementType": "labels.text.fill",
+                "stylers": [{"color": "#444444"}]
+            },
+            {
+                "featureType": "landscape",
+                "elementType": "all",
+                "stylers": [{"color": "#f2f2f2"}]
+            },
+            {
+                "featureType": "poi",
+                "elementType": "all",
+                "stylers": [{"visibility": "off"}]
+            },
+            {
+                "featureType": "road",
+                "elementType": "all",
+                "stylers": [{"saturation": -100}, {"lightness": 45}]
+            },
+            {
+                "featureType": "water",
+                "elementType": "all",
+                "stylers": [{"color": "#5DAD47"}, {"visibility": "on"}]
+            }
+        ]
+    });
+
+    infoWindow = new google.maps.InfoWindow();
+
+    // Crear marcadores
+    createMarkers();
+    
+    // Event listeners para controles
+    setupMapControls();
+}
+
+// Crear marcadores en el mapa
+function createMarkers() {
+    markers.forEach(marker => marker.setMap(null));
+    markers = [];
+
+    marcadores.forEach(data => {
+        const icon = {
+            url: data.tipo === 'lugar' ? '/static/img/marker-lugar.png' : '/static/img/marker-establecimiento.png',
+            scaledSize: new google.maps.Size(40, 40)
+        };
+
+        const marker = new google.maps.Marker({
+            position: { lat: data.latitud, lng: data.longitud },
+            map: map,
+            title: data.nombre,
+            icon: icon,
+            tipo: data.tipo,
+            categoria: data.categoria
+        });
+
+        const contentString = `
+            <div class="info-window">
+                <div class="info-header">
+                    <h6>${data.nombre}</h6>
+                    <span class="info-category">${data.categoria}</span>
+                </div>
+                ${data.imagen ? `<img src="${data.imagen}" alt="${data.nombre}" class="info-image">` : ''}
+                <div class="info-actions">
+                    <a href="${data.url}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                </div>
+            </div>
+        `;
+
+        marker.addListener('click', () => {
+            infoWindow.setContent(contentString);
+            infoWindow.open(map, marker);
+        });
+
+        markers.push(marker);
+    });
+}
+
+// Configurar controles del mapa
+function setupMapControls() {
+    // Filtros
+    document.querySelectorAll('.map-filter').forEach(filter => {
+        filter.addEventListener('change', filterMarkers);
+    });
+    
+    // Cambiar vista del mapa
+    document.querySelectorAll('.view-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            map.setMapTypeId(this.getAttribute('data-view'));
+        });
+    });
+    
+    // Toggle sidebar
+    document.getElementById('sidebarToggle').addEventListener('click', function() {
+        const sidebar = document.querySelector('.map-sidebar');
+        sidebar.classList.toggle('collapsed');
+        this.querySelector('i').classList.toggle('ph-caret-left');
+        this.querySelector('i').classList.toggle('ph-caret-right');
+    });
+    
+    // Centrar mapa
+    document.getElementById('centerMap').addEventListener('click', function() {
+        map.setCenter({ lat: 2.1976, lng: -75.6276 });
+        map.setZoom(14);
+    });
+    
+    // Pantalla completa
+    document.getElementById('fullscreenMap').addEventListener('click', function() {
+        const mapContainer = document.querySelector('.map-container');
+        if (!document.fullscreenElement) {
+            mapContainer.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    });
+    
+    // Compartir ubicación
+    document.getElementById('shareLocation').addEventListener('click', function() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Mapa de Garzón - Huila',
+                text: 'Explora los lugares turísticos de Garzón',
+                url: window.location.href
+            });
+        } else {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Enlace copiado al portapapeles');
+        }
+    });
+}
+
+// Filtrar marcadores
+function filterMarkers() {
+    const activeFilters = {
+        tipos: [],
+        categorias: []
+    };
+    
+    // Obtener filtros activos
+    document.querySelectorAll('.map-filter:checked').forEach(filter => {
+        const type = filter.getAttribute('data-type');
+        const categoria = filter.getAttribute('data-categoria');
+        const tipo = filter.getAttribute('data-tipo');
+        
+        if (type) activeFilters.tipos.push(type);
+        if (categoria) activeFilters.categorias.push(categoria);
+        if (tipo) activeFilters.tipos.push(tipo);
+    });
+    
+    // Filtrar marcadores
+    markers.forEach(marker => {
+        const shouldShow = activeFilters.tipos.includes(marker.tipo) || 
+                          activeFilters.categorias.includes(marker.categoria);
+        marker.setVisible(shouldShow);
+    });
+}
+
+// Cargar Google Maps API
+function loadGoogleMaps() {
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+// Inicializar cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    // Si no hay Google Maps API configurada, mostrar mensaje
+    if (typeof google === 'undefined') {
+        document.getElementById('google-map').innerHTML = `
+            <div class="map-placeholder">
+                <div class="placeholder-content">
+                    <i class="ph-map-pin placeholder-icon"></i>
+                    <h4>Mapa no disponible</h4>
+                    <p>Para habilitar el mapa interactivo, es necesario configurar la API de Google Maps.</p>
+                </div>
+            </div>
+        `;
+    }
+});
+</script>
+{% endblock %}

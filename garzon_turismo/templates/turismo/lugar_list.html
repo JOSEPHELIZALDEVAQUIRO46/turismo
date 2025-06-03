@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Lugares Turísticos en Garzón - Alma del Huila{% endblock %}
+{% block meta_description %}Descubre los lugares turísticos más destacados de Garzón, Huila. Cascadas, montañas, sitios históricos y más.{% endblock %}
+
+{% block body_class %}lugares-page{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'turismo:lugar_list' %}">Turismo</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Lugares Turísticos</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header text-center">
+            <h1 class="section-title">Lugares Turísticos</h1>
+            <p class="section-text">Descubre los tesoros naturales y culturales que Garzón tiene para ofrecerte. Desde impresionantes paisajes naturales hasta sitios históricos que te transportarán en el tiempo.</p>
+        </div>
+
+        <!-- Filtros de categorías -->
+        <div class="filter-categories" data-aos="fade-up">
+            <div class="filter-header">
+                <h3>Categorías</h3>
+            </div>
+            <div class="filter-buttons">
+                <a href="{% url 'turismo:lugar_list' %}" class="filter-btn {% if not categoria_actual %}active{% endif %}">
+                    Todos
+                </a>
+                {% for cat in categorias %}
+                <a href="{% url 'turismo:lugares_categoria' cat.slug %}" class="filter-btn {% if categoria_actual.slug == cat.slug %}active{% endif %}">
+                    {{ cat.nombre }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        {% if categoria_actual %}
+        <div class="category-description" data-aos="fade-up">
+            <h2>{{ categoria_actual.nombre }}</h2>
+            <p>{{ categoria_actual.descripcion }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Lugares turísticos -->
+        <div class="row">
+            {% for lugar in lugares %}
+            <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter }}00">
+                <div class="destination-card">
+                    <div class="destination-img">
+                        {% if lugar.imagen_principal %}
+                        <img src="{{ lugar.imagen_principal.url }}" alt="{{ lugar.nombre }}">
+                        {% else %}
+                        <img src="{% static 'img/placeholder.jpg' %}" alt="{{ lugar.nombre }}">
+                        {% endif %}
+                        <span class="destination-category">{{ lugar.categoria.nombre }}</span>
+                    </div>
+                    <div class="destination-content">
+                        <h3 class="destination-title">
+                            <a href="{% url 'turismo:lugar_detail' lugar.slug %}">{{ lugar.nombre }}</a>
+                        </h3>
+                        <div class="destination-meta">
+                            {% if lugar.direccion %}
+                            <div class="destination-meta-item">
+                                <i class="ph-map-pin"></i> {{ lugar.direccion|truncatechars:30 }}
+                            </div>
+                            {% endif %}
+                            {% if lugar.tiene_coordenadas %}
+                            <div class="destination-meta-item">
+                                <i class="ph-map-trifold"></i> En el mapa
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="destination-description">
+                            {{ lugar.descripcion|striptags|truncatewords:15 }}
+                        </div>
+                        <a href="{% url 'turismo:lugar_detail' lugar.slug %}" class="btn btn-sm btn-primary">Ver detalles</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="ph-info"></i> No se encontraron lugares turísticos en esta categoría. ¡Vuelve pronto para ver las novedades!
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="pagination-container">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="Primera">
+                            <i class="ph-caret-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Anterior">
+                            <i class="ph-caret-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% for num in paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Siguiente">
+                            <i class="ph-caret-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ paginator.num_pages }}" aria-label="Última">
+                            <i class="ph-caret-double-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Map Section -->
+<section class="map-section section-light">
+    <div class="container">
+        <div class="section-header text-center">
+            <h2 class="section-title">Explora nuestros destinos</h2>
+            <p class="section-text">Ubica todos los lugares turísticos de Garzón en nuestro mapa interactivo</p>
+        </div>
+        <div class="map-container" data-aos="fade-up">
+            <a href="{% url 'turismo:mapa' %}" class="map-link">
+                <div class="map-preview">
+                    <img src="{% static 'img/mapa-preview.jpg' %}" alt="Mapa de Garzón" class="img-fluid">
+                    <div class="map-overlay">
+                        <div class="map-cta">
+                            <i class="ph-map-trifold"></i>
+                            <span>Ver mapa completo</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

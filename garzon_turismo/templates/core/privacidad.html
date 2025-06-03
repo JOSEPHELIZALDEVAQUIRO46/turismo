@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Política de Privacidad - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Conoce cómo protegemos y tratamos tu información personal en Alma del Huila. Nuestra política de privacidad y protección de datos.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Política de Privacidad</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<section class="section legal-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="legal-content" data-aos="fade-up">
+                    <div class="legal-header">
+                        <h1 class="legal-title">Política de Privacidad</h1>
+                        <p class="legal-subtitle">Última actualización: {{ "now"|date:"d F Y" }}</p>
+                        <div class="legal-intro">
+                            <p>En {{ config.nombre_sitio|default:"Alma del Huila" }}, valoramos y respetamos tu privacidad. Esta política describe cómo recopilamos, usamos y protegemos tu información personal cuando visitas y utilizas nuestro sitio web.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="legal-sections">
+                        {% if privacidad_texto %}
+                            <div class="legal-section-content">
+                                {{ privacidad_texto|linebreaks }}
+                            </div>
+                        {% else %}
+                        <!-- Contenido por defecto si no hay texto personalizado -->
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="100">
+                            <h3>1. Información que Recopilamos</h3>
+                            <div class="section-content">
+                                <h4>Información Personal</h4>
+                                <p>Podemos recopilar información personal que nos proporciones voluntariamente cuando:</p>
+                                <ul>
+                                    <li>Te comunicas con nosotros a través de formularios de contacto</li>
+                                    <li>Te suscribes a nuestro boletín informativo</li>
+                                    <li>Participas en encuestas o promociones</li>
+                                    <li>Dejas comentarios o valoraciones</li>
+                                </ul>
+                                
+                                <h4>Información Técnica</h4>
+                                <p>Automáticamente recopilamos cierta información cuando visitas nuestro sitio:</p>
+                                <ul>
+                                    <li>Dirección IP</li>
+                                    <li>Tipo de navegador y versión</li>
+                                    <li>Páginas visitadas y tiempo de permanencia</li>
+                                    <li>Información del dispositivo</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="200">
+                            <h3>2. Cómo Utilizamos tu Información</h3>
+                            <div class="section-content">
+                                <p>Utilizamos la información recopilada para:</p>
+                                <ul>
+                                    <li>Responder a tus consultas y solicitudes</li>
+                                    <li>Enviar información turística relevante</li>
+                                    <li>Mejorar nuestro sitio web y servicios</li>
+                                    <li>Personalizar tu experiencia de usuario</li>
+                                    <li>Cumplir con obligaciones legales</li>
+                                    <li>Prevenir fraudes y actividades maliciosas</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="300">
+                            <h3>3. Cookies y Tecnologías Similares</h3>
+                            <div class="section-content">
+                                <p>Nuestro sitio web utiliza cookies para mejorar tu experiencia. Las cookies son pequeños archivos que se almacenan en tu dispositivo para:</p>
+                                <ul>
+                                    <li>Recordar tus preferencias</li>
+                                    <li>Analizar el tráfico del sitio</li>
+                                    <li>Personalizar el contenido</li>
+                                    <li>Mejorar la funcionalidad del sitio</li>
+                                </ul>
+                                <p>Puedes controlar las cookies a través de la configuración de tu navegador.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="400">
+                            <h3>4. Compartir Información</h3>
+                            <div class="section-content">
+                                <p>No vendemos, intercambiamos ni transferimos tu información personal a terceros, excepto en los siguientes casos:</p>
+                                <ul>
+                                    <li>Con proveedores de servicios que nos ayudan a operar el sitio web</li>
+                                    <li>Cuando sea requerido por ley o autoridades competentes</li>
+                                    <li>Para proteger nuestros derechos o la seguridad de otros usuarios</li>
+                                    <li>Con tu consentimiento explícito</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="500">
+                            <h3>5. Seguridad de la Información</h3>
+                            <div class="section-content">
+                                <p>Implementamos medidas de seguridad técnicas y organizativas para proteger tu información personal contra:</p>
+                                <ul>
+                                    <li>Acceso no autorizado</li>
+                                    <li>Alteración, divulgación o destrucción</li>
+                                    <li>Pérdida accidental</li>
+                                    <li>Procesamiento ilegal</li>
+                                </ul>
+                                <p>Sin embargo, ningún método de transmisión por internet es 100% seguro.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="600">
+                            <h3>6. Tus Derechos</h3>
+                            <div class="section-content">
+                                <p>En cumplimiento de la Ley 1581 de 2012 de Colombia, tienes derecho a:</p>
+                                <div class="rights-grid">
+                                    <div class="right-item">
+                                        <i class="ph-eye"></i>
+                                        <div>
+                                            <h5>Acceso</h5>
+                                            <p>Conocer qué información tenemos sobre ti</p>
+                                        </div>
+                                    </div>
+                                    <div class="right-item">
+                                        <i class="ph-pencil"></i>
+                                        <div>
+                                            <h5>Rectificación</h5>
+                                            <p>Solicitar la corrección de datos inexactos</p>
+                                        </div>
+                                    </div>
+                                    <div class="right-item">
+                                        <i class="ph-trash"></i>
+                                        <div>
+                                            <h5>Supresión</h5>
+                                            <p>Solicitar la eliminación de tus datos</p>
+                                        </div>
+                                    </div>
+                                    <div class="right-item">
+                                        <i class="ph-prohibition"></i>
+                                        <div>
+                                            <h5>Oposición</h5>
+                                            <p>Oponerte al tratamiento de tus datos</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="700">
+                            <h3>7. Retención de Datos</h3>
+                            <div class="section-content">
+                                <p>Conservaremos tu información personal solo durante el tiempo necesario para cumplir con los propósitos descritos en esta política, a menos que la ley requiera un período de retención más largo.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="800">
+                            <h3>8. Enlaces a Sitios de Terceros</h3>
+                            <div class="section-content">
+                                <p>Nuestro sitio puede contener enlaces a sitios web de terceros. No somos responsables de las prácticas de privacidad de estos sitios externos. Te recomendamos leer sus políticas de privacidad.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="900">
+                            <h3>9. Cambios en esta Política</h3>
+                            <div class="section-content">
+                                <p>Podemos actualizar esta política de privacidad ocasionalmente. Te notificaremos sobre cambios importantes publicando la nueva política en esta página con una nueva fecha de "última actualización".</p>
+                            </div>
+                        </div>
+                        
+                        <div class="legal-section-item" data-aos="fade-up" data-aos-delay="1000">
+                            <h3>10. Contacto</h3>
+                            <div class="section-content">
+                                <p>Si tienes preguntas sobre esta política de privacidad o deseas ejercer tus derechos, puedes contactarnos:</p>
+                                <div class="contact-info">
+                                    {% if config.email_contacto %}
+                                    <div class="contact-item">
+                                        <i class="ph-envelope"></i>
+                                        <div>
+                                            <strong>Email:</strong>
+                                            <a href="mailto:{{ config.email_contacto }}">{{ config.email_contacto }}</a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if config.telefono_contacto %}
+                                    <div class="contact-item">
+                                        <i class="ph-phone"></i>
+                                        <div>
+                                            <strong>Teléfono:</strong>
+                                            <a href="tel:{{ config.telefono_contacto }}">{{ config.telefono_contacto }}</a>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if config.direccion %}
+                                    <div class="contact-item">
+                                        <i class="ph-map-pin"></i>
+                                        <div>
+                                            <strong>Dirección:</strong>
+                                            {{ config.direccion }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="legal-footer" data-aos="fade-up">
+                        <div class="legal-actions">
+                            <a href="{% url 'core:home' %}" class="btn btn-primary">
+                                <i class="ph-house"></i> Volver al Inicio
+                            </a>
+                            <a href="{% url 'contacto:contacto' %}" class="btn btn-outline-primary">
+                                <i class="ph-envelope"></i> Contactar
+                            </a>
+                        </div>
+                        
+                        <div class="legal-note">
+                            <p><small>Esta política de privacidad está elaborada en cumplimiento de la Ley 1581 de 2012 de Protección de Datos Personales de Colombia y el Decreto 1377 de 2013.</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

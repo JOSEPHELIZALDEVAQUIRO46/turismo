@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Contacto - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Ponte en contacto con nosotros para planificar tu visita a Garzón, Huila. Información turística, reservas y consultas. Te ayudamos a vivir la mejor experiencia.{% endblock %}
+
+{% block breadcrumb %}
+<section class="breadcrumb-section">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Contacto</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+{% endblock %}
+
+{% block content %}
+<!-- Header de Contacto -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-subtitle">Estamos Aquí para Ayudarte</div>
+            <h1 class="section-title">Contáctanos</h1>
+            <p class="section-text">¿Tienes preguntas sobre Garzón? ¿Quieres planificar tu visita? ¡Estamos aquí para ayudarte a vivir la mejor experiencia en nuestra hermosa ciudad!</p>
+        </div>
+    </div>
+</section>
+
+<!-- Información de Contacto -->
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4" data-aos="fade-right">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="ph-map-pin"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Nuestra Ubicación</h4>
+                        {% if config.direccion %}
+                        <p>{{ config.direccion }}</p>
+                        {% else %}
+                        <p>Garzón, Huila<br>Colombia</p>
+                        {% endif %}
+                        <a href="{% url 'turismo:mapa' %}" class="contact-link">
+                            <i class="ph-navigation-arrow"></i> Ver en Mapa
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="ph-phone"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Teléfono</h4>
+                        {% if config.telefono_contacto %}
+                        <p>{{ config.telefono_contacto }}</p>
+                        <a href="tel:{{ config.telefono_contacto }}" class="contact-link">
+                            <i class="ph-phone-call"></i> Llamar Ahora
+                        </a>
+                        {% else %}
+                        <p>Información no disponible</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 mb-4" data-aos="fade-left" data-aos-delay="200">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="ph-envelope"></i>
+                    </div>
+                    <div class="contact-content">
+                        <h4>Email</h4>
+                        {% if config.email_contacto %}
+                        <p>{{ config.email_contacto }}</p>
+                        <a href="mailto:{{ config.email_contacto }}" class="contact-link">
+                            <i class="ph-paper-plane-tilt"></i> Enviar Email
+                        </a>
+                        {% else %}
+                        <p>Información no disponible</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if config.horario_atencion %}
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="schedule-info" data-aos="fade-up" data-aos-delay="300">
+                    <div class="schedule-content">
+                        <i class="ph-clock schedule-icon"></i>
+                        <div class="schedule-text">
+                            <h5>Horario de Atención</h5>
+                            <p>{{ config.horario_atencion }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Formulario de Contacto -->
+<section class="section section-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="contact-form-wrapper" data-aos="fade-up">
+                    <div class="contact-form-header">
+                        <h3>Envíanos un Mensaje</h3>
+                        <p>Completa el formulario y nos pondremos en contacto contigo lo antes posible</p>
+                    </div>
+                    
+                    <form method="post" class="contact-form" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.nombre.id_for_label }}" class="form-label">
+                                        <i class="ph-user"></i> Nombre Completo *
+                                    </label>
+                                    {{ form.nombre }}
+                                    {% if form.nombre.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.nombre.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">
+                                        <i class="ph-envelope"></i> Email *
+                                    </label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                        <div class="form-error">
+                                            {% for error in form.email.errors %}
+                                                <small>{{ error }}</small>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.asunto.id_for_label }}" class="form-label">
+                                <i class="ph-tag"></i> Asunto *
+                            </label>
+                            {{ form.asunto }}
+                            {% if form.asunto.errors %}
+                                <div class="form-error">
+                                    {% for error in form.asunto.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="{{ form.mensaje.id_for_label }}" class="form-label">
+                                <i class="ph-chat-circle"></i> Mensaje *
+                            </label>
+                            {{ form.mensaje }}
+                            {% if form.mensaje.errors %}
+                                <div class="form-error">
+                                    {% for error in form.mensaje.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="ph-paper-plane-tilt"></i> Enviar Mensaje
+                            </button>
+                            <button type="reset" class="btn btn-outline-secondary btn-lg">
+                                <i class="ph-x"></i> Limpiar Formulario
+                            </button>
+                        </div>
+                        
+                        <div class="form-note">
+                            <p><small>Los campos marcados con (*) son obligatorios. Respetamos tu privacidad y no compartimos tu información con terceros.</small></p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Formas Alternativas de Contacto -->
+<section class="section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="alternative-contact" data-aos="fade-up">
+                    <h3 class="text-center mb-4">Otras Formas de Contactarnos</h3>
+                    
+                    <div class="contact-methods">
+                        {% if config.whatsapp %}
+                        <div class="contact-method">
+                            <div class="method-icon whatsapp">
+                                <i class="ph-whatsapp-logo"></i>
+                            </div>
+                            <div class="method-content">
+                                <h5>WhatsApp</h5>
+                                <p>Chatea con nosotros para respuestas rápidas</p>
+                                <a href="https://wa.me/{{ config.whatsapp }}?text=Hola, me gustaría obtener información sobre Garzón" target="_blank" class="btn btn-success">
+                                    <i class="ph-whatsapp-logo"></i> Abrir Chat
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if config.facebook %}
+                        <div class="contact-method">
+                            <div class="method-icon facebook">
+                                <i class="ph-facebook-logo"></i>
+                            </div>
+                            <div class="method-content">
+                                <h5>Facebook</h5>
+                                <p>Síguenos y escríbenos por Messenger</p>
+                                <a href="{{ config.facebook }}" target="_blank" class="btn btn-primary">
+                                    <i class="ph-facebook-logo"></i> Ir a Facebook
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if config.instagram %}
+                        <div class="contact-method">
+                            <div class="method-icon instagram">
+                                <i class="ph-instagram-logo"></i>
+                            </div>
+                            <div class="method-content">
+                                <h5>Instagram</h5>
+                                <p>Síguenos para contenido visual y Direct</p>
+                                <a href="{{ config.instagram }}" target="_blank" class="btn btn-gradient">
+                                    <i class="ph-instagram-logo"></i> Ir a Instagram
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Preguntas Frecuentes -->
+<section class="section section-light">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <h2 class="section-title">Preguntas Frecuentes</h2>
+            <p class="section-text">Aquí tienes respuestas a las consultas más comunes de nuestros visitantes</p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="faq-accordion" data-aos="fade-up" data-aos-delay="100">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    <i class="ph-question"></i>
+                                    ¿Cuál es la mejor época para visitar Garzón?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Garzón se puede visitar durante todo el año gracias a su clima templado. La época seca (diciembre a marzo y julio-agosto) es ideal para actividades al aire libre, mientras que la época de lluvias ofrece paisajes más verdes y frondosos.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    <i class="ph-question"></i>
+                                    ¿Cómo llegar a Garzón desde Bogotá?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Puedes llegar por vía aérea hasta Neiva (40 min en auto desde Garzón) o por carretera directamente (aproximadamente 4 horas). También hay servicios de bus desde la Terminal de Bogotá con varias empresas de transporte.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    <i class="ph-question"></i>
+                                    ¿Qué experiencias de café puedo vivir en Garzón?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Puedes visitar fincas cafeteras, participar en procesos de cosecha y beneficio, catar cafés especiales, y aprender sobre el proceso completo del grano. Ofrecemos tours guiados y experiencias auténticas con productores locales.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    <i class="ph-question"></i>
+                                    ¿Necesito reservar con anticipación?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Recomendamos reservar alojamiento y tours especializados con anticipación, especialmente en temporadas altas (diciembre-enero, Semana Santa, y festivales locales). Para restaurantes y actividades generales, usualmente no es necesario.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

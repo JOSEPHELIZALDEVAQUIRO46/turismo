@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Error del servidor - {{ block.super }}{% endblock %}
+
+{% block meta_description %}Ha ocurrido un error interno en el servidor. Nuestro equipo técnico está trabajando para solucionarlo.{% endblock %}
+
+{% block body_class %}error-page{% endblock %}
+
+{% block content %}
+<section class="error-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="error-content" data-aos="fade-up">
+                    <div class="error-code">
+                        <span class="error-number">5</span>
+                        <div class="error-icon">
+                            <i class="ph-warning-circle"></i>
+                        </div>
+                        <span class="error-number">0</span>
+                    </div>
+                    
+                    <h1 class="error-title">¡Error interno del servidor!</h1>
+                    <p class="error-description">
+                        Ha ocurrido un problema técnico en nuestros servidores. 
+                        Nuestro equipo ha sido notificado y está trabajando para solucionarlo lo antes posible.
+                    </p>
+                    
+                    <div class="error-info">
+                        <div class="info-box" data-aos="fade-up" data-aos-delay="100">
+                            <i class="ph-wrench"></i>
+                            <h5>¿Qué está pasando?</h5>
+                            <p>Estamos experimentando dificultades técnicas temporales que impiden mostrar correctamente esta página.</p>
+                        </div>
+                        
+                        <div class="info-box" data-aos="fade-up" data-aos-delay="200">
+                            <i class="ph-clock"></i>
+                            <h5>¿Cuándo se solucionará?</h5>
+                            <p>Nuestro equipo técnico está trabajando activamente en resolver este problema. Por favor, intenta nuevamente en unos minutos.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="error-actions">
+                        <a href="{% url 'core:home' %}" class="btn btn-primary btn-lg">
+                            <i class="ph-house"></i> Volver al Inicio
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-outline-primary btn-lg">
+                            <i class="ph-arrow-clockwise"></i> Intentar de Nuevo
+                        </button>
+                    </div>
+                    
+                    <div class="error-contact" data-aos="fade-up" data-aos-delay="300">
+                        <h4>¿Necesitas ayuda urgente?</h4>
+                        <p>Si el problema persiste o necesitas asistencia inmediata, puedes contactarnos:</p>
+                        <div class="contact-options">
+                            {% if config.email_contacto %}
+                            <a href="mailto:{{ config.email_contacto }}" class="contact-option">
+                                <i class="ph-envelope"></i>
+                                <span>{{ config.email_contacto }}</span>
+                            </a>
+                            {% endif %}
+                            {% if config.telefono_contacto %}
+                            <a href="tel:{{ config.telefono_contacto }}" class="contact-option">
+                                <i class="ph-phone"></i>
+                                <span>{{ config.telefono_contacto }}</span>
+                            </a>
+                            {% endif %}
+                            {% if config.whatsapp %}
+                            <a href="https://wa.me/{{ config.whatsapp }}" class="contact-option" target="_blank">
+                                <i class="ph-whatsapp-logo"></i>
+                                <span>WhatsApp</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Elementos decorativos -->
+    <div class="error-decorations">
+        <div class="decoration decoration-1">
+            <i class="ph-gear"></i>
+        </div>
+        <div class="decoration decoration-2">
+            <i class="ph-wrench"></i>
+        </div>
+        <div class="decoration decoration-3">
+            <i class="ph-warning"></i>
+        </div>
+        <div class="decoration decoration-4">
+            <i class="ph-tools"></i>
+        </div>
+    </div>
+</section>
+{% endblock %}
