@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Actividades Físicas en Garzón - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="mt-5 pt-4">
+    <div class="container-fluid">
+        <!-- Hero Section -->
+        <div class="row text-white py-5 mb-4" style="background-color: #5DAD47;">
+            <div class="col-12 text-center">
+                <h1 class="display-4 mb-3 text-uppercase fw-bold text-white">Actividades Físicas en Garzón</h1>
+                <p class="lead text-white">Vive la aventura y conecta con la naturaleza en experiencias únicas</p>
+                <div class="row text-center mt-4">
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.actividades_fisicas }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Actividades Disponibles</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.senderismo }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Rutas de Senderismo</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.ciclismo }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Rutas de Ciclismo</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.escalada }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Escalada y Aventura</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-decoration-none fw-bold w-100 text-start" 
+                                    style="color: #5DAD47;" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#filtros" 
+                                    aria-expanded="false">
+                                <i class="fas fa-filter me-2"></i> Filtros de Búsqueda
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div class="collapse" id="filtros">
+                        <div class="card-body">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="search" class="form-label text-dark fw-bold text-uppercase small">Búsqueda general:</label>
+                                    <input type="text" name="search" class="form-control" style="border-color: #5DAD47;" placeholder="Buscar actividades..." value="{{ search }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="tipo_actividad" class="form-label text-dark fw-bold text-uppercase small">Tipo:</label>
+                                    {{ filtro_form.tipo_actividad }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="dificultad" class="form-label text-dark fw-bold text-uppercase small">Dificultad:</label>
+                                    {{ filtro_form.dificultad }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="edad_minima" class="form-label text-dark fw-bold text-uppercase small">Edad mínima:</label>
+                                    {{ filtro_form.edad_minima }}
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <div class="d-grid gap-2 w-100">
+                                        <button type="submit" class="btn text-white fw-bold" style="background-color: #5DAD47;">
+                                            <i class="fas fa-search me-1"></i> Buscar
+                                        </button>
+                                        <a href="{% url 'turismo:actividades_fisicas_list' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-1"></i> Limpiar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Actividades Destacadas -->
+    {% if actividades_destacadas %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="mb-4">Actividades Destacadas</h3>
+            <div class="row">
+                {% for actividad in actividades_destacadas %}
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if actividad.imagen_principal %}
+                        <img src="{{ actividad.imagen_principal.url }}" class="card-img-top" alt="{{ actividad.nombre }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="fas fa-running fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ actividad.nombre }}</h6>
+                            <p class="text-muted small mb-1">
+                                <i class="fas fa-map-marker-alt"></i> {{ actividad.ubicacion }}
+                            </p>
+                            <p class="text-muted small mb-2">
+                                <i class="fas fa-clock"></i> {{ actividad.duracion }}
+                            </p>
+                            <span class="badge badge-{{ actividad.get_color_dificultad }}">{{ actividad.get_dificultad_display }}</span>
+                            {% if actividad.costo %}
+                            <p class="text-success font-weight-bold mt-2 mb-0">{{ actividad.costo }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer">
+                            <a href="{{ actividad.get_absolute_url }}" class="btn btn-success btn-sm btn-block">
+                                <i class="fas fa-eye"></i> Ver Detalles
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Lista Principal de Actividades -->
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3>Todas las Actividades Físicas</h3>
+                {% if actividades %}
+                <span class="text-muted">{{ actividades|length }} actividades encontradas</span>
+                {% endif %}
+            </div>
+
+            {% if actividades %}
+            <div class="row">
+                {% for actividad in actividades %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        {% if actividad.imagen_principal %}
+                        <img src="{{ actividad.imagen_principal.url }}" class="card-img-top" alt="{{ actividad.nombre }}" style="height: 250px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                            {% if actividad.tipo_actividad == 'senderismo' %}
+                                <i class="fas fa-hiking fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'escalada' %}
+                                <i class="fas fa-mountain fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'ciclismo' %}
+                                <i class="fas fa-bicycle fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'natacion' %}
+                                <i class="fas fa-swimming-pool fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'kayak' %}
+                                <i class="fas fa-ship fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'parapente' %}
+                                <i class="fas fa-parachute-box fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'cabalgata' %}
+                                <i class="fas fa-horse fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'camping' %}
+                                <i class="fas fa-campground fa-4x text-muted"></i>
+                            {% elif actividad.tipo_actividad == 'avistamiento' %}
+                                <i class="fas fa-binoculars fa-4x text-muted"></i>
+                            {% else %}
+                                <i class="fas fa-running fa-4x text-muted"></i>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        
+                        {% if actividad.destacado %}
+                        <div class="position-absolute" style="top: 10px; right: 10px;">
+                            <span class="badge badge-warning">
+                                <i class="fas fa-star"></i> Destacado
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{ actividad.nombre }}</h5>
+                            
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-map-marker-alt"></i> {{ actividad.ubicacion }}
+                            </p>
+
+                            <p class="card-text">{{ actividad.descripcion|truncatewords:15 }}</p>
+                            
+                            <div class="mb-3">
+                                <span class="badge badge-info">{{ actividad.get_tipo_actividad_display }}</span>
+                                <span class="badge badge-{{ actividad.get_color_dificultad }}">{{ actividad.get_dificultad_display }}</span>
+                                {% if not actividad.disponible %}
+                                <span class="badge badge-secondary">No disponible</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Información adicional -->
+                            <div class="row text-center small text-muted mb-3">
+                                <div class="col-4">
+                                    <i class="fas fa-clock"></i><br>
+                                    {{ actividad.duracion }}
+                                </div>
+                                <div class="col-4">
+                                    <i class="fas fa-users"></i><br>
+                                    {% if actividad.edad_minima %}{{ actividad.edad_minima }}+ años{% else %}Todo público{% endif %}
+                                </div>
+                                <div class="col-4">
+                                    {% if actividad.costo %}
+                                    <i class="fas fa-dollar-sign"></i><br>
+                                    {{ actividad.costo }}
+                                    {% else %}
+                                    <i class="fas fa-info-circle"></i><br>
+                                    Consultar
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% if actividad.instructor_guia %}
+                            <p class="small text-muted mb-2">
+                                <i class="fas fa-user-tie"></i> <strong>Guía:</strong> {{ actividad.instructor_guia }}
+                            </p>
+                            {% endif %}
+
+                            {% if actividad.capacidad_maxima %}
+                            <p class="small text-muted mb-0">
+                                <i class="fas fa-users"></i> <strong>Capacidad máxima:</strong> {{ actividad.capacidad_maxima }} personas
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="col-8">
+                                    <a href="{{ actividad.get_absolute_url }}" class="btn btn-success btn-sm">
+                                        <i class="fas fa-eye"></i> Ver Detalles
+                                    </a>
+                                </div>
+                                <div class="col-4 text-right">
+                                    {% if actividad.telefono %}
+                                    <button class="btn btn-outline-success btn-sm" title="Contactar">
+                                        <i class="fas fa-phone"></i>
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginación -->
+            {% if is_paginated %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <nav aria-label="Paginación de actividades">
+                        <ul class="pagination justify-content-center">
+                            {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo_actividad %}&tipo_actividad={{ request.GET.tipo_actividad }}{% endif %}{% if request.GET.dificultad %}&dificultad={{ request.GET.dificultad }}{% endif %}{% if request.GET.edad_minima %}&edad_minima={{ request.GET.edad_minima }}{% endif %}">Primera</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo_actividad %}&tipo_actividad={{ request.GET.tipo_actividad }}{% endif %}{% if request.GET.dificultad %}&dificultad={{ request.GET.dificultad }}{% endif %}{% if request.GET.edad_minima %}&edad_minima={{ request.GET.edad_minima }}{% endif %}">Anterior</a>
+                            </li>
+                            {% endif %}
+
+                            <li class="page-item active">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo_actividad %}&tipo_actividad={{ request.GET.tipo_actividad }}{% endif %}{% if request.GET.dificultad %}&dificultad={{ request.GET.dificultad }}{% endif %}{% if request.GET.edad_minima %}&edad_minima={{ request.GET.edad_minima }}{% endif %}">Siguiente</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo_actividad %}&tipo_actividad={{ request.GET.tipo_actividad }}{% endif %}{% if request.GET.dificultad %}&dificultad={{ request.GET.dificultad }}{% endif %}{% if request.GET.edad_minima %}&edad_minima={{ request.GET.edad_minima }}{% endif %}">Última</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <!-- No hay resultados -->
+            <div class="row">
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-running fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">No se encontraron actividades físicas</h4>
+                    <p class="text-muted">Intenta modificar los filtros de búsqueda o explora todos nuestros tipos de actividad.</p>
+                    <a href="{% url 'turismo:actividades_fisicas_list' %}" class="btn btn-success">
+                        <i class="fas fa-arrow-left"></i> Ver Todas las Actividades
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="bg-light py-5 mt-5">
+    <div class="container text-center">
+        <h3>¿Ofreces actividades de aventura?</h3>
+        <p class="lead">Únete a nuestra plataforma y conecta con aventureros de todo el mundo</p>
+        <a href="{% url 'contacto:contacto' %}" class="btn btn-success btn-lg">
+            <i class="fas fa-plus"></i> Registrar mi Actividad
+        </a>
+    </div>
+</div>
+{% endblock %}

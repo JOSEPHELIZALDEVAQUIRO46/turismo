@@ -327,3 +327,217 @@ class Evento(TimeStampedModel):
     
     class Meta:
         ordering = ['fecha_inicio']
+
+        # Nuevos models
+
+class Transporte(TimeStampedModel):
+    TIPO_TRANSPORTE_CHOICES = (
+        ('bus', 'Autobús'),
+        ('taxi', 'Taxi'),
+        ('moto', 'Mototaxi'),
+        ('bicicleta', 'Bicicleta'),
+        ('caminata', 'Caminata'),
+        ('vehiculo_propio', 'Vehículo Propio'),
+        ('tour', 'Tour Organizado'),
+        ('otro', 'Otro'),
+    )
+    
+    nombre = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_TRANSPORTE_CHOICES)
+    descripcion = models.TextField()
+    origen = models.CharField(max_length=255)
+    destino = models.CharField(max_length=255)
+    duracion_estimada = models.CharField(max_length=50, help_text="Ej: '30 minutos', '2 horas'")
+    costo_aproximado = models.CharField(max_length=100, blank=True)
+    contacto = models.CharField(max_length=200, blank=True)
+    telefono = models.CharField(max_length=20, blank=True)
+    horarios = models.TextField(blank=True, help_text="Horarios de operación")
+    recomendaciones = models.TextField(blank=True)
+    imagen = models.ImageField(upload_to='transporte', blank=True)
+    destacado = models.BooleanField(default=False)
+    disponible = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.nombre} ({self.get_tipo_display()})"
+    
+    def get_absolute_url(self):
+        return reverse('turismo:transporte_detail', kwargs={'slug': self.slug})
+    
+    class Meta:
+        verbose_name_plural = "Transportes"
+
+
+class Artesania(TimeStampedModel):
+    CATEGORIA_CHOICES = (
+        ('ceramica', 'Cerámica'),
+        ('textil', 'Textil'),
+        ('madera', 'Madera'),
+        ('cuero', 'Cuero'),
+        ('metal', 'Metal'),
+        ('piedra', 'Piedra'),
+        ('fibra', 'Fibra Natural'),
+        ('joyeria', 'Joyería'),
+        ('otro', 'Otro'),
+    )
+    
+    nombre = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES)
+    descripcion = models.TextField()
+    artesano = models.CharField(max_length=200, help_text="Nombre del artesano o taller")
+    lugar_origen = models.CharField(max_length=255)
+    tecnica_elaboracion = models.TextField(blank=True)
+    materiales = models.TextField(help_text="Materiales utilizados separados por comas")
+    precio_referencia = models.CharField(max_length=100, blank=True)
+    tiempo_elaboracion = models.CharField(max_length=100, blank=True)
+    imagen_principal = models.ImageField(upload_to='artesanias')
+    destacado = models.BooleanField(default=False)
+    disponible_venta = models.BooleanField(default=True)
+    contacto_artesano = models.TextField(blank=True)
+    historia = models.TextField(blank=True, help_text="Historia o tradición detrás de la artesanía")
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.nombre} - {self.artesano}"
+    
+    def get_absolute_url(self):
+        return reverse('turismo:artesania_detail', kwargs={'slug': self.slug})
+    
+    def get_materiales_list(self):
+        """Convierte el campo materiales en una lista"""
+        if not self.materiales:
+            return []
+        return [m.strip() for m in self.materiales.split(',') if m.strip()]
+    
+    class Meta:
+        verbose_name_plural = "Artesanías"
+
+
+class ActividadFisica(TimeStampedModel):
+    TIPO_ACTIVIDAD_CHOICES = (
+        ('senderismo', 'Senderismo'),
+        ('escalada', 'Escalada'),
+        ('ciclismo', 'Ciclismo'),
+        ('natacion', 'Natación'),
+        ('kayak', 'Kayak'),
+        ('rafting', 'Rafting'),
+        ('parapente', 'Parapente'),
+        ('cabalgata', 'Cabalgata'),
+        ('canopy', 'Canopy'),
+        ('rappel', 'Rappel'),
+        ('camping', 'Camping'),
+        ('avistamiento', 'Avistamiento de Aves'),
+        ('otro', 'Otra'),
+    )
+    
+    DIFICULTAD_CHOICES = (
+        ('principiante', 'Principiante'),
+        ('intermedio', 'Intermedio'),
+        ('avanzado', 'Avanzado'),
+        ('experto', 'Experto'),
+    )
+    
+    nombre = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    tipo_actividad = models.CharField(max_length=20, choices=TIPO_ACTIVIDAD_CHOICES)
+    descripcion = models.TextField()
+    ubicacion = models.CharField(max_length=255)
+    dificultad = models.CharField(max_length=15, choices=DIFICULTAD_CHOICES, default='principiante')
+    duracion = models.CharField(max_length=50, help_text="Ej: '2 horas', 'Día completo'")
+    costo = models.CharField(max_length=100, blank=True)
+    edad_minima = models.PositiveSmallIntegerField(default=0, help_text="Edad mínima recomendada")
+    capacidad_maxima = models.PositiveSmallIntegerField(blank=True, null=True)
+    equipamiento_incluido = models.TextField(blank=True, help_text="Equipamiento proporcionado")
+    equipamiento_requerido = models.TextField(blank=True, help_text="Equipamiento que debe traer el participante")
+    recomendaciones_salud = models.TextField(blank=True)
+    mejor_epoca = models.CharField(max_length=200, blank=True, help_text="Mejor época del año para la actividad")
+    horarios_disponibles = models.TextField(blank=True)
+    instructor_guia = models.CharField(max_length=200, blank=True)
+    contacto = models.CharField(max_length=200, blank=True)
+    telefono = models.CharField(max_length=20, blank=True)
+    email = models.EmailField(blank=True, null=True)
+    imagen_principal = models.ImageField(upload_to='actividades_fisicas')
+    latitud = models.FloatField(null=True, blank=True)
+    longitud = models.FloatField(null=True, blank=True)
+    destacado = models.BooleanField(default=False)
+    disponible = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.nombre} ({self.get_tipo_actividad_display()})"
+    
+    def get_absolute_url(self):
+        return reverse('turismo:actividad_fisica_detail', kwargs={'slug': self.slug})
+    
+    def get_color_dificultad(self):
+        """Retorna color CSS basado en la dificultad"""
+        colors = {
+            'principiante': 'success',
+            'intermedio': 'warning',
+            'avanzado': 'danger',
+            'experto': 'dark'
+        }
+        return colors.get(self.dificultad, 'primary')
+    
+    def get_equipamiento_incluido_list(self):
+        """Convierte el equipamiento incluido en una lista"""
+        if not self.equipamiento_incluido:
+            return []
+        return [e.strip() for e in self.equipamiento_incluido.split(',') if e.strip()]
+    
+    def get_equipamiento_requerido_list(self):
+        """Convierte el equipamiento requerido en una lista"""
+        if not self.equipamiento_requerido:
+            return []
+        return [e.strip() for e in self.equipamiento_requerido.split(',') if e.strip()]
+    
+    def tiene_coordenadas(self):
+        """Verifica si la actividad tiene coordenadas para mostrar en mapa"""
+        return self.latitud is not None and self.longitud is not None
+    
+    def es_apta_para_edad(self, edad):
+        """Verifica si una persona de cierta edad puede realizar la actividad"""
+        return edad >= self.edad_minima
+    
+    class Meta:
+        verbose_name_plural = "Actividades Físicas"
+
+
+class ImagenArtesania(models.Model):
+    artesania = models.ForeignKey(Artesania, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to='artesanias/galerias')
+    titulo = models.CharField(max_length=100, blank=True)
+    orden = models.PositiveSmallIntegerField(default=0, help_text="Orden de visualización")
+    
+    def __str__(self):
+        return f"Imagen de {self.artesania.nombre}: {self.titulo or 'Sin título'}"
+    
+    class Meta:
+        ordering = ['orden', 'id']
+
+
+class ImagenActividadFisica(models.Model):
+    actividad = models.ForeignKey(ActividadFisica, on_delete=models.CASCADE, related_name='imagenes')
+    imagen = models.ImageField(upload_to='actividades_fisicas/galerias')
+    titulo = models.CharField(max_length=100, blank=True)
+    orden = models.PositiveSmallIntegerField(default=0, help_text="Orden de visualización")
+    
+    def __str__(self):
+        return f"Imagen de {self.actividad.nombre}: {self.titulo or 'Sin título'}"
+    
+    class Meta:
+        ordering = ['orden', 'id']

@@ -1,0 +1,369 @@
+{# templates/turismo/transporte/list.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Transporte en Garzón - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="mt-5 pt-4">
+    <div class="container-fluid">
+        <!-- Hero Section -->
+        <div class="row text-white py-5 mb-4" style="background-color: #5DAD47;">
+            <div class="col-12 text-center">
+                <h1 class="display-4 mb-3 text-uppercase fw-bold text-white">Transporte en Garzón</h1>
+                <p class="lead text-white">Encuentra la mejor forma de moverte por nuestra región</p>
+                <div class="row text-center mt-4">
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.transportes }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Opciones de Transporte</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.buses }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Rutas de Bus</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.taxis }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Servicios de Taxi</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.tours }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Tours Organizados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-decoration-none fw-bold w-100 text-start" 
+                                    style="color: #5DAD47;" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#filtros" 
+                                    aria-expanded="false">
+                                <i class="fas fa-filter me-2"></i> Filtros de Búsqueda
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div class="collapse" id="filtros">
+                        <div class="card-body">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="search" class="form-label text-dark fw-bold text-uppercase small">Búsqueda general:</label>
+                                    <input type="text" name="search" class="form-control" style="border-color: #5DAD47;" placeholder="Buscar transporte..." value="{{ search }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="tipo" class="form-label text-dark fw-bold text-uppercase small">Tipo de transporte:</label>
+                                    {{ filtro_form.tipo }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="origen" class="form-label text-dark fw-bold text-uppercase small">Origen:</label>
+                                    {{ filtro_form.origen }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="destino" class="form-label text-dark fw-bold text-uppercase small">Destino:</label>
+                                    {{ filtro_form.destino }}
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <div class="d-grid gap-2 w-100">
+                                        <button type="submit" class="btn text-white fw-bold" style="background-color: #5DAD47;">
+                                            <i class="fas fa-search me-1"></i> Buscar
+                                        </button>
+                                        <a href="{% url 'turismo:transporte_list' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-1"></i> Limpiar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <!-- Transportes Destacados -->
+        {% if transportes_destacados %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <h3 class="mb-4 text-center text-uppercase fw-bold" style="color: #5DAD47;">Transportes Destacados</h3>
+                <div class="row g-4">
+                    {% for transporte in transportes_destacados %}
+                    <div class="col-lg-2 col-md-4 col-sm-6">
+                        <div class="card h-100 shadow-sm border-0">
+                            {% if transporte.imagen %}
+                            <div class="position-relative">
+                                <img src="{{ transporte.imagen.url }}" class="card-img-top" alt="{{ transporte.nombre }}" style="height: 200px; object-fit: cover;">
+                                <div class="position-absolute top-0 end-0 m-2">
+                                    <span class="badge text-dark fw-bold" style="background-color: #F4DC26;">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                {% if transporte.tipo == 'bus' %}
+                                    <i class="fas fa-bus fa-3x text-muted"></i>
+                                {% elif transporte.tipo == 'taxi' %}
+                                    <i class="fas fa-taxi fa-3x text-muted"></i>
+                                {% elif transporte.tipo == 'moto' %}
+                                    <i class="fas fa-motorcycle fa-3x text-muted"></i>
+                                {% elif transporte.tipo == 'bicicleta' %}
+                                    <i class="fas fa-bicycle fa-3x text-muted"></i>
+                                {% elif transporte.tipo == 'caminata' %}
+                                    <i class="fas fa-walking fa-3x text-muted"></i>
+                                {% elif transporte.tipo == 'tour' %}
+                                    <i class="fas fa-route fa-3x text-muted"></i>
+                                {% else %}
+                                    <i class="fas fa-car fa-3x text-muted"></i>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-bold text-dark">{{ transporte.nombre }}</h6>
+                                <p class="text-muted small mb-1">
+                                    <i class="fas fa-map-marker-alt me-1" style="color: #5DAD47;"></i> {{ transporte.origen }}
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-flag me-1" style="color: #F4DC26;"></i> {{ transporte.destino }}
+                                </p>
+                                <span class="badge text-white small" style="background-color: #5DAD47;">{{ transporte.get_tipo_display }}</span>
+                                {% if transporte.costo_aproximado %}
+                                <p class="text-success fw-bold mt-2 mb-0 small">{{ transporte.costo_aproximado }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white border-0 p-3">
+                                <a href="{{ transporte.get_absolute_url }}" class="btn btn-sm w-100 text-white fw-bold" style="background-color: #5DAD47;">
+                                    <i class="fas fa-eye me-1"></i> Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Lista Principal de Transportes -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4 text-center">
+                    <h3 class="text-uppercase fw-bold" style="color: #5DAD47;">Todas las Opciones de Transporte</h3>
+                    {% if transportes %}
+                    <span class="text-muted">{{ transportes|length }} opciones encontradas</span>
+                    {% endif %}
+                </div>
+
+                {% if transportes %}
+                <div class="row g-4">
+                    {% for transporte in transportes %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 shadow-sm border-0">
+                            {% if transporte.imagen %}
+                            <div class="position-relative">
+                                <img src="{{ transporte.imagen.url }}" class="card-img-top" alt="{{ transporte.nombre }}" style="height: 250px; object-fit: cover;">
+                                {% if transporte.destacado %}
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge text-dark fw-bold" style="background-color: #F4DC26;">
+                                        <i class="fas fa-star me-1"></i> Destacado
+                                    </span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                {% if transporte.tipo == 'bus' %}
+                                    <i class="fas fa-bus fa-4x text-muted"></i>
+                                {% elif transporte.tipo == 'taxi' %}
+                                    <i class="fas fa-taxi fa-4x text-muted"></i>
+                                {% elif transporte.tipo == 'moto' %}
+                                    <i class="fas fa-motorcycle fa-4x text-muted"></i>
+                                {% elif transporte.tipo == 'bicicleta' %}
+                                    <i class="fas fa-bicycle fa-4x text-muted"></i>
+                                {% elif transporte.tipo == 'caminata' %}
+                                    <i class="fas fa-walking fa-4x text-muted"></i>
+                                {% elif transporte.tipo == 'tour' %}
+                                    <i class="fas fa-route fa-4x text-muted"></i>
+                                {% else %}
+                                    <i class="fas fa-car fa-4x text-muted"></i>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div class="card-body p-4">
+                                <h5 class="card-title fw-bold text-dark">{{ transporte.nombre }}</h5>
+                                
+                                <!-- Ruta Visual Mejorada -->
+                                <div class="mb-3 p-3 rounded" style="background-color: #f8f9fa; border-left: 4px solid #5DAD47;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="text-center">
+                                            <i class="fas fa-map-marker-alt fa-lg" style="color: #5DAD47;"></i>
+                                            <p class="mb-0 small fw-bold text-dark mt-1">{{ transporte.origen }}</p>
+                                            <small class="text-muted text-uppercase">Origen</small>
+                                        </div>
+                                        <div class="flex-fill mx-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-fill" style="height: 3px; background: linear-gradient(to right, #5DAD47, #F4DC26);"></div>
+                                                <i class="fas fa-arrow-right mx-2" style="color: #5DAD47;"></i>
+                                                <div class="flex-fill" style="height: 3px; background: linear-gradient(to right, #F4DC26, #5DAD47);"></div>
+                                            </div>
+                                            {% if transporte.duracion_estimada %}
+                                            <div class="text-center mt-1">
+                                                <small class="text-muted fw-bold">{{ transporte.duracion_estimada }}</small>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-center">
+                                            <i class="fas fa-flag fa-lg" style="color: #F4DC26;"></i>
+                                            <p class="mb-0 small fw-bold text-dark mt-1">{{ transporte.destino }}</p>
+                                            <small class="text-muted text-uppercase">Destino</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="card-text text-muted">{{ transporte.descripcion|truncatewords:15 }}</p>
+                                
+                                <div class="mb-3">
+                                    <span class="badge text-white" style="background-color: #5DAD47;">{{ transporte.get_tipo_display }}</span>
+                                    {% if not transporte.disponible %}
+                                    <span class="badge bg-secondary ms-2">No disponible</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Información adicional en cards pequeños -->
+                                <div class="row g-2 mb-3">
+                                    {% if transporte.costo_aproximado %}
+                                    <div class="col-6">
+                                        <div class="text-center p-2 rounded border">
+                                            <i class="fas fa-dollar-sign" style="color: #5DAD47;"></i>
+                                            <p class="mb-0 small fw-bold text-success">{{ transporte.costo_aproximado }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% if transporte.duracion_estimada %}
+                                    <div class="col-6">
+                                        <div class="text-center p-2 rounded border">
+                                            <i class="fas fa-clock" style="color: #5DAD47;"></i>
+                                            <p class="mb-0 small text-muted">{{ transporte.duracion_estimada }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Información de contacto -->
+                                {% if transporte.contacto %}
+                                <p class="small text-muted mb-1">
+                                    <i class="fas fa-user me-1" style="color: #5DAD47;"></i> 
+                                    <strong>Contacto:</strong> {{ transporte.contacto }}
+                                </p>
+                                {% endif %}
+
+                                {% if transporte.telefono %}
+                                <p class="small text-muted mb-0">
+                                    <i class="fas fa-phone me-1" style="color: #5DAD47;"></i> 
+                                    <strong>Teléfono:</strong> {{ transporte.telefono }}
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-footer bg-white border-0 p-4">
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <a href="{{ transporte.get_absolute_url }}" class="btn text-white flex-fill" style="background-color: #5DAD47;">
+                                        <i class="fas fa-eye me-1"></i> Ver Detalles
+                                    </a>
+                                    {% if transporte.telefono %}
+                                    <a href="tel:{{ transporte.telefono }}" class="btn" style="border-color: #5DAD47; color: #5DAD47;" title="Llamar">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginación -->
+                {% if is_paginated %}
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <nav aria-label="Paginación de transportes">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" style="color: #5DAD47; border-color: #5DAD47;" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.origen %}&origen={{ request.GET.origen }}{% endif %}{% if request.GET.destino %}&destino={{ request.GET.destino }}{% endif %}">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" style="color: #5DAD47; border-color: #5DAD47;" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.origen %}&origen={{ request.GET.origen }}{% endif %}{% if request.GET.destino %}&destino={{ request.GET.destino }}{% endif %}">Anterior</a>
+                                </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link" style="background-color: #5DAD47; border-color: #5DAD47;">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" style="color: #5DAD47; border-color: #5DAD47;" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.origen %}&origen={{ request.GET.origen }}{% endif %}{% if request.GET.destino %}&destino={{ request.GET.destino }}{% endif %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" style="color: #5DAD47; border-color: #5DAD47;" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.tipo %}&tipo={{ request.GET.tipo }}{% endif %}{% if request.GET.origen %}&origen={{ request.GET.origen }}{% endif %}{% if request.GET.destino %}&destino={{ request.GET.destino }}{% endif %}">Última</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- No hay resultados -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <div class="mb-4">
+                                <i class="fas fa-bus display-1 text-muted"></i>
+                            </div>
+                            <h4 class="text-muted mb-3">No se encontraron opciones de transporte</h4>
+                            <p class="text-muted mb-4">Intenta modificar los filtros de búsqueda o explora todos nuestros tipos de transporte.</p>
+                            <a href="{% url 'turismo:transporte_list' %}" class="btn text-white" style="background-color: #5DAD47;">
+                                <i class="fas fa-arrow-left me-2"></i> Ver Todas las Opciones
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="py-5 mt-5" style="background-color: #f8f9fa;">
+    <div class="container text-center">
+        <h3 class="text-uppercase fw-bold mb-3" style="color: #5DAD47;">¿Ofreces servicios de transporte?</h3>
+        <p class="lead text-muted mb-4">Únete a nuestra plataforma y conecta con más turistas</p>
+        <a href="{% url 'contacto:contacto' %}" class="btn btn-lg text-white fw-bold" style="background-color: #5DAD47;">
+            <i class="fas fa-plus me-2"></i> Registrar mi Servicio
+        </a>
+    </div>
+</div>
+
+{% endblock %}

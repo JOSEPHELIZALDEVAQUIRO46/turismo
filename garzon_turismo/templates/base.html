@@ -133,6 +133,12 @@
                                 <li><a class="dropdown-item" href="{% url 'turismo:establecimiento_list' %}?tipo=restaurante"><i class="ph-coffee"></i> Dónde Comer</a></li>
                                 <li><a class="dropdown-item" href="{% url 'turismo:evento_list' %}"><i class="ph-calendar-plus"></i> Eventos</a></li>
                                 <li><a class="dropdown-item" href="{% url 'turismo:ruta_list' %}"><i class="ph-map-trifold"></i> Rutas</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <!-- NUEVAS OPCIONES EN EL MENÚ -->
+                                <li><a class="dropdown-item" href="{% url 'turismo:transporte_list' %}"><i class="ph-bus"></i> Transporte</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:artesanias_list' %}"><i class="ph-palette"></i> Artesanías</a></li>
+                                <li><a class="dropdown-item" href="{% url 'turismo:actividades_fisicas_list' %}"><i class="ph-bicycle"></i> Actividades Físicas</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'turismo:galeria' %}"><i class="ph-image"></i> Galería</a></li>
                                 <li><a class="dropdown-item" href="{% url 'turismo:mapa' %}"><i class="ph-map-pin"></i> Mapa Interactivo</a></li>
                             </ul>
@@ -164,18 +170,18 @@
             </div>
         </nav>
         
-        <!-- Search Overlay -->
+        <!-- Search Overlay MEJORADO -->
         <div class="search-overlay" id="searchOverlay">
             <div class="container">
                 <div class="search-header">
-                    <h3>Buscar</h3>
+                    <h3>Buscar en Alma del Huila</h3>
                     <button class="search-close" id="searchClose">
                         <i class="ph-x"></i>
                     </button>
                 </div>
                 <form action="{% url 'turismo:turismo_search' %}" method="get" class="search-form">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="¿Qué quieres descubrir en Garzón?" required>
+                        <input type="text" name="q" class="form-control" placeholder="¿Qué quieres descubrir en Garzón?" required minlength="3">
                         <button type="submit" class="btn btn-primary">
                             <i class="ph-magnifying-glass"></i> Buscar
                         </button>
@@ -184,11 +190,21 @@
                 <div class="search-suggestions">
                     <p>Sugerencias populares:</p>
                     <div class="suggestion-tags">
-                        <a href="{% url 'turismo:turismo_search' %}?q=café">Café</a>
-                        <a href="{% url 'turismo:turismo_search' %}?q=hotel">Hoteles</a>
-                        <a href="{% url 'turismo:turismo_search' %}?q=restaurante">Restaurantes</a>
-                        <a href="{% url 'turismo:turismo_search' %}?q=naturaleza">Naturaleza</a>
-                        <a href="{% url 'turismo:turismo_search' %}?q=catedral">Catedral</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=café" class="suggestion-tag">Café</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=hotel" class="suggestion-tag">Hoteles</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=restaurante" class="suggestion-tag">Restaurantes</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=naturaleza" class="suggestion-tag">Naturaleza</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=catedral" class="suggestion-tag">Catedral</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=parque" class="suggestion-tag">Parques</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=senderismo" class="suggestion-tag">Senderismo</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=artesania" class="suggestion-tag">Artesanías</a>
+                    </div>
+                </div>
+
+                <!-- RESULTADOS DE BÚSQUEDA EN TIEMPO REAL -->
+                <div class="search-results" id="liveSearchResults" style="display: none;">
+                    <div class="search-results-content">
+                        <!-- Los resultados se cargarán aquí via AJAX -->
                     </div>
                 </div>
             </div>
@@ -221,7 +237,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- Footer ACTUALIZADO -->
     <footer class="site-footer">
         <div class="footer-widgets">
             <div class="container">
@@ -280,6 +296,10 @@
                                 <li><a href="{% url 'turismo:establecimiento_list' %}?tipo=restaurante">Gastronomía</a></li>
                                 <li><a href="{% url 'turismo:ruta_list' %}">Rutas Turísticas</a></li>
                                 <li><a href="{% url 'turismo:evento_list' %}">Eventos</a></li>
+                                <!-- NUEVOS ENLACES EN EL FOOTER -->
+                                <li><a href="{% url 'turismo:transporte_list' %}">Transporte</a></li>
+                                <li><a href="{% url 'turismo:artesanias_list' %}">Artesanías</a></li>
+                                <li><a href="{% url 'turismo:actividades_fisicas_list' %}">Actividades</a></li>
                                 <li><a href="{% url 'turismo:mapa' %}">Mapa</a></li>
                             </ul>
                         </div>
@@ -362,6 +382,125 @@
     
     <!-- Main JavaScript -->
     <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- BÚSQUEDA EN TIEMPO REAL -->
+    <script>
+    $(document).ready(function() {
+        // Búsqueda en tiempo real
+        let searchTimeout;
+        const searchInput = $('.search-form input[name="q"]');
+        const searchResults = $('#liveSearchResults');
+        
+        searchInput.on('input', function() {
+            const query = $(this).val().trim();
+            
+            // Limpiar timeout anterior
+            clearTimeout(searchTimeout);
+            
+            if (query.length >= 3) {
+                // Esperar 500ms antes de buscar
+                searchTimeout = setTimeout(function() {
+                    performLiveSearch(query);
+                }, 500);
+            } else {
+                searchResults.hide();
+            }
+        });
+        
+        function performLiveSearch(query) {
+            $.ajax({
+                url: '{% url "turismo:api_busqueda_rapida" %}',
+                data: { 'q': query },
+                dataType: 'json',
+                success: function(data) {
+                    displaySearchResults(data);
+                },
+                error: function() {
+                    console.log('Error en la búsqueda');
+                }
+            });
+        }
+        
+        function displaySearchResults(data) {
+            let html = '<h5>Resultados encontrados:</h5>';
+            let hasResults = false;
+            
+            // Mostrar lugares turísticos
+            if (data.lugares && data.lugares.length > 0) {
+                hasResults = true;
+                html += '<div class="search-category"><h6><i class="ph-mountains"></i> Lugares Turísticos</h6>';
+                data.lugares.forEach(function(lugar) {
+                    html += `<a href="${lugar.url}" class="search-result-item">
+                        <div class="search-result-content">
+                            <strong>${lugar.nombre}</strong>
+                            <p>${lugar.descripcion.substring(0, 80)}...</p>
+                        </div>
+                    </a>`;
+                });
+                html += '</div>';
+            }
+            
+            // Mostrar transportes
+            if (data.transportes && data.transportes.length > 0) {
+                hasResults = true;
+                html += '<div class="search-category"><h6><i class="ph-bus"></i> Transporte</h6>';
+                data.transportes.forEach(function(transporte) {
+                    html += `<a href="${transporte.url}" class="search-result-item">
+                        <div class="search-result-content">
+                            <strong>${transporte.nombre}</strong>
+                            <p>${transporte.origen} → ${transporte.destino}</p>
+                        </div>
+                    </a>`;
+                });
+                html += '</div>';
+            }
+            
+            // Mostrar artesanías
+            if (data.artesanias && data.artesanias.length > 0) {
+                hasResults = true;
+                html += '<div class="search-category"><h6><i class="ph-palette"></i> Artesanías</h6>';
+                data.artesanias.forEach(function(artesania) {
+                    html += `<a href="${artesania.url}" class="search-result-item">
+                        <div class="search-result-content">
+                            <strong>${artesania.nombre}</strong>
+                            <p>Por ${artesania.artesano}</p>
+                        </div>
+                    </a>`;
+                });
+                html += '</div>';
+            }
+            
+            // Mostrar actividades físicas
+            if (data.actividades && data.actividades.length > 0) {
+                hasResults = true;
+                html += '<div class="search-category"><h6><i class="ph-bicycle"></i> Actividades Físicas</h6>';
+                data.actividades.forEach(function(actividad) {
+                    html += `<a href="${actividad.url}" class="search-result-item">
+                        <div class="search-result-content">
+                            <strong>${actividad.nombre}</strong>
+                            <p>${actividad.ubicacion} - ${actividad.dificultad}</p>
+                        </div>
+                    </a>`;
+                });
+                html += '</div>';
+            }
+            
+            if (!hasResults) {
+                html = '<div class="no-results"><p>No se encontraron resultados para tu búsqueda.</p></div>';
+            }
+            
+            searchResults.find('.search-results-content').html(html);
+            searchResults.show();
+        }
+        
+        // Cerrar resultados al hacer clic fuera
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.search-form, #liveSearchResults').length) {
+                searchResults.hide();
+            }
+        });
+    });
+    </script>
     
     <!-- JavaScript específico por página -->
     {% block extra_js %}{% endblock %}

@@ -1,0 +1,324 @@
+{# templates/turismo/transporte/detail.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ transporte.nombre }} - Transporte en Garzón - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="mt-5 pt-4">
+    <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-light p-3 rounded">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-decoration-none" style="color: #5DAD47;">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'turismo:transporte_list' %}" class="text-decoration-none" style="color: #5DAD47;">Transporte</a></li>
+                <li class="breadcrumb-item active text-dark">{{ transporte.nombre }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <!-- Galería de Imágenes -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <!-- Carousel de Imágenes -->
+                        {% if imagenes %}
+                        <div id="galeriaCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000">
+                            <div class="carousel-inner">
+                                <!-- Imagen Principal -->
+                                {% if transporte.imagen %}
+                                <div class="carousel-item active">
+                                    <img src="{{ transporte.imagen.url }}" 
+                                         class="d-block w-100 rounded" alt="{{ transporte.nombre }}" 
+                                         style="height: 400px; object-fit: cover;">
+                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                                        <h6 class="text-white">{{ transporte.nombre }}</h6>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Imágenes Adicionales -->
+                                {% for imagen in imagenes %}
+                                <div class="carousel-item">
+                                    <img src="{{ imagen.imagen.url }}" 
+                                         class="d-block w-100 rounded" alt="{{ imagen.titulo }}" 
+                                         style="height: 400px; object-fit: cover;">
+                                    {% if imagen.titulo %}
+                                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                                        <h6 class="text-white">{{ imagen.titulo }}</h6>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Controles del Carousel -->
+                            <button class="carousel-control-prev" type="button" data-bs-target="#galeriaCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#galeriaCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon bg-dark rounded-circle p-2" aria-hidden="true"></span>
+                                <span class="visually-hidden">Siguiente</span>
+                            </button>
+                            
+                            <!-- Indicadores -->
+                            <div class="carousel-indicators">
+                                {% if transporte.imagen %}
+                                <button type="button" data-bs-target="#galeriaCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Imagen principal"></button>
+                                {% endif %}
+                                {% for imagen in imagenes %}
+                                <button type="button" data-bs-target="#galeriaCarousel" data-bs-slide-to="{{ forloop.counter }}" aria-label="Imagen {{ forloop.counter }}"></button>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Contador de imágenes -->
+                            <div class="position-absolute top-0 end-0 m-3">
+                                <span class="badge text-white" style="background-color: rgba(0,0,0,0.7);">
+                                    <i class="fas fa-images me-1"></i>
+                                    {% if transporte.imagen %}{{ imagenes|length|add:1 }}{% else %}{{ imagenes|length }}{% endif %} fotos
+                                </span>
+                            </div>
+                        </div>
+                        
+                        {% else %}
+                        <!-- Solo imagen principal o placeholder -->
+                        {% if transporte.imagen %}
+                        <img src="{{ transporte.imagen.url }}" 
+                             class="img-fluid w-100 rounded" alt="{{ transporte.nombre }}" 
+                             style="height: 400px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 400px;">
+                            {% if transporte.tipo == 'bus' %}
+                                <i class="fas fa-bus fa-5x text-muted"></i>
+                            {% elif transporte.tipo == 'taxi' %}
+                                <i class="fas fa-taxi fa-5x text-muted"></i>
+                            {% elif transporte.tipo == 'moto' %}
+                                <i class="fas fa-motorcycle fa-5x text-muted"></i>
+                            {% elif transporte.tipo == 'bicicleta' %}
+                                <i class="fas fa-bicycle fa-5x text-muted"></i>
+                            {% elif transporte.tipo == 'caminata' %}
+                                <i class="fas fa-walking fa-5x text-muted"></i>
+                            {% elif transporte.tipo == 'tour' %}
+                                <i class="fas fa-route fa-5x text-muted"></i>
+                            {% else %}
+                                <i class="fas fa-car fa-5x text-muted"></i>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                        {% endif %}
+
+                        <!-- Thumbnails para navegación rápida (opcional) -->
+                        {% if imagenes %}
+                        <div class="p-3">
+                            <h6 class="text-uppercase fw-bold mb-3" style="color: #5DAD47;">Vista Rápida</h6>
+                            <div class="row g-2">
+                                {% if transporte.imagen %}
+                                <div class="col-3">
+                                    <img src="{{ transporte.imagen.url }}" 
+                                         class="img-thumbnail" 
+                                         alt="{{ transporte.nombre }}"
+                                         style="height: 60px; object-fit: cover; cursor: pointer;">
+                                </div>
+                                {% endif %}
+                                {% for imagen in imagenes %}
+                                <div class="col-3">
+                                    <img src="{{ imagen.imagen.url }}" 
+                                         class="img-thumbnail" 
+                                         alt="{{ imagen.titulo }}"
+                                         style="height: 60px; object-fit: cover; cursor: pointer;">
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información Principal -->
+            <div class="col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <!-- Título y Estado -->
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <h1 class="h3 fw-bold text-dark">{{ transporte.nombre }}</h1>
+                            <div>
+                                {% if transporte.destacado %}
+                                <span class="badge text-dark mb-2" style="background-color: #F4DC26;">
+                                    <i class="fas fa-star"></i> Destacado
+                                </span><br>
+                                {% endif %}
+                                {% if transporte.disponible %}
+                                <span class="badge text-white" style="background-color: #5DAD47;">Disponible</span>
+                                {% else %}
+                                <span class="badge bg-secondary">No disponible</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Ruta Principal -->
+                        <div class="border rounded p-3 mb-4" style="background-color: #f8f9fa; border-left: 4px solid #5DAD47 !important;">
+                            <h5 class="fw-bold text-dark"><i class="fas fa-route me-2" style="color: #5DAD47;"></i> Ruta</h5>
+                            <div class="d-flex align-items-center">
+                                <div class="text-center">
+                                    <i class="fas fa-map-marker-alt fa-2x" style="color: #5DAD47;"></i>
+                                    <p class="mb-0 fw-bold text-dark">{{ transporte.origen }}</p>
+                                    <small class="text-muted text-uppercase">Origen</small>
+                                </div>
+                                <div class="flex-fill mx-3">
+                                    <div style="height: 3px; background: linear-gradient(to right, #5DAD47, #F4DC26);"></div>
+                                    <div class="text-center mt-1">
+                                        {% if transporte.duracion_estimada %}
+                                        <small class="text-muted fw-bold">{{ transporte.duracion_estimada }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-flag fa-2x" style="color: #F4DC26;"></i>
+                                    <p class="mb-0 fw-bold text-dark">{{ transporte.destino }}</p>
+                                    <small class="text-muted text-uppercase">Destino</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detalles del Transporte -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-tag me-2" style="color: #5DAD47;"></i> Tipo:</strong><br>
+                                <span class="badge text-white" style="background-color: #5DAD47;">{{ transporte.get_tipo_display }}</span></p>
+                            </div>
+                            {% if transporte.costo_aproximado %}
+                            <div class="col-md-6">
+                                <p><strong><i class="fas fa-dollar-sign me-2 text-success"></i> Costo aproximado:</strong><br>
+                                <span class="h5 text-success">{{ transporte.costo_aproximado }}</span></p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-dark"><i class="fas fa-info-circle me-2" style="color: #5DAD47;"></i> Descripción</h5>
+                            <p class="text-muted">{{ transporte.descripcion|linebreaks }}</p>
+                        </div>
+
+                        <!-- Información de Contacto -->
+                        {% if transporte.contacto or transporte.telefono %}
+                        <div class="border rounded p-3 mb-4" style="background-color: #f8f9fa; border-left: 4px solid #5DAD47 !important;">
+                            <h6 class="fw-bold text-dark"><i class="fas fa-address-book me-2" style="color: #5DAD47;"></i> Información de Contacto</h6>
+                            {% if transporte.contacto %}
+                            <p class="mb-1 text-dark"><strong>Contacto:</strong> {{ transporte.contacto }}</p>
+                            {% endif %}
+                            {% if transporte.telefono %}
+                            <p class="mb-0 text-dark"><strong>Teléfono:</strong> {{ transporte.telefono }}</p>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Botones de Acción -->
+                        {% if transporte.disponible %}
+                        <div class="d-flex flex-wrap gap-2">
+                            {% if transporte.telefono %}
+                            <a href="tel:{{ transporte.telefono }}" class="btn text-white fw-bold" style="background-color: #5DAD47;">
+                                <i class="fas fa-phone me-1"></i> Llamar
+                            </a>
+                            {% endif %}
+                            <button class="btn" style="border-color: #5DAD47; color: #5DAD47;">
+                                <i class="fas fa-share-alt me-1"></i> Compartir
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Adicional -->
+        <div class="row mt-5 g-4">
+            <!-- Horarios -->
+            {% if transporte.horarios %}
+            <div class="col-lg-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-clock me-2" style="color: #5DAD47;"></i> Horarios de Operación</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ transporte.horarios|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recomendaciones -->
+            {% if transporte.recomendaciones %}
+            <div class="col-lg-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-white border-0">
+                        <h5 class="mb-0 fw-bold text-dark"><i class="fas fa-lightbulb me-2" style="color: #F4DC26;"></i> Recomendaciones</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ transporte.recomendaciones|linebreaks }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Transportes Relacionados -->
+        {% if transportes_relacionados %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h3 class="mb-4 text-center text-uppercase fw-bold" style="color: #5DAD47;">Opciones de Transporte Relacionadas</h3>
+                <div class="row g-4">
+                    {% for relacionado in transportes_relacionados %}
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            {% if relacionado.imagen %}
+                            <img src="{{ relacionado.imagen.url }}" class="card-img-top" 
+                                 alt="{{ relacionado.nombre }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                {% if relacionado.tipo == 'bus' %}
+                                    <i class="fas fa-bus fa-3x text-muted"></i>
+                                {% elif relacionado.tipo == 'taxi' %}
+                                    <i class="fas fa-taxi fa-3x text-muted"></i>
+                                {% elif relacionado.tipo == 'moto' %}
+                                    <i class="fas fa-motorcycle fa-3x text-muted"></i>
+                                {% elif relacionado.tipo == 'bicicleta' %}
+                                    <i class="fas fa-bicycle fa-3x text-muted"></i>
+                                {% elif relacionado.tipo == 'caminata' %}
+                                    <i class="fas fa-walking fa-3x text-muted"></i>
+                                {% elif relacionado.tipo == 'tour' %}
+                                    <i class="fas fa-route fa-3x text-muted"></i>
+                                {% else %}
+                                    <i class="fas fa-car fa-3x text-muted"></i>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="card-body p-3">
+                                <h6 class="card-title fw-bold text-dark">{{ relacionado.nombre }}</h6>
+                                <p class="text-muted small">
+                                    <i class="fas fa-map-marker-alt me-1" style="color: #5DAD47;"></i> {{ relacionado.origen }} 
+                                    <i class="fas fa-arrow-right mx-1" style="color: #5DAD47;"></i> 
+                                    {{ relacionado.destino }}
+                                </p>
+                                <span class="badge text-white" style="background-color: #5DAD47;">{{ relacionado.get_tipo_display }}</span>
+                                {% if relacionado.costo_aproximado %}
+                                <p class="text-success fw-bold mt-2 mb-0">{{ relacionado.costo_aproximado }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer bg-white border-0 p-3">
+                                <a href="{{ relacionado.get_absolute_url }}" class="btn btn-sm w-100 text-white fw-bold" style="background-color: #5DAD47;">
+                                    Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

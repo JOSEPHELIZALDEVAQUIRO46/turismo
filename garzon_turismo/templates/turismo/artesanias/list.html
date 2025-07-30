@@ -1,0 +1,327 @@
+{# templates/turismo/artesanias/list.html #}
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Artesanías de Garzón - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="mt-5 pt-4">
+    <div class="container-fluid">
+        <!-- Hero Section -->
+        <div class="row text-white py-5 mb-4" style="background: linear-gradient(135deg, #5DAD47 0%, #4A9639 100%);">
+            <div class="col-12 text-center">
+                <h1 class="display-4 mb-3 text-uppercase fw-bold text-white">Artesanías de Garzón</h1>
+                <p class="lead text-white">Descubre la riqueza cultural y tradición artesanal de nuestra región</p>
+                <div class="row text-center mt-4">
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.artesanias }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Artesanías Disponibles</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.ceramicas }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Cerámicas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.textiles }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Textiles</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded" style="background-color: rgba(255,255,255,0.1);">
+                            <h3 class="fw-bold">{{ contadores.maderas }}</h3>
+                            <p class="mb-0 text-uppercase small text-white">Trabajos en Madera</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros y Búsqueda -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link text-decoration-none fw-bold w-100 text-start" 
+                                    style="color: #5DAD47;" 
+                                    type="button" 
+                                    data-bs-toggle="collapse" 
+                                    data-bs-target="#filtros" 
+                                    aria-expanded="false">
+                                <i class="fas fa-filter me-2"></i> Filtros de Búsqueda
+                                <i class="fas fa-chevron-down float-end"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div class="collapse" id="filtros">
+                        <div class="card-body">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="search" class="form-label text-dark fw-bold text-uppercase small">Búsqueda general:</label>
+                                    <input type="text" name="search" class="form-control" style="border-color: #5DAD47;" placeholder="Buscar artesanías..." value="{{ search }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="categoria" class="form-label text-dark fw-bold text-uppercase small">Categoría:</label>
+                                    {{ filtro_form.categoria }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="lugar_origen" class="form-label text-dark fw-bold text-uppercase small">Lugar de origen:</label>
+                                    {{ filtro_form.lugar_origen }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="artesano" class="form-label text-dark fw-bold text-uppercase small">Artesano:</label>
+                                    <input type="text" name="artesano" class="form-control" style="border-color: #5DAD47;" placeholder="Buscar por artesano..." value="{{ request.GET.artesano }}">
+                                </div>
+                                <div class="col-md-3 d-flex align-items-end">
+                                    <div class="d-grid gap-2 w-100">
+                                        <button type="submit" class="btn text-white fw-bold" style="background-color: #5DAD47;">
+                                            <i class="fas fa-search me-1"></i> Buscar
+                                        </button>
+                                        <a href="{% url 'turismo:artesanias_list' %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-times me-1"></i> Limpiar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Artesanías Destacadas -->
+        {% if artesanias_destacadas %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <h3 class="mb-4">Artesanías Destacadas</h3>
+                <div class="row">
+                    {% for artesania in artesanias_destacadas %}
+                    <div class="col-lg-2 col-md-4 col-sm-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            {% if artesania.imagen_principal %}
+                            <img src="{{ artesania.imagen_principal.url }}" class="card-img-top" alt="{{ artesania.nombre }}" style="height: 200px; object-fit: cover;">
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-palette fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ artesania.nombre }}</h6>
+                                <p class="text-muted small mb-1">
+                                    <i class="fas fa-user"></i> {{ artesania.artesano }}
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> {{ artesania.lugar_origen }}
+                                </p>
+                                <span class="badge" style="background-color: #5DAD47; color: white;">{{ artesania.get_categoria_display }}</span>
+                                {% if artesania.precio_referencia %}
+                                <p class="text-success font-weight-bold mt-2 mb-0">{{ artesania.precio_referencia }}</p>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ artesania.get_absolute_url }}" class="btn btn-sm btn-block text-white" style="background-color: #5DAD47;">
+                                    <i class="fas fa-eye"></i> Ver Detalles
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Lista Principal de Artesanías -->
+        <div class="row">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3>Todas las Artesanías</h3>
+                    {% if artesanias %}
+                    <span class="text-muted">{{ artesanias|length }} artesanías encontradas</span>
+                    {% endif %}
+                </div>
+
+                {% if artesanias %}
+                <div class="row">
+                    {% for artesania in artesanias %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            {% if artesania.imagen_principal %}
+                            <img src="{{ artesania.imagen_principal.url }}" class="card-img-top" alt="{{ artesania.nombre }}" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                {% if artesania.categoria == 'ceramica' %}
+                                    <i class="fas fa-vase fa-4x text-muted"></i>
+                                {% elif artesania.categoria == 'textil' %}
+                                    <i class="fas fa-tshirt fa-4x text-muted"></i>
+                                {% elif artesania.categoria == 'madera' %}
+                                    <i class="fas fa-tree fa-4x text-muted"></i>
+                                {% elif artesania.categoria == 'metal' %}
+                                    <i class="fas fa-hammer fa-4x text-muted"></i>
+                                {% elif artesania.categoria == 'cuero' %}
+                                    <i class="fas fa-shoe-prints fa-4x text-muted"></i>
+                                {% else %}
+                                    <i class="fas fa-palette fa-4x text-muted"></i>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            
+                            {% if artesania.destacado %}
+                            <div class="position-absolute" style="top: 10px; right: 10px;">
+                                <span class="badge badge-warning">
+                                    <i class="fas fa-star"></i> Destacado
+                                </span>
+                            </div>
+                            {% endif %}
+
+                            <div class="card-body">
+                                <h5 class="card-title">{{ artesania.nombre }}</h5>
+                                
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-user"></i> 
+                                    <a href="{% url 'turismo:artesanias_por_artesano' artesano=artesania.artesano %}" class="text-decoration-none text-muted">
+                                        {{ artesania.artesano }}
+                                    </a>
+                                </p>
+
+                                <p class="text-muted mb-2">
+                                    <i class="fas fa-map-marker-alt"></i> {{ artesania.lugar_origen }}
+                                </p>
+
+                                <p class="card-text">{{ artesania.descripcion|truncatewords:15 }}</p>
+                                
+                                <div class="mb-3">
+                                    <span class="badge text-white" style="background-color: #5DAD47;">{{ artesania.get_categoria_display }}</span>
+                                    {% if not artesania.disponible_venta %}
+                                    <span class="badge badge-secondary">No disponible</span>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Información adicional -->
+                                <div class="row text-center small text-muted mb-3">
+                                    <div class="col-4">
+                                        <i class="fas fa-clock"></i><br>
+                                        {% if artesania.tiempo_elaboracion %}{{ artesania.tiempo_elaboracion }}{% else %}Variable{% endif %}
+                                    </div>
+                                    <div class="col-4">
+                                        <i class="fas fa-tools"></i><br>
+                                        {% if artesania.materiales %}{{ artesania.get_materiales_list.0 }}...{% else %}Varios{% endif %}
+                                    </div>
+                                    <div class="col-4">
+                                        {% if artesania.precio_referencia %}
+                                        <i class="fas fa-dollar-sign"></i><br>
+                                        {{ artesania.precio_referencia }}
+                                        {% else %}
+                                        <i class="fas fa-info-circle"></i><br>
+                                        Consultar
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                {% if artesania.materiales %}
+                                <p class="small text-muted mb-2">
+                                    <i class="fas fa-tools"></i> <strong>Materiales:</strong> 
+                                    {% for material in artesania.get_materiales_list|slice:":2" %}
+                                        {{ material }}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                    {% if artesania.get_materiales_list|length > 2 %}...{% endif %}
+                                </p>
+                                {% endif %}
+
+                                {% if artesania.tecnica_elaboracion %}
+                                <p class="small text-muted mb-0">
+                                    <i class="fas fa-hands"></i> <strong>Técnica:</strong> {{ artesania.tecnica_elaboracion|truncatewords:5 }}
+                                </p>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-footer">
+                                <div class="row">
+                                    <div class="col-8">
+                                        <a href="{{ artesania.get_absolute_url }}" class="btn btn-sm text-white" style="background-color: #5DAD47;">
+                                            <i class="fas fa-eye"></i> Ver Detalles
+                                        </a>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        {% if artesania.contacto_artesano %}
+                                        <button class="btn btn-outline-success btn-sm" title="Contactar" style="border-color: #5DAD47; color: #5DAD47;">
+                                            <i class="fas fa-phone"></i>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Paginación -->
+                {% if is_paginated %}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <nav aria-label="Paginación de artesanías">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1{% if search %}&search={{ search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.lugar_origen %}&lugar_origen={{ request.GET.lugar_origen }}{% endif %}{% if request.GET.artesano %}&artesano={{ request.GET.artesano }}{% endif %}">Primera</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.lugar_origen %}&lugar_origen={{ request.GET.lugar_origen }}{% endif %}{% if request.GET.artesano %}&artesano={{ request.GET.artesano }}{% endif %}">Anterior</a>
+                                </li>
+                                {% endif %}
+
+                                <li class="page-item active">
+                                    <span class="page-link">
+                                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                    </span>
+                                </li>
+
+                                {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.lugar_origen %}&lugar_origen={{ request.GET.lugar_origen }}{% endif %}{% if request.GET.artesano %}&artesano={{ request.GET.artesano }}{% endif %}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if request.GET.categoria %}&categoria={{ request.GET.categoria }}{% endif %}{% if request.GET.lugar_origen %}&lugar_origen={{ request.GET.lugar_origen }}{% endif %}{% if request.GET.artesano %}&artesano={{ request.GET.artesano }}{% endif %}">Última</a>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- No hay resultados -->
+                <div class="row">
+                    <div class="col-12 text-center py-5">
+                        <i class="fas fa-palette fa-4x text-muted mb-3"></i>
+                        <h4 class="text-muted">No se encontraron artesanías</h4>
+                        <p class="text-muted">Intenta modificar los filtros de búsqueda o explora todas nuestras categorías.</p>
+                        <a href="{% url 'turismo:artesanias_list' %}" class="btn text-white" style="background-color: #5DAD47;">
+                            <i class="fas fa-arrow-left"></i> Ver Todas las Artesanías
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="bg-light py-5 mt-5">
+        <div class="container text-center">
+            <h3>¿Eres artesano?</h3>
+            <p class="lead">Únete a nuestra plataforma y muestra tu trabajo al mundo</p>
+            <a href="{% url 'contacto:contacto' %}" class="btn btn-lg text-white" style="background-color: #5DAD47;">
+                <i class="fas fa-plus"></i> Registrar mi Artesanía
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
