@@ -14,11 +14,26 @@
 {% block content %}
 <!-- Hero Section -->
 <section class="hero-slider">
-    <div class="swiper hero-swiper">
-        <div class="swiper-wrapper">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-indicators">
             {% if banners %}
                 {% for banner in banners %}
-                <div class="swiper-slide hero-slide" style="background-image: url({{ banner.imagen.url }});">
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ forloop.counter0 }}" 
+                        {% if forloop.first %}class="active" aria-current="true"{% endif %} 
+                        aria-label="Slide {{ forloop.counter }}"></button>
+                {% endfor %}
+            {% else %}
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+            {% endif %}
+        </div>
+        
+        <div class="carousel-inner">
+            {% if banners %}
+                {% for banner in banners %}
+                <div class="carousel-item {% if forloop.first %}active{% endif %} hero-slide" 
+                     style="background-image: url('{{ banner.imagen.url }}');">
                     <div class="hero-content">
                         <h1 class="hero-title" data-aos="fade-up">{{ banner.titulo }}</h1>
                         {% if banner.subtitulo %}
@@ -41,7 +56,7 @@
                 {% endfor %}
             {% else %}
                 <!-- Banners por defecto si no hay banners configurados -->
-                <div class="swiper-slide hero-slide" style="background-image: url({% static 'img/hero/catedral-garzon.jpg' %});">
+                <div class="carousel-item active hero-slide" style="background-image: url({% static 'img/hero/catedral-garzon.jpg' %});">
                     <div class="hero-content">
                         <h1 class="hero-title" data-aos="fade-up">{{ config.nombre_sitio|default:"GARZÓN, TIERRA DE OPORTUNIDADES" }}</h1>
                         <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">{{ config.slogan|default:"Descubre la magia de nuestro municipio" }}</p>
@@ -56,7 +71,7 @@
                     </div>
                 </div>
                 
-                <div class="swiper-slide hero-slide" style="background-image: url({% static 'img/hero/cafe-garzon.jpg' %});">
+                <div class="carousel-item hero-slide" style="background-image: url({% static 'img/hero/cafe-garzon.jpg' %});">
                     <div class="hero-content">
                         <h1 class="hero-title" data-aos="fade-up">CAFÉ DE ALTA CALIDAD</h1>
                         <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Reconocido a nivel nacional e internacional</p>
@@ -68,7 +83,7 @@
                     </div>
                 </div>
                 
-                <div class="swiper-slide hero-slide" style="background-image: url({% static 'img/hero/naturaleza-garzon.jpg' %});">
+                <div class="carousel-item hero-slide" style="background-image: url({% static 'img/hero/naturaleza-garzon.jpg' %});">
                     <div class="hero-content">
                         <h1 class="hero-title" data-aos="fade-up">NATURALEZA EXUBERANTE</h1>
                         <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">Paisajes que cautivan al visitante</p>
@@ -83,9 +98,14 @@
         </div>
         
         <!-- Controles del slider -->
-        <div class="swiper-pagination"></div>
-        <div class="swiper-button-prev"></div>
-        <div class="swiper-button-next"></div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Siguiente</span>
+        </button>
     </div>
     
     <!-- Scroll Down Indicator -->
@@ -243,7 +263,7 @@
                         <!-- Contador DINÁMICO de Rutas -->
                         <div class="col-4">
                             <div class="stat-item">
-                                <div class="stat-number counter-number" data-target="{{ contadores.rutas }}">0</div>
+                                <div class="stat-number counter-number" data-target="{{ contadores.rutas|default:0 }}">0</div>
                                 <div class="stat-label">Rutas</div>
                             </div>
                         </div>
@@ -251,7 +271,7 @@
                         <!-- Contador DINÁMICO de Destinos -->
                         <div class="col-4">
                             <div class="stat-item">
-                                <div class="stat-number counter-number" data-target="{{ contadores.destinos }}">0</div>
+                                <div class="stat-number counter-number" data-target="{{ contadores.destinos|default:0 }}">0</div>
                                 <div class="stat-label">Destinos</div>
                             </div>
                         </div>
@@ -259,7 +279,7 @@
                         <!-- Contador DINÁMICO de Experiencias -->
                         <div class="col-4">
                             <div class="stat-item">
-                                <div class="stat-number counter-number" data-target="{{ contadores.experiencias }}">0</div>
+                                <div class="stat-number counter-number" data-target="{{ contadores.experiencias|default:0 }}">0</div>
                                 <div class="stat-label">Experiencias</div>
                             </div>
                         </div>
@@ -269,6 +289,7 @@
         </div>
     </div>
 </section>
+
 <!-- Nueva Sección: Actividades y Experiencias -->
 <section class="section">
     <div class="container">
@@ -289,7 +310,7 @@
                         <h3>Transporte</h3>
                         <p>Opciones de movilidad para llegar y moverte por Garzón</p>
                         <div class="experience-counter">
-                            <span class="counter-sm" data-target="{{ contadores.transportes }}">0</span>
+                            <span class="counter-number" data-target="{{ contadores.transportes|default:0 }}">0</span>
                             <span>opciones disponibles</span>
                         </div>
                         <a href="{% url 'turismo:transporte_list' %}" class="btn btn-outline-primary">
@@ -309,7 +330,7 @@
                         <h3>Artesanías</h3>
                         <p>Productos únicos hechos por artesanos locales</p>
                         <div class="experience-counter">
-                            <span class="counter-sm" data-target="{{ contadores.artesanias }}">0</span>
+                            <span class="counter-number" data-target="{{ contadores.artesanias|default:0 }}">0</span>
                             <span>piezas únicas</span>
                         </div>
                         <a href="{% url 'turismo:artesanias_list' %}" class="btn btn-outline-primary">
@@ -329,7 +350,7 @@
                         <h3>Actividades Físicas</h3>
                         <p>Aventuras y deportes en entornos naturales</p>
                         <div class="experience-counter">
-                            <span class="counter-sm" data-target="{{ contadores.actividades_fisicas }}">0</span>
+                            <span class="counter-number" data-target="{{ contadores.actividades_fisicas|default:0 }}">0</span>
                             <span>actividades</span>
                         </div>
                         <a href="{% url 'turismo:actividades_fisicas_list' %}" class="btn btn-outline-primary">
@@ -440,7 +461,7 @@
                         <h3>Hoteles y Hospedajes</h3>
                         <p>Encuentra el lugar perfecto para descansar durante tu estadía en Garzón</p>
                         <div class="service-counter">
-                            <span class="counter-sm" data-target="{{ contadores.hoteles }}">0</span>
+                            <span class="counter-number" data-target="{{ contadores.hoteles|default:0 }}">0</span>
                             <span>establecimientos</span>
                         </div>
                         <a href="{% url 'turismo:establecimiento_list' %}?tipo=hotel" class="btn btn-primary">
@@ -458,7 +479,7 @@
                         <h3>Restaurantes y Cafés</h3>
                         <p>Disfruta de nuestra exquisita gastronomía local y el mejor café del mundo</p>
                         <div class="service-counter">
-                            <span class="counter-sm" data-target="{{ contadores.restaurantes }}">0</span>
+                            <span class="counter-number" data-target="{{ contadores.restaurantes|default:0 }}">0</span>
                             <span>opciones gastronómicas</span>
                         </div>
                         <a href="{% url 'turismo:establecimiento_list' %}?tipo=restaurante" class="btn btn-primary">
@@ -671,14 +692,21 @@
             </div>
             <div class="col-lg-7" data-aos="fade-left">
                 <div class="map-preview">
-                    <div id="home-map" class="home-map-container" data-marcadores="{{ marcadores_json }}">
-                        <!-- Mapa se cargará aquí o imagen de placeholder -->
-                        <div class="map-placeholder">
-                            <img src="{% static 'img/mapa-garzon.jpg' %}" alt="Mapa de Garzón" class="img-fluid rounded">
-                            <div class="map-overlay">
-                                <a href="{% url 'turismo:mapa' %}" class="btn btn-light">
-                                    <i class="ph-map-pin"></i> Ver Mapa Interactivo
-                                </a>
+                    <div class="card">
+                        <div class="card-header text-white btn btn-primary">
+                            <h5 class="mb-0 text-white"><i class="ph-map-pin me-2"></i>Mapa de Garzón</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="home-map" class="home-map-container" data-marcadores="{{ marcadores_json|default:'[]' }}" style="height: 400px; width: 100%;">
+                                <!-- El mapa se cargará aquí con Google Maps -->
+                                <div class="map-loading d-flex justify-content-center align-items-center h-100">
+                                    <div class="text-center">
+                                        <div class="spinner-border text-primary mb-3" role="status">
+                                            <span class="visually-hidden">Cargando mapa...</span>
+                                        </div>
+                                        <p class="text-muted">Cargando mapa de Garzón...</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -714,5 +742,9 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Google Maps API -->
+<script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVxz-5XL-Irl8AII_GwTo6nqe7eCDoyeo&callback=initHomeMap&libraries=places">
+</script>
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

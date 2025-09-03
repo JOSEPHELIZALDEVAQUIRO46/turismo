@@ -4,7 +4,9 @@ from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 from core.models import TimeStampedModel
+import json
 
 class Categoria(TimeStampedModel):
     nombre = models.CharField(max_length=100)
@@ -32,15 +34,23 @@ class LugarTuristico(TimeStampedModel):
     direccion = models.CharField(max_length=255)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='lugares')
     imagen_principal = models.ImageField(upload_to='lugares')
-    latitud = models.FloatField(null=True, blank=True)
-    longitud = models.FloatField(null=True, blank=True)
+    latitud = models.FloatField(null=True, blank=True, help_text="Latitud en formato decimal")
+    longitud = models.FloatField(null=True, blank=True, help_text="Longitud en formato decimal")
     destacado = models.BooleanField(default=False)
     horario = models.TextField(blank=True)
     costo_entrada = models.CharField(max_length=100, blank=True)
     
+    def clean(self):
+        """Validación personalizada para coordenadas"""
+        if self.latitud is not None and (self.latitud < -90 or self.latitud > 90):
+            raise ValidationError({'latitud': 'La latitud debe estar entre -90 y 90 grados'})
+        if self.longitud is not None and (self.longitud < -180 or self.longitud > 180):
+            raise ValidationError({'longitud': 'La longitud debe estar entre -180 y 180 grados'})
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nombre)
+        self.clean()
         super().save(*args, **kwargs)
     
     def __str__(self):
@@ -58,6 +68,19 @@ class LugarTuristico(TimeStampedModel):
     def tiene_coordenadas(self):
         """Verifica si el lugar tiene coordenadas para mostrar en mapa"""
         return self.latitud is not None and self.longitud is not None
+    
+    def get_coordenadas_dict(self):
+        """Retorna las coordenadas como diccionario para usar en mapas"""
+        if self.tiene_coordenadas():
+            return {
+                'lat': float(self.latitud),
+                'lng': float(self.longitud),
+                'nombre': self.nombre,
+                'descripcion': self.descripcion[:100] + '...' if len(self.descripcion) > 100 else self.descripcion,
+                'url': self.get_absolute_url(),
+                'imagen': self.get_imagen_principal_url()
+            }
+        return None
     
     def get_rutas(self):
         """Obtener las rutas que incluyen este lugar"""
@@ -103,7 +126,13 @@ class Ruta(TimeStampedModel):
     dificultad = models.CharField(max_length=10, choices=DIFICULTAD_CHOICES, default='facil')
     recomendaciones = models.TextField(blank=True)
     imagen_principal = models.ImageField(upload_to='rutas')
-    mapa_ruta = models.JSONField(blank=True, null=True, help_text="Coordenadas del trazado para Google Maps")
+    
+    # Campo mejorado para el mapa de la ruta
+    mapa_configuracion = models.JSONField(
+        blank=True, 
+        null=True, 
+        help_text="Configuración específica del mapa (centro, zoom, estilo, etc.)"
+    )
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -142,16 +171,165 @@ class Ruta(TimeStampedModel):
         return LugarTuristico.objects.filter(
             puntos_ruta__ruta=self
         ).distinct()
+    
+    def get_coordenadas_puntos(self):
+        """Retorna todas las coordenadas de los puntos de esta ruta para el mapa"""
+        puntos = self.get_puntos_ordenados()
+        coordenadas = []
+        
+        for punto in puntos:
+            coord_data = {
+                'lat': float(punto.latitud),
+                'lng': float(punto.longitud),
+                'orden': punto.orden,
+                'nombre': punto.get_nombre_display(),
+                'descripcion': punto.get_descripcion_display(),
+                'tiempo_estancia': punto.tiempo_estancia,
+                'es_lugar_turistico': punto.lugar_turistico is not None,
+            }
+            
+            # Si tiene lugar turístico asociado, agregar información adicional
+            if punto.lugar_turistico:
+                coord_data.update({
+                    'lugar_url': punto.lugar_turistico.get_absolute_url(),
+                    'imagen': punto.lugar_turistico.get_imagen_principal_url(),
+                    'categoria': punto.lugar_turistico.categoria.nombre,
+                })
+            elif punto.get_imagen():
+                coord_data['imagen'] = punto.get_imagen().url
+            
+            coordenadas.append(coord_data)
+        
+        return coordenadas
+    
+    def get_centro_mapa(self):
+        """Calcula el centro del mapa basado en los puntos de la ruta"""
+        puntos = self.get_puntos_ordenados()
+        if not puntos:
+            # Coordenadas por defecto para Garzón, Huila
+            return {'lat': 2.1964, 'lng': -75.6472}
+        
+        latitudes = [punto.latitud for punto in puntos]
+        longitudes = [punto.longitud for punto in puntos]
+        
+        centro_lat = sum(latitudes) / len(latitudes)
+        centro_lng = sum(longitudes) / len(longitudes)
+        
+        return {'lat': centro_lat, 'lng': centro_lng}
+    
+    def get_configuracion_mapa(self):
+        """Retorna la configuración completa del mapa para esta ruta"""
+        config_base = {
+            'centro': self.get_centro_mapa(),
+            'zoom': 13,
+            'puntos': self.get_coordenadas_puntos(),
+            'estilo_marcador': 'numbered',  # numbered, colored, custom
+            'mostrar_ruta': True,
+            'color_ruta': self.get_color_dificultad_hex(),
+        }
+        
+        # Si hay configuración personalizada, la fusiona
+        if self.mapa_configuracion:
+            config_base.update(self.mapa_configuracion)
+        
+        return config_base
+    
+    def get_color_dificultad_hex(self):
+        """Retorna color hexadecimal basado en la dificultad para usar en mapas"""
+        colors = {
+            'facil': '#28a745',    # Verde
+            'media': '#ffc107',    # Amarillo
+            'dificil': '#dc3545'   # Rojo
+        }
+        return colors.get(self.dificultad, '#007bff')  # Azul por defecto
+    
+    def tiene_puntos(self):
+        """Verifica si la ruta tiene puntos definidos"""
+        return self.puntos.exists()
+    
+    def get_bounds_mapa(self):
+        """Calcula los límites del mapa para ajustar automáticamente el zoom"""
+        puntos = self.get_puntos_ordenados()
+        if not puntos:
+            return None
+        
+        latitudes = [punto.latitud for punto in puntos]
+        longitudes = [punto.longitud for punto in puntos]
+        
+        return {
+            'north': max(latitudes),
+            'south': min(latitudes),
+            'east': max(longitudes),
+            'west': min(longitudes)
+        }
 
 class PuntoRuta(models.Model):
     ruta = models.ForeignKey(Ruta, on_delete=models.CASCADE, related_name='puntos')
-    lugar_turistico = models.ForeignKey(LugarTuristico, on_delete=models.SET_NULL, null=True, blank=True, related_name='puntos_ruta')
+    lugar_turistico = models.ForeignKey(
+        LugarTuristico, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='puntos_ruta'
+    )
     nombre = models.CharField(max_length=200, blank=True)
     descripcion = models.TextField(blank=True)
     orden = models.PositiveSmallIntegerField(help_text="Posición en la secuencia de la ruta")
-    latitud = models.FloatField()
-    longitud = models.FloatField()
-    tiempo_estancia = models.CharField(max_length=50, blank=True, help_text="Tiempo recomendado de parada")
+    latitud = models.FloatField(help_text="Latitud en formato decimal")
+    longitud = models.FloatField(help_text="Longitud en formato decimal")
+    tiempo_estancia = models.CharField(
+        max_length=50, 
+        blank=True, 
+        help_text="Tiempo recomendado de parada (ej: '30 min', '2 horas')"
+    )
+    
+    # Nuevos campos para mejorar la funcionalidad del mapa
+    icono_personalizado = models.CharField(
+        max_length=50, 
+        blank=True,
+        help_text="Nombre del icono personalizado para este punto"
+    )
+    color_marcador = models.CharField(
+        max_length=7, 
+        blank=True,
+        help_text="Color hexadecimal del marcador (ej: #FF0000)"
+    )
+    mostrar_en_mapa = models.BooleanField(
+        default=True,
+        help_text="Si está marcado, este punto se mostrará en el mapa"
+    )
+    
+    def clean(self):
+        """Validación personalizada"""
+        # Validar coordenadas
+        if self.latitud < -90 or self.latitud > 90:
+            raise ValidationError({'latitud': 'La latitud debe estar entre -90 y 90 grados'})
+        if self.longitud < -180 or self.longitud > 180:
+            raise ValidationError({'longitud': 'La longitud debe estar entre -180 y 180 grados'})
+        
+        # Si no tiene lugar turístico, debe tener al menos un nombre
+        if not self.lugar_turistico and not self.nombre:
+            raise ValidationError({'nombre': 'Debe proporcionar un nombre si no hay lugar turístico asociado'})
+    
+    def save(self, *args, **kwargs):
+        self.clean()
+        # Si está asociado a un lugar turístico y no tiene coordenadas definidas,
+        # usar las coordenadas del lugar turístico
+        if self.lugar_turistico and self.lugar_turistico.tiene_coordenadas():
+            # Solo asignar coordenadas si son None (no definidas)
+            if self.latitud is None:
+                self.latitud = self.lugar_turistico.latitud
+            if self.longitud is None:
+                self.longitud = self.lugar_turistico.longitud
+        
+        # Si después de todo aún hay coordenadas None, asignar valores por defecto
+        # (esto evita errores de base de datos si el campo no permite NULL)
+        if self.latitud is None:
+            self.latitud = 0.0
+        if self.longitud is None:
+            self.longitud = 0.0
+            
+        super().save(*args, **kwargs)
     
     def __str__(self):
         if self.lugar_turistico:
@@ -169,7 +347,9 @@ class PuntoRuta(models.Model):
         if self.descripcion:
             return self.descripcion
         if self.lugar_turistico and self.lugar_turistico.descripcion:
-            return self.lugar_turistico.descripcion
+            # Truncar descripción larga para el mapa
+            desc = self.lugar_turistico.descripcion
+            return desc[:150] + '...' if len(desc) > 150 else desc
         return ""
     
     def get_imagen(self):
@@ -178,9 +358,53 @@ class PuntoRuta(models.Model):
             return self.lugar_turistico.imagen_principal
         return None
     
+    def get_coordenadas_dict(self):
+        """Retorna las coordenadas como diccionario para JavaScript"""
+        return {
+            'lat': float(self.latitud),
+            'lng': float(self.longitud)
+        }
+    
+    def get_info_marcador(self):
+        """Retorna información completa para el marcador del mapa"""
+        info = {
+            'id': self.id,
+            'orden': self.orden,
+            'lat': float(self.latitud),
+            'lng': float(self.longitud),
+            'nombre': self.get_nombre_display(),
+            'descripcion': self.get_descripcion_display(),
+            'tiempo_estancia': self.tiempo_estancia,
+            'mostrar': self.mostrar_en_mapa,
+        }
+        
+        # Agregar información específica del lugar turístico si existe
+        if self.lugar_turistico:
+            info.update({
+                'es_lugar_turistico': True,
+                'lugar_url': self.lugar_turistico.get_absolute_url(),
+                'categoria': self.lugar_turistico.categoria.nombre,
+                'direccion': self.lugar_turistico.direccion,
+                'imagen': self.lugar_turistico.get_imagen_principal_url(),
+            })
+        else:
+            info['es_lugar_turistico'] = False
+        
+        # Personalización del marcador
+        if self.color_marcador:
+            info['color'] = self.color_marcador
+        if self.icono_personalizado:
+            info['icono'] = self.icono_personalizado
+        
+        return info
+    
     class Meta:
         ordering = ['orden']
         unique_together = ['ruta', 'orden']
+        verbose_name = "Punto de Ruta"
+        verbose_name_plural = "Puntos de Ruta"
+
+# Resto de modelos sin cambios significativos...
 
 class Establecimiento(TimeStampedModel):
     TIPO_CHOICES = (
@@ -250,22 +474,9 @@ class Establecimiento(TimeStampedModel):
         return self.latitud is not None and self.longitud is not None
     
     def get_lugares_cercanos(self, limite=3):
-        """
-        Obtiene lugares turísticos cercanos (si tiene coordenadas)
-        Para implementación real, se requeriría un cálculo de distancia geoespacial
-        """
+        """Obtiene lugares turísticos cercanos (implementación simplificada)"""
         if not self.tiene_coordenadas():
             return LugarTuristico.objects.filter(destacado=True)[:limite]
-        
-        # Esta es una implementación simplificada. Para producción,
-        # habría que usar una consulta geoespacial como:
-        # from django.contrib.gis.db.models.functions import Distance
-        # from django.contrib.gis.geos import Point
-        # point = Point(self.longitud, self.latitud, srid=4326)
-        # return LugarTuristico.objects.filter(punto__isnull=False)
-        #    .annotate(distance=Distance('punto', point))
-        #    .order_by('distance')[:limite]
-        
         return LugarTuristico.objects.filter(destacado=True)[:limite]
 
 class Evento(TimeStampedModel):
@@ -319,7 +530,7 @@ class Evento(TimeStampedModel):
         
         from datetime import datetime
         dias = (self.fecha_inicio - timezone.now()).days
-        return max(0, dias)  # Asegurarse de que no sea negativo
+        return max(0, dias)
     
     def get_duracion_dias(self):
         """Calcula la duración del evento en días"""
@@ -327,8 +538,6 @@ class Evento(TimeStampedModel):
     
     class Meta:
         ordering = ['fecha_inicio']
-
-        # Nuevos models
 
 class Transporte(TimeStampedModel):
     TIPO_TRANSPORTE_CHOICES = (
@@ -373,22 +582,36 @@ class Transporte(TimeStampedModel):
         verbose_name_plural = "Transportes"
 
 
-class Artesania(TimeStampedModel):
-    CATEGORIA_CHOICES = (
-        ('ceramica', 'Cerámica'),
-        ('textil', 'Textil'),
-        ('madera', 'Madera'),
-        ('cuero', 'Cuero'),
-        ('metal', 'Metal'),
-        ('piedra', 'Piedra'),
-        ('fibra', 'Fibra Natural'),
-        ('joyeria', 'Joyería'),
-        ('otro', 'Otro'),
-    )
+# NUEVO: Categoría de Artesanías (también flexible)
+class CategoriaArtesania(TimeStampedModel):
+    nombre = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+    descripcion = models.TextField(blank=True)
+    icono = models.CharField(max_length=50, blank=True, help_text="Clase CSS del icono (ej: fas fa-pottery)")
+    orden = models.PositiveSmallIntegerField(default=0, help_text="Orden de visualización")
     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.nombre
+    
+    def get_absolute_url(self):
+        return reverse('turismo:artesanias_categoria', kwargs={'slug': self.slug})
+    
+    class Meta:
+        verbose_name = "Categoría de Artesanía"
+        verbose_name_plural = "Categorías de Artesanías"
+        ordering = ['orden', 'nombre']
+
+
+class Artesania(TimeStampedModel):
     nombre = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
-    categoria = models.CharField(max_length=20, choices=CATEGORIA_CHOICES)
+    # CAMBIO: Ahora usa la categoría flexible
+    categoria = models.ForeignKey(CategoriaArtesania, on_delete=models.CASCADE, related_name='artesanias')
     descripcion = models.TextField()
     artesano = models.CharField(max_length=200, help_text="Nombre del artesano o taller")
     lugar_origen = models.CharField(max_length=255)
@@ -423,23 +646,37 @@ class Artesania(TimeStampedModel):
         verbose_name_plural = "Artesanías"
 
 
-class ActividadFisica(TimeStampedModel):
-    TIPO_ACTIVIDAD_CHOICES = (
-        ('senderismo', 'Senderismo'),
-        ('escalada', 'Escalada'),
-        ('ciclismo', 'Ciclismo'),
-        ('natacion', 'Natación'),
-        ('kayak', 'Kayak'),
-        ('rafting', 'Rafting'),
-        ('parapente', 'Parapente'),
-        ('cabalgata', 'Cabalgata'),
-        ('canopy', 'Canopy'),
-        ('rappel', 'Rappel'),
-        ('camping', 'Camping'),
-        ('avistamiento', 'Avistamiento de Aves'),
-        ('otro', 'Otra'),
-    )
+# NUEVO: Categoría de Actividades Físicas (flexible)
+class CategoriaActividadFisica(TimeStampedModel):
+    nombre = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+    descripcion = models.TextField(blank=True)
+    icono = models.CharField(max_length=50, blank=True, help_text="Clase CSS del icono (ej: fas fa-hiking)")
+    color_tema = models.CharField(max_length=7, blank=True, help_text="Color hexadecimal para esta categoría")
+    orden = models.PositiveSmallIntegerField(default=0, help_text="Orden de visualización")
     
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.nombre
+    
+    def get_absolute_url(self):
+        return reverse('turismo:actividades_categoria', kwargs={'slug': self.slug})
+    
+    def get_total_actividades(self):
+        """Retorna el total de actividades en esta categoría"""
+        return self.actividades.filter(disponible=True).count()
+    
+    class Meta:
+        verbose_name = "Categoría de Actividad Física"
+        verbose_name_plural = "Categorías de Actividades Físicas"
+        ordering = ['orden', 'nombre']
+
+
+class ActividadFisica(TimeStampedModel):
     DIFICULTAD_CHOICES = (
         ('principiante', 'Principiante'),
         ('intermedio', 'Intermedio'),
@@ -449,7 +686,8 @@ class ActividadFisica(TimeStampedModel):
     
     nombre = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, blank=True)
-    tipo_actividad = models.CharField(max_length=20, choices=TIPO_ACTIVIDAD_CHOICES)
+    # CAMBIO: Ahora usa la categoría flexible
+    categoria = models.ForeignKey(CategoriaActividadFisica, on_delete=models.CASCADE, related_name='actividades')
     descripcion = models.TextField()
     ubicacion = models.CharField(max_length=255)
     dificultad = models.CharField(max_length=15, choices=DIFICULTAD_CHOICES, default='principiante')
@@ -472,13 +710,27 @@ class ActividadFisica(TimeStampedModel):
     destacado = models.BooleanField(default=False)
     disponible = models.BooleanField(default=True)
     
+    # NUEVO: Campos adicionales para flexibilidad
+    nivel_riesgo = models.CharField(
+        max_length=20,
+        choices=(
+            ('bajo', 'Bajo'),
+            ('medio', 'Medio'),
+            ('alto', 'Alto'),
+        ),
+        default='bajo',
+        help_text="Nivel de riesgo de la actividad"
+    )
+    requiere_reserva = models.BooleanField(default=False)
+    disponible_todo_año = models.BooleanField(default=True)
+    
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nombre)
         super().save(*args, **kwargs)
     
     def __str__(self):
-        return f"{self.nombre} ({self.get_tipo_actividad_display()})"
+        return f"{self.nombre} ({self.categoria.nombre})"
     
     def get_absolute_url(self):
         return reverse('turismo:actividad_fisica_detail', kwargs={'slug': self.slug})
@@ -492,6 +744,15 @@ class ActividadFisica(TimeStampedModel):
             'experto': 'dark'
         }
         return colors.get(self.dificultad, 'primary')
+    
+    def get_color_riesgo(self):
+        """Retorna color CSS basado en el nivel de riesgo"""
+        colors = {
+            'bajo': 'success',
+            'medio': 'warning',
+            'alto': 'danger'
+        }
+        return colors.get(self.nivel_riesgo, 'primary')
     
     def get_equipamiento_incluido_list(self):
         """Convierte el equipamiento incluido en una lista"""
@@ -512,6 +773,20 @@ class ActividadFisica(TimeStampedModel):
     def es_apta_para_edad(self, edad):
         """Verifica si una persona de cierta edad puede realizar la actividad"""
         return edad >= self.edad_minima
+    
+    def get_coordenadas_dict(self):
+        """Retorna las coordenadas como diccionario para usar en mapas"""
+        if self.tiene_coordenadas():
+            return {
+                'lat': float(self.latitud),
+                'lng': float(self.longitud),
+                'nombre': self.nombre,
+                'categoria': self.categoria.nombre,
+                'dificultad': self.get_dificultad_display(),
+                'url': self.get_absolute_url(),
+                'imagen': self.imagen_principal.url if self.imagen_principal else None
+            }
+        return None
     
     class Meta:
         verbose_name_plural = "Actividades Físicas"

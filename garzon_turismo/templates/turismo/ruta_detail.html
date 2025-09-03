@@ -5,6 +5,10 @@
 
 {% block meta_description %}{{ ruta.descripcion|truncatewords:30|striptags }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/route_maps.css' %}">
+{% endblock %}
+
 {% block breadcrumb %}
 <section class="breadcrumb-section">
     <div class="container">
@@ -27,71 +31,71 @@
             <div class="col-lg-8">
                 {% if ruta.imagen_principal %}
                 <div class="route-hero-img mb-4" data-aos="fade-up">
-                    <img src="{{ ruta.imagen_principal.url }}" alt="{{ ruta.nombre }}" class="img-fluid rounded">
+                    <img src="{{ ruta.imagen_principal.url }}" alt="{{ ruta.nombre }}" class="img-fluid rounded shadow-lg">
                 </div>
                 {% endif %}
                 
                 <div class="route-hero-content" data-aos="fade-up" data-aos-delay="100">
                     <div class="route-badges mb-3">
-                        <span class="badge bg-{{ ruta.get_color_dificultad }} me-2">
+                        <span class="badge bg-{{ ruta.get_color_dificultad }} me-2 px-3 py-2">
                             <i class="ph-flag"></i> {{ ruta.get_dificultad_display }}
                         </span>
-                        <span class="badge bg-info me-2">
+                        <span class="badge bg-info me-2 px-3 py-2">
                             <i class="ph-clock"></i> {{ ruta.duracion_estimada }}
                         </span>
-                        <span class="badge bg-secondary">
+                        <span class="badge bg-secondary px-3 py-2">
                             <i class="ph-path"></i> {{ ruta.distancia }} km
                         </span>
                     </div>
                     
-                    <h1 class="route-title mb-3">{{ ruta.nombre }}</h1>
+                    <h1 class="route-title mb-4 display-4 fw-bold" style="color: #2c3e50;">{{ ruta.nombre }}</h1>
                     
                     <div class="route-stats-grid">
                         <div class="row g-4">
                             <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="ph-timer"></i>
+                                <div class="stat-item bg-white p-3 rounded shadow-sm">
+                                    <div class="stat-icon mb-2" style="color: #5DAD47;">
+                                        <i class="ph-timer display-6"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <h6>Duración</h6>
-                                        <p>{{ ruta.duracion_estimada }}</p>
+                                        <h6 class="text-muted mb-1">Duración</h6>
+                                        <p class="fw-bold mb-0">{{ ruta.duracion_estimada }}</p>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="ph-path"></i>
+                                <div class="stat-item bg-white p-3 rounded shadow-sm">
+                                    <div class="stat-icon mb-2" style="color: #5DAD47;">
+                                        <i class="ph-path display-6"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <h6>Distancia</h6>
-                                        <p>{{ ruta.distancia }} km</p>
+                                        <h6 class="text-muted mb-1">Distancia</h6>
+                                        <p class="fw-bold mb-0">{{ ruta.distancia }} km</p>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="ph-flag"></i>
+                                <div class="stat-item bg-white p-3 rounded shadow-sm">
+                                    <div class="stat-icon mb-2" style="color: #5DAD47;">
+                                        <i class="ph-flag display-6"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <h6>Dificultad</h6>
-                                        <p>{{ ruta.get_dificultad_display }}</p>
+                                        <h6 class="text-muted mb-1">Dificultad</h6>
+                                        <p class="fw-bold mb-0">{{ ruta.get_dificultad_display }}</p>
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="col-md-3">
-                                <div class="stat-item">
-                                    <div class="stat-icon">
-                                        <i class="ph-map-trifold"></i>
+                                <div class="stat-item bg-white p-3 rounded shadow-sm">
+                                    <div class="stat-icon mb-2" style="color: #5DAD47;">
+                                        <i class="ph-map-trifold display-6"></i>
                                     </div>
                                     <div class="stat-content">
-                                        <h6>Puntos</h6>
-                                        <p>{{ puntos.count }} paradas</p>
+                                        <h6 class="text-muted mb-1">Puntos</h6>
+                                        <p class="fw-bold mb-0">{{ puntos.count }} paradas</p>
                                     </div>
                                 </div>
                             </div>
@@ -103,50 +107,53 @@
             <div class="col-lg-4">
                 <div class="route-sidebar">
                     <!-- Información Rápida -->
-                    <div class="sidebar-widget route-quick-info" data-aos="fade-left">
-                        <h5 class="widget-title">Información de la Ruta</h5>
+                    <div class="sidebar-widget route-quick-info bg-white rounded shadow-sm p-4 mb-4" data-aos="fade-left">
+                        <h5 class="widget-title mb-3 fw-bold" style="color: #2c3e50;">
+                            <i class="ph-info me-2" style="color: #5DAD47;"></i>
+                            Información de la Ruta
+                        </h5>
                         <div class="quick-info-content">
-                            <div class="info-row">
-                                <span class="info-label">
-                                    <i class="ph-play"></i> Punto de Inicio
+                            <div class="info-row d-flex justify-content-between py-2 border-bottom">
+                                <span class="info-label d-flex align-items-center text-muted">
+                                    <i class="ph-play me-2" style="color: #22C55E;"></i> Punto de Inicio
                                 </span>
-                                <span class="info-value">
+                                <span class="info-value fw-semibold">
                                     {% if ruta.get_primer_punto %}
-                                        {{ ruta.get_primer_punto.get_nombre_display }}
+                                        {{ ruta.get_primer_punto.get_nombre_display|truncatechars:20 }}
                                     {% else %}
                                         No definido
                                     {% endif %}
                                 </span>
                             </div>
-                            <div class="info-row">
-                                <span class="info-label">
-                                    <i class="ph-stop"></i> Punto Final
+                            <div class="info-row d-flex justify-content-between py-2 border-bottom">
+                                <span class="info-label d-flex align-items-center text-muted">
+                                    <i class="ph-stop me-2" style="color: #EF4444;"></i> Punto Final
                                 </span>
-                                <span class="info-value">
+                                <span class="info-value fw-semibold">
                                     {% if ruta.get_ultimo_punto %}
-                                        {{ ruta.get_ultimo_punto.get_nombre_display }}
+                                        {{ ruta.get_ultimo_punto.get_nombre_display|truncatechars:20 }}
                                     {% else %}
                                         No definido
                                     {% endif %}
                                 </span>
                             </div>
-                            <div class="info-row">
-                                <span class="info-label">
-                                    <i class="ph-calendar"></i> Mejor Época
+                            <div class="info-row d-flex justify-content-between py-2 border-bottom">
+                                <span class="info-label d-flex align-items-center text-muted">
+                                    <i class="ph-calendar me-2" style="color: #5DAD47;"></i> Mejor Época
                                 </span>
-                                <span class="info-value">Todo el año</span>
+                                <span class="info-value fw-semibold">Todo el año</span>
                             </div>
-                            <div class="info-row">
-                                <span class="info-label">
-                                    <i class="ph-users"></i> Recomendado para
+                            <div class="info-row d-flex justify-content-between py-2">
+                                <span class="info-label d-flex align-items-center text-muted">
+                                    <i class="ph-users me-2" style="color: #5DAD47;"></i> Recomendado para
                                 </span>
-                                <span class="info-value">
+                                <span class="info-value fw-semibold">
                                     {% if ruta.dificultad == 'facil' %}
-                                        Familias y principiantes
+                                        Familias
                                     {% elif ruta.dificultad == 'media' %}
-                                        Aventureros intermedios
+                                        Aventureros
                                     {% else %}
-                                        Expertos y aventureros
+                                        Expertos
                                     {% endif %}
                                 </span>
                             </div>
@@ -154,35 +161,43 @@
                     </div>
                     
                     <!-- Compartir -->
-                    <div class="sidebar-widget share-widget" data-aos="fade-left" data-aos-delay="100">
-                        <h5 class="widget-title">Compartir Ruta</h5>
-                        <div class="share-buttons">
-                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn facebook">
-                                <i class="ph-facebook-logo"></i>
+                    <div class="sidebar-widget share-widget bg-white rounded shadow-sm p-4 mb-4" data-aos="fade-left" data-aos-delay="100">
+                        <h5 class="widget-title mb-3 fw-bold" style="color: #2c3e50;">
+                            <i class="ph-share-network me-2" style="color: #5DAD47;"></i>
+                            Compartir Ruta
+                        </h5>
+                        <div class="share-buttons d-grid gap-2">
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="share-btn facebook btn btn-primary d-flex align-items-center justify-content-center">
+                                <i class="ph-facebook-logo me-2"></i>
                                 Facebook
                             </a>
-                            <a href="https://twitter.com/intent/tweet?text={{ ruta.nombre }}&url={{ request.build_absolute_uri }}" target="_blank" class="share-btn twitter">
-                                <i class="ph-twitter-logo"></i>
+                            <a href="https://twitter.com/intent/tweet?text={{ ruta.nombre }}&url={{ request.build_absolute_uri }}" target="_blank" class="share-btn twitter btn btn-info d-flex align-items-center justify-content-center">
+                                <i class="ph-twitter-logo me-2"></i>
                                 Twitter
                             </a>
-                            <a href="https://wa.me/?text={{ ruta.nombre }} {{ request.build_absolute_uri }}" target="_blank" class="share-btn whatsapp">
-                                <i class="ph-whatsapp-logo"></i>
+                            <a href="https://wa.me/?text={{ ruta.nombre }} {{ request.build_absolute_uri }}" target="_blank" class="share-btn whatsapp btn btn-success d-flex align-items-center justify-content-center">
+                                <i class="ph-whatsapp-logo me-2"></i>
                                 WhatsApp
                             </a>
                         </div>
                     </div>
                     
-                    <!-- Descargar GPX -->
-                    <div class="sidebar-widget download-widget" data-aos="fade-left" data-aos-delay="200">
-                        <h5 class="widget-title">Herramientas</h5>
+                    <!-- Herramientas -->
+                    <div class="sidebar-widget download-widget bg-white rounded shadow-sm p-4" data-aos="fade-left" data-aos-delay="200">
+                        <h5 class="widget-title mb-3 fw-bold" style="color: #2c3e50;">
+                            <i class="ph-toolbox me-2" style="color: #5DAD47;"></i>
+                            Herramientas
+                        </h5>
                         <div class="widget-content">
-                            <p class="mb-3">Descarga la ruta en formato GPX para usar en tu dispositivo GPS o aplicación de mapas.</p>
-                            <button class="btn btn-outline-primary w-100 mb-2" id="downloadGPX">
-                                <i class="ph-download"></i> Descargar GPX
-                            </button>
-                            <button class="btn btn-outline-secondary w-100" id="printRoute">
-                                <i class="ph-printer"></i> Imprimir Ruta
-                            </button>
+                            <p class="mb-3 text-muted">Descarga la ruta en formato GPX para usar en tu dispositivo GPS.</p>
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" id="downloadGPX">
+                                    <i class="ph-download me-2"></i> Descargar GPX
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="window.print()">
+                                    <i class="ph-printer me-2"></i> Imprimir Ruta
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -192,20 +207,26 @@
 </section>
 
 <!-- Descripción de la Ruta -->
-<section class="section route-description">
+<section class="section route-description bg-light">
     <div class="container">
         <div class="row">
             <div class="col-lg-8">
-                <div class="content-section" data-aos="fade-up">
-                    <h3>Acerca de esta Ruta</h3>
+                <div class="content-section bg-white rounded shadow-sm p-4 mb-4" data-aos="fade-up">
+                    <h3 class="mb-3 fw-bold" style="color: #2c3e50;">
+                        <i class="ph-article me-2" style="color: #5DAD47;"></i>
+                        Acerca de esta Ruta
+                    </h3>
                     <div class="route-description-text">
                         {{ ruta.descripcion|linebreaks }}
                     </div>
                 </div>
                 
                 {% if ruta.recomendaciones %}
-                <div class="content-section" data-aos="fade-up" data-aos-delay="100">
-                    <h3>Recomendaciones</h3>
+                <div class="content-section bg-white rounded shadow-sm p-4" data-aos="fade-up" data-aos-delay="100">
+                    <h3 class="mb-3 fw-bold" style="color: #2c3e50;">
+                        <i class="ph-lightbulb me-2" style="color: #5DAD47;"></i>
+                        Recomendaciones
+                    </h3>
                     <div class="recommendations-content">
                         {{ ruta.recomendaciones|linebreaks }}
                     </div>
@@ -216,12 +237,36 @@
     </div>
 </section>
 
-<!-- Puntos de la Ruta -->
-<section class="section section-light">
+<!-- Mapa Interactivo de la Ruta -->
+<section class="section py-5">
     <div class="container">
-        <div class="section-header" data-aos="fade-up">
-            <h2 class="section-title">Puntos de la Ruta</h2>
-            <p class="section-text">Descubre cada parada de esta increíble ruta turística</p>
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title display-5 fw-bold mb-3" style="color: #2c3e50;">
+                <i class="ph-map-trifold me-3" style="color: #5DAD47;"></i>
+                Mapa Interactivo
+            </h2>
+            <p class="section-text lead text-muted mx-auto" style="max-width: 600px;">
+                Explora la ruta completa con nuestro mapa interactivo. Haz clic en los marcadores para obtener información detallada de cada punto.
+            </p>
+        </div>
+        
+        <div class="route-map-container route-{{ ruta.slug }}" data-aos="fade-up" data-aos-delay="200">
+            <div id="route-map" class="route-map" style="height: 500px; width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Puntos de la Ruta -->
+<section class="section section-light py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title display-5 fw-bold mb-3" style="color: #2c3e50;">
+                <i class="ph-map-pin me-3" style="color: #5DAD47;"></i>
+                Puntos de la Ruta
+            </h2>
+            <p class="section-text lead text-muted mx-auto" style="max-width: 600px;">
+                Descubre cada parada de esta increíble ruta turística y planifica tu aventura
+            </p>
         </div>
         
         <div class="route-timeline">
@@ -235,13 +280,13 @@
                     <div class="row align-items-center">
                         <div class="col-lg-4">
                             {% if punto.get_imagen %}
-                            <div class="timeline-img">
-                                <img src="{{ punto.get_imagen.url }}" alt="{{ punto.get_nombre_display }}" class="img-fluid rounded">
-                            </div>
+                                <div class="timeline-img">
+                                    <img src="{{ punto.get_imagen.url }}" alt="{{ punto.get_nombre_display }}" class="img-fluid rounded">
+                                </div>
                             {% else %}
-                            <div class="timeline-placeholder">
-                                <i class="ph-map-pin"></i>
-                            </div>
+                                <div class="timeline-placeholder">
+                                    <i class="ph-map-pin"></i>
+                                </div>
                             {% endif %}
                         </div>
                         
@@ -256,7 +301,10 @@
                                     </span>
                                     {% endif %}
                                     <span class="meta-item">
-                                        <i class="ph-map-pin"></i> {{ punto.latitud|floatformat:4 }}, {{ punto.longitud|floatformat:4 }}
+                                        <i class="ph-map-pin"></i> Punto {{ punto.orden }} de {{ puntos.count }}
+                                    </span>
+                                    <span class="meta-item">
+                                        <i class="ph-navigation-arrow"></i> {{ punto.latitud|floatformat:4 }}, {{ punto.longitud|floatformat:4 }}
                                     </span>
                                 </div>
                                 
@@ -284,81 +332,60 @@
     </div>
 </section>
 
-<!-- Mapa de la Ruta -->
-<section class="section">
-    <div class="container">
-        <div class="section-header" data-aos="fade-up">
-            <h2 class="section-title">Mapa de la Ruta</h2>
-            <p class="section-text">Visualiza el recorrido completo y planifica tu aventura</p>
-        </div>
-        
-        <div class="route-map-container" data-aos="fade-up" data-aos-delay="100">
-            <div id="route-map" class="route-map" style="height: 500px; border-radius: 12px; overflow: hidden;">
-                <!-- El mapa se inicializará aquí -->
-            </div>
-            
-            <div class="map-controls">
-                <button class="map-control-btn" id="centerRoute">
-                    <i class="ph-crosshair"></i> Centrar Ruta
-                </button>
-                <button class="map-control-btn" id="toggleSatellite">
-                    <i class="ph-globe"></i> Vista Satélite
-                </button>
-                <button class="map-control-btn" id="fullscreenRoute">
-                    <i class="ph-arrows-out"></i> Pantalla Completa
-                </button>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- Rutas Similares -->
 {% if rutas_similares %}
-<section class="section section-light">
+<section class="section py-5">
     <div class="container">
-        <div class="section-header" data-aos="fade-up">
-            <h2 class="section-title">Rutas Similares</h2>
-            <p class="section-text">Otras rutas que podrían interesarte</p>
+        <div class="section-header text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title display-5 fw-bold mb-3" style="color: #2c3e50;">
+                <i class="ph-path me-3" style="color: #5DAD47;"></i>
+                Rutas Similares
+            </h2>
+            <p class="section-text lead text-muted mx-auto" style="max-width: 600px;">
+                Otras rutas que podrían interesarte para completar tu experiencia en Garzón
+            </p>
         </div>
         
-        <div class="row">
+        <div class="row g-4">
             {% for ruta_sim in rutas_similares %}
             <div class="col-lg-4 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
-                <div class="route-card">
-                    <div class="route-img">
+                <div class="card route-card h-100 shadow-sm border-0">
+                    <div class="route-img position-relative" style="height: 200px; overflow: hidden;">
                         {% if ruta_sim.imagen_principal %}
-                            <img src="{{ ruta_sim.imagen_principal.url }}" alt="{{ ruta_sim.nombre }}" class="img-fluid">
+                            <img src="{{ ruta_sim.imagen_principal.url }}" alt="{{ ruta_sim.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
                         {% else %}
-                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ ruta_sim.nombre }}" class="img-fluid">
+                            <img src="{% static 'img/placeholder.jpg' %}" alt="{{ ruta_sim.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
                         {% endif %}
                         
-                        <div class="route-difficulty">
-                            <span class="badge bg-{{ ruta_sim.get_color_dificultad }}">
+                        <div class="position-absolute top-0 start-0 m-3">
+                            <span class="badge bg-{{ ruta_sim.get_color_dificultad }} px-3 py-2 rounded-pill">
                                 {{ ruta_sim.get_dificultad_display }}
                             </span>
                         </div>
                     </div>
                     
-                    <div class="route-content">
-                        <h5 class="route-title">
-                            <a href="{{ ruta_sim.get_absolute_url }}">{{ ruta_sim.nombre }}</a>
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title fw-bold mb-3">
+                            <a href="{{ ruta_sim.get_absolute_url }}" class="text-decoration-none text-dark">{{ ruta_sim.nombre }}</a>
                         </h5>
                         
-                        <div class="route-meta">
-                            <div class="route-meta-item">
-                                <i class="ph-clock"></i>
-                                {{ ruta_sim.duracion_estimada }}
-                            </div>
-                            <div class="route-meta-item">
-                                <i class="ph-path"></i>
-                                {{ ruta_sim.distancia }} km
+                        <div class="route-meta mb-3">
+                            <div class="row g-2 small text-muted">
+                                <div class="col-6">
+                                    <i class="ph-timer me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta_sim.duracion_estimada }}</strong>
+                                </div>
+                                <div class="col-6">
+                                    <i class="ph-path me-1" style="color: #5DAD47;"></i>
+                                    <strong>{{ ruta_sim.distancia }} km</strong>
+                                </div>
                             </div>
                         </div>
                         
-                        <p class="route-description">{{ ruta_sim.descripcion|truncatewords:15 }}</p>
+                        <p class="card-text text-muted flex-grow-1">{{ ruta_sim.descripcion|truncatewords:15 }}</p>
                         
-                        <a href="{{ ruta_sim.get_absolute_url }}" class="btn btn-outline-primary btn-sm">
-                            <i class="ph-arrow-right"></i> Ver Ruta
+                        <a href="{{ ruta_sim.get_absolute_url }}" class="btn mt-auto" style="background-color: #5DAD47; color: white; border-color: #5DAD47;">
+                            <i class="ph-arrow-right me-1"></i> Explorar Ruta
                         </a>
                     </div>
                 </div>
@@ -368,245 +395,371 @@
     </div>
 </section>
 {% endif %}
+
+<!-- Llamada a la Acción -->
+<section class="section text-white py-5" style="background: linear-gradient(135deg, #5DAD47 0%, #4a9639 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <div class="cta-content" data-aos="fade-up">
+                    <h3 class="display-5 fw-bold mb-3">¿Listo para vivir esta experiencia?</h3>
+                    <p class="lead mb-4 text-white">Contacta con nuestros guías locales para obtener información personalizada y hacer de tu visita una experiencia inolvidable.</p>
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{% url 'contacto:contacto' %}" class="btn btn-light btn-lg px-4 py-3">
+                            <i class="ph-chat-circle me-2"></i> Contactar Guía
+                        </a>
+                        <a href="{% url 'turismo:lugar_list' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                            <i class="ph-compass me-2"></i> Ver Más Destinos
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Script para pasar datos a JavaScript -->
+<script>
+    // Datos de la ruta para el mapa
+    const routeDetailData = {
+        ruta: {
+            id: {{ ruta.id }},
+            nombre: "{{ ruta.nombre|escapejs }}",
+            slug: "{{ ruta.slug }}",
+            descripcion: "{{ ruta.descripcion|escapejs }}",
+            distancia: {{ ruta.distancia }},
+            duracion_estimada: "{{ ruta.duracion_estimada|escapejs }}",
+            dificultad: "{{ ruta.dificultad }}"
+        },
+        puntos: [
+            {% for punto in puntos %}
+            {
+                id: {{ punto.id }},
+                orden: {{ punto.orden }},
+                nombre: "{{ punto.get_nombre_display|escapejs }}",
+                descripcion: "{{ punto.get_descripcion_display|escapejs }}",
+                latitud: {{ punto.latitud }},
+                longitud: {{ punto.longitud }},
+                tiempo_estancia: "{{ punto.tiempo_estancia|default:''|escapejs }}",
+                {% if punto.get_imagen %}
+                imagen: "{{ punto.get_imagen.url }}"
+                {% else %}
+                imagen: null
+                {% endif %}
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    };
+    
+    console.log('Datos de la ruta cargados:', routeDetailData);
+</script>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-// Datos de los puntos de la ruta
-const puntosRuta = {{ puntos_json|safe }};
-
-// Variables del mapa
+// Variables globales
 let routeMap;
-let directionsService;
-let directionsRenderer;
-let routeMarkers = [];
+let markers = [];
+let routePath;
 
-// Inicializar mapa de la ruta
-function initRouteMap() {
-    if (puntosRuta.length === 0) {
-        document.getElementById('route-map').innerHTML = `
-            <div class="map-placeholder">
-                <div class="placeholder-content">
-                    <i class="ph-map-pin placeholder-icon"></i>
-                    <h4>No hay puntos definidos</h4>
-                    <p>Esta ruta no tiene puntos de coordenadas definidos.</p>
-                </div>
-            </div>
-        `;
+// Función de callback para Google Maps
+window.initGoogleMaps = function() {
+    console.log('Google Maps API cargada, inicializando mapa de ruta...');
+    
+    // Verificar si tenemos datos
+    if (!routeDetailData || !routeDetailData.puntos || routeDetailData.puntos.length === 0) {
+        console.error('No hay datos de puntos disponibles');
+        showMapError('No hay puntos de ruta disponibles');
         return;
     }
+    
+    try {
+        initRouteMap();
+    } catch (error) {
+        console.error('Error inicializando el mapa:', error);
+        showMapError('Error al cargar el mapa: ' + error.message);
+    }
+};
 
-    // Configurar mapa
-    const center = {
-        lat: puntosRuta[0].latitud,
-        lng: puntosRuta[0].longitud
-    };
-
-    routeMap = new google.maps.Map(document.getElementById('route-map'), {
+// Función para inicializar el mapa de la ruta
+function initRouteMap() {
+    const mapContainer = document.getElementById('route-map');
+    
+    if (!mapContainer) {
+        console.error('Contenedor del mapa no encontrado');
+        return;
+    }
+    
+    // Calcular el centro y bounds del mapa
+    const bounds = new google.maps.LatLngBounds();
+    const puntos = routeDetailData.puntos;
+    
+    // Centro por defecto en Garzón si no hay puntos
+    let center = { lat: 2.1975, lng: -75.6514 };
+    
+    if (puntos.length > 0) {
+        // Usar el primer punto como centro inicial
+        center = { lat: puntos[0].latitud, lng: puntos[0].longitud };
+        
+        // Extender bounds con todos los puntos
+        puntos.forEach(punto => {
+            bounds.extend(new google.maps.LatLng(punto.latitud, punto.longitud));
+        });
+    }
+    
+    // Crear el mapa
+    routeMap = new google.maps.Map(mapContainer, {
         zoom: 13,
         center: center,
-        mapTypeId: 'roadmap'
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        styles: [
+            {
+                featureType: 'poi',
+                elementType: 'labels',
+                stylers: [{ visibility: 'on' }]
+            },
+            {
+                featureType: 'transit',
+                elementType: 'labels',
+                stylers: [{ visibility: 'off' }]
+            }
+        ],
+        mapTypeControl: true,
+        streetViewControl: true,
+        fullscreenControl: true,
+        zoomControl: true
     });
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-        draggable: false,
-        suppressMarkers: true
-    });
-    directionsRenderer.setMap(routeMap);
-
-    // Crear marcadores para cada punto
-    createRouteMarkers();
     
-    // Calcular y mostrar ruta
-    calculateRoute();
+    console.log('Mapa base creado');
     
-    // Setup controles
-    setupRouteControls();
+    // Agregar marcadores
+    addRouteMarkers();
+    
+    // Dibujar la ruta si hay más de un punto
+    if (puntos.length > 1) {
+        drawRoutePath();
+    }
+    
+    // Ajustar la vista al contenido
+    if (puntos.length > 1) {
+        routeMap.fitBounds(bounds);
+        
+        // Asegurar un zoom mínimo
+        const listener = google.maps.event.addListener(routeMap, 'idle', function() {
+            if (routeMap.getZoom() > 15) routeMap.setZoom(15);
+            google.maps.event.removeListener(listener);
+        });
+    }
+    
+    console.log('Mapa de ruta inicializado correctamente con ' + puntos.length + ' puntos');
 }
 
-// Crear marcadores de la ruta
-function createRouteMarkers() {
-    puntosRuta.forEach((punto, index) => {
+// Función para agregar marcadores
+function addRouteMarkers() {
+    const puntos = routeDetailData.puntos;
+    
+    puntos.forEach((punto, index) => {
+        const position = { lat: punto.latitud, lng: punto.longitud };
+        
+        // Crear marcador personalizado
         const marker = new google.maps.Marker({
-            position: { lat: punto.latitud, lng: punto.longitud },
+            position: position,
             map: routeMap,
             title: punto.nombre,
             label: {
                 text: punto.orden.toString(),
                 color: 'white',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                fontSize: '14px'
             },
             icon: {
-                url: '/static/img/route-marker.png',
-                scaledSize: new google.maps.Size(40, 40)
-            }
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: index === 0 ? '#22C55E' : (index === puntos.length - 1 ? '#EF4444' : '#5DAD47'),
+                fillOpacity: 1,
+                strokeColor: 'white',
+                strokeWeight: 2,
+                scale: 12
+            },
+            animation: google.maps.Animation.DROP
         });
-
-        const infoContent = `
-            <div class="route-info-window">
-                <h6>${punto.nombre}</h6>
-                <p class="mb-2">${punto.descripcion || 'Punto de la ruta'}</p>
-                ${punto.tiempo_estancia ? `<small><i class="ph-clock"></i> ${punto.tiempo_estancia}</small>` : ''}
-                ${punto.lugar_turistico ? `<div class="mt-2"><a href="/lugar/${punto.lugar_turistico.slug}/" class="btn btn-primary btn-sm">Ver Lugar</a></div>` : ''}
-            </div>
-        `;
-
+        
+        // Crear ventana de información
         const infoWindow = new google.maps.InfoWindow({
-            content: infoContent
+            content: createInfoWindowContent(punto, index)
         });
-
-        marker.addListener('click', () => {
+        
+        // Agregar evento click
+        marker.addListener('click', function() {
+            // Cerrar otras ventanas
+            markers.forEach(m => {
+                if (m.infoWindow) {
+                    m.infoWindow.close();
+                }
+            });
+            
             infoWindow.open(routeMap, marker);
         });
-
-        routeMarkers.push(marker);
-    });
-}
-
-// Calcular ruta entre puntos
-function calculateRoute() {
-    if (puntosRuta.length < 2) return;
-
-    const waypoints = [];
-    for (let i = 1; i < puntosRuta.length - 1; i++) {
-        waypoints.push({
-            location: { lat: puntosRuta[i].latitud, lng: puntosRuta[i].longitud },
-            stopover: true
-        });
-    }
-
-    const request = {
-        origin: { lat: puntosRuta[0].latitud, lng: puntosRuta[0].longitud },
-        destination: { 
-            lat: puntosRuta[puntosRuta.length - 1].latitud, 
-            lng: puntosRuta[puntosRuta.length - 1].longitud 
-        },
-        waypoints: waypoints,
-        travelMode: google.maps.TravelMode.DRIVING,
-        optimizeWaypoints: false
-    };
-
-    directionsService.route(request, (result, status) => {
-        if (status === 'OK') {
-            directionsRenderer.setDirections(result);
-        }
-    });
-}
-
-// Configurar controles del mapa
-function setupRouteControls() {
-    // Centrar ruta
-    document.getElementById('centerRoute')?.addEventListener('click', () => {
-        const bounds = new google.maps.LatLngBounds();
-        puntosRuta.forEach(punto => {
-            bounds.extend({ lat: punto.latitud, lng: punto.longitud });
-        });
-        routeMap.fitBounds(bounds);
-    });
-
-    // Toggle vista satélite
-    document.getElementById('toggleSatellite')?.addEventListener('click', function() {
-        const currentType = routeMap.getMapTypeId();
-        const newType = currentType === 'satellite' ? 'roadmap' : 'satellite';
-        routeMap.setMapTypeId(newType);
         
-        const icon = this.querySelector('i');
-        if (newType === 'satellite') {
-            icon.className = 'ph-map';
-            this.innerHTML = '<i class="ph-map"></i> Vista Mapa';
-        } else {
-            icon.className = 'ph-globe';
-            this.innerHTML = '<i class="ph-globe"></i> Vista Satélite';
-        }
+        // Guardar referencia
+        markers.push({
+            marker: marker,
+            infoWindow: infoWindow,
+            punto: punto
+        });
     });
-
-    // Pantalla completa
-    document.getElementById('fullscreenRoute')?.addEventListener('click', () => {
-        const mapContainer = document.querySelector('.route-map-container');
-        if (!document.fullscreenElement) {
-            mapContainer.requestFullscreen();
-        } else {
-            document.exitFullscreen();
-        }
-    });
+    
+    console.log('Agregados ' + markers.length + ' marcadores al mapa');
 }
 
-// Mostrar punto en mapa (llamada desde timeline)
-function showPointOnMap(lat, lng, name) {
-    routeMap.setCenter({ lat: lat, lng: lng });
-    routeMap.setZoom(16);
+// Función para crear contenido de la ventana de información
+function createInfoWindowContent(punto, index) {
+    const isFirst = index === 0;
+    const isLast = index === routeDetailData.puntos.length - 1;
     
-    // Encontrar y abrir info window del marcador
-    const marker = routeMarkers.find(m => 
-        Math.abs(m.getPosition().lat() - lat) < 0.0001 && 
-        Math.abs(m.getPosition().lng() - lng) < 0.0001
-    );
+    let statusText = 'Punto intermedio';
+    let statusColor = '#5DAD47';
     
-    if (marker) {
-        google.maps.event.trigger(marker, 'click');
+    if (isFirst) {
+        statusText = 'Punto de inicio';
+        statusColor = '#22C55E';
+    } else if (isLast) {
+        statusText = 'Punto final';
+        statusColor = '#EF4444';
     }
+    
+    return `
+        <div style="max-width: 300px; padding: 10px;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <div style="background: ${statusColor}; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 8px;">
+                    ${punto.orden}
+                </div>
+                <div>
+                    <h6 style="margin: 0; color: #2c3e50; font-weight: bold;">${punto.nombre}</h6>
+                    <small style="color: ${statusColor}; font-weight: 500;">${statusText}</small>
+                </div>
+            </div>
+            ${punto.descripcion ? `<p style="margin: 10px 0; color: #666; font-size: 14px; line-height: 1.4;">${punto.descripcion}</p>` : ''}
+            ${punto.tiempo_estancia ? `
+                <div style="margin: 8px 0; font-size: 13px; color: #888;">
+                    <i class="ph-clock" style="margin-right: 4px;"></i>
+                    Tiempo recomendado: ${punto.tiempo_estancia}
+                </div>
+            ` : ''}
+            <div style="margin-top: 10px; font-size: 12px; color: #999;">
+                Coordenadas: ${punto.latitud.toFixed(4)}, ${punto.longitud.toFixed(4)}
+            </div>
+        </div>
+    `;
 }
 
-// Descargar GPX
-document.getElementById('downloadGPX')?.addEventListener('click', function() {
-    if (puntosRuta.length === 0) {
-        alert('No hay puntos disponibles para descargar');
+// Función para dibujar la ruta
+function drawRoutePath() {
+    const puntos = routeDetailData.puntos;
+    
+    if (puntos.length < 2) return;
+    
+    const path = puntos.map(punto => ({
+        lat: punto.latitud,
+        lng: punto.longitud
+    }));
+    
+    routePath = new google.maps.Polyline({
+        path: path,
+        geodesic: true,
+        strokeColor: '#5DAD47',
+        strokeOpacity: 1.0,
+        strokeWeight: 3,
+        icons: [{
+            icon: {
+                path: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
+                strokeColor: '#5DAD47',
+                strokeWeight: 2,
+                scale: 3
+            },
+            offset: '100%',
+            repeat: '100px'
+        }]
+    });
+    
+    routePath.setMap(routeMap);
+    console.log('Ruta dibujada conectando ' + puntos.length + ' puntos');
+}
+
+// Función para mostrar un punto específico en el mapa
+function showPointOnMap(lat, lng, nombre) {
+    if (!routeMap) {
+        console.warn('El mapa no está inicializado aún');
         return;
     }
-
-    let gpxContent = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Alma del Huila">
-    <trk>
-        <name>{{ ruta.nombre }}</name>
-        <desc>{{ ruta.descripcion|truncatewords:20 }}</desc>
-        <trkseg>`;
-
-    puntosRuta.forEach(punto => {
-        gpxContent += `
-            <trkpt lat="${punto.latitud}" lon="${punto.longitud}">
-                <name>${punto.nombre}</name>
-                <desc>${punto.descripcion || ''}</desc>
-            </trkpt>`;
+    
+    // Centrar el mapa en el punto
+    const position = new google.maps.LatLng(lat, lng);
+    routeMap.setCenter(position);
+    routeMap.setZoom(16);
+    
+    // Encontrar y abrir la ventana de información correspondiente
+    const markerData = markers.find(m => 
+        m.punto.latitud === lat && m.punto.longitud === lng
+    );
+    
+    if (markerData) {
+        // Cerrar otras ventanas
+        markers.forEach(m => {
+            if (m.infoWindow) {
+                m.infoWindow.close();
+            }
+        });
+        
+        // Abrir la ventana del punto seleccionado
+        markerData.infoWindow.open(routeMap, markerData.marker);
+        
+        // Hacer bounce al marcador
+        markerData.marker.setAnimation(google.maps.Animation.BOUNCE);
+        setTimeout(() => {
+            markerData.marker.setAnimation(null);
+        }, 2000);
+    }
+    
+    // Scroll suave al mapa
+    document.getElementById('route-map').scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
     });
+}
 
-    gpxContent += `
-        </trkseg>
-    </trk>
-</gpx>`;
-
-    const blob = new Blob([gpxContent], { type: 'application/gpx+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = '{{ ruta.slug }}.gpx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-});
-
-// Imprimir ruta
-document.getElementById('printRoute')?.addEventListener('click', function() {
-    window.print();
-});
-
-// Inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-    // Si Google Maps no está disponible, mostrar placeholder
-    if (typeof google === 'undefined') {
-        document.getElementById('route-map').innerHTML = `
-            <div class="map-placeholder">
-                <div class="placeholder-content">
-                    <i class="ph-map-pin placeholder-icon"></i>
-                    <h4>Mapa no disponible</h4>
-                    <p>Para visualizar el mapa de la ruta, es necesario configurar la API de Google Maps.</p>
+// Función para mostrar error en el mapa
+function showMapError(message = 'No se pudieron cargar los datos de la ruta') {
+    const mapContainer = document.getElementById('route-map');
+    if (mapContainer) {
+        const errorHTML = `
+            <div style="display: flex; align-items: center; justify-content: center; height: 500px; background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; color: #6c757d; text-align: center;">
+                <div>
+                    <div style="font-size: 4rem; margin-bottom: 20px;">🗺️</div>
+                    <h4 style="margin-bottom: 10px;">Mapa no disponible</h4>
+                    <p style="margin: 0;">${message}</p>
                 </div>
             </div>
         `;
-    } else {
-        initRouteMap();
+        mapContainer.innerHTML = errorHTML;
+    }
+}
+
+// Manejo de errores de autenticación de Google Maps
+window.gm_authFailure = function() {
+    console.error('Error de autenticación de Google Maps API');
+    showMapError('Error de autenticación. Verifica tu API key de Google Maps.');
+};
+
+// Función para descargar GPX (placeholder)
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('downloadGPX');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            alert('Función de descarga GPX próximamente disponible');
+        });
     }
 });
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVxz-5XL-Irl8AII_GwTo6nqe7eCDoyeo&libraries=geometry,places&callback=initGoogleMaps"></script>
 {% endblock %}

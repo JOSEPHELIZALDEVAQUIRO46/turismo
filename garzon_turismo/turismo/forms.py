@@ -1,9 +1,10 @@
-# turismo/forms.py - Agregar estos formularios a los existentes
+# turismo/forms.py
 
 from django import forms
 from core.models import Comentario, Valoracion
 from .models import (
-    Establecimiento, Transporte, Artesania, ActividadFisica
+    Establecimiento, Transporte, Artesania, ActividadFisica, 
+    CategoriaArtesania, CategoriaActividadFisica, Ruta, PuntoRuta
 )
 
 class ComentarioForm(forms.ModelForm):
@@ -117,6 +118,13 @@ class TransporteFiltroForm(forms.Form):
             'placeholder': 'Buscar por destino'
         })
     )
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Búsqueda general'
+        })
+    )
 
 class ArtesaniaForm(forms.ModelForm):
     class Meta:
@@ -145,10 +153,15 @@ class ArtesaniaForm(forms.ModelForm):
         }
 
 class ArtesaniaFiltroForm(forms.Form):
-    CATEGORIA_CHOICES = [('', 'Todas las categorías')] + list(Artesania.CATEGORIA_CHOICES)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Cargar categorías dinámicamente desde la base de datos
+        categoria_choices = [('', 'Todas las categorías')]
+        categoria_choices.extend([(cat.pk, cat.nombre) for cat in CategoriaArtesania.objects.all()])
+        self.fields['categoria'].choices = categoria_choices
     
     categoria = forms.ChoiceField(
-        choices=CATEGORIA_CHOICES,
+        choices=[],  # Se cargan dinámicamente en __init__
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
@@ -159,20 +172,28 @@ class ArtesaniaFiltroForm(forms.Form):
             'placeholder': 'Lugar de origen'
         })
     )
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Búsqueda general'
+        })
+    )
 
 class ActividadFisicaForm(forms.ModelForm):
     class Meta:
         model = ActividadFisica
         fields = [
-            'nombre', 'tipo_actividad', 'descripcion', 'ubicacion', 'dificultad',
+            'nombre', 'categoria', 'descripcion', 'ubicacion', 'dificultad',
             'duracion', 'costo', 'edad_minima', 'capacidad_maxima',
             'equipamiento_incluido', 'equipamiento_requerido', 'recomendaciones_salud',
             'mejor_epoca', 'horarios_disponibles', 'instructor_guia', 'contacto',
-            'telefono', 'email', 'imagen_principal', 'latitud', 'longitud'
+            'telefono', 'email', 'imagen_principal', 'latitud', 'longitud',
+            'nivel_riesgo', 'requiere_reserva', 'disponible_todo_año'
         ]
         widgets = {
             'nombre': forms.TextInput(attrs={'class': 'form-control'}),
-            'tipo_actividad': forms.Select(attrs={'class': 'form-control'}),
+            'categoria': forms.Select(attrs={'class': 'form-control'}),
             'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'ubicacion': forms.TextInput(attrs={'class': 'form-control'}),
             'dificultad': forms.Select(attrs={'class': 'form-control'}),
@@ -208,19 +229,26 @@ class ActividadFisicaForm(forms.ModelForm):
                 'step': 'any',
                 'placeholder': 'Ej: -75.5905'
             }),
+            'nivel_riesgo': forms.Select(attrs={'class': 'form-control'}),
+            'requiere_reserva': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'disponible_todo_año': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
 
 class ActividadFisicaFiltroForm(forms.Form):
-    TIPO_CHOICES = [('', 'Todos los tipos')] + list(ActividadFisica.TIPO_ACTIVIDAD_CHOICES)
-    DIFICULTAD_CHOICES = [('', 'Todas las dificultades')] + list(ActividadFisica.DIFICULTAD_CHOICES)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Cargar categorías dinámicamente desde la base de datos
+        categoria_choices = [('', 'Todas las categorías')]
+        categoria_choices.extend([(cat.pk, cat.nombre) for cat in CategoriaActividadFisica.objects.all()])
+        self.fields['categoria'].choices = categoria_choices
     
-    tipo_actividad = forms.ChoiceField(
-        choices=TIPO_CHOICES,
+    categoria = forms.ChoiceField(
+        choices=[],  # Se cargan dinámicamente en __init__
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
     dificultad = forms.ChoiceField(
-        choices=DIFICULTAD_CHOICES,
+        choices=[('', 'Todas las dificultades')] + list(ActividadFisica.DIFICULTAD_CHOICES),
         required=False,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
@@ -231,4 +259,169 @@ class ActividadFisicaFiltroForm(forms.Form):
             'placeholder': 'Edad mínima',
             'min': 0
         })
+    )
+    search = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Búsqueda general'
+        })
+    )
+
+# ========== FORMULARIOS PARA ADMINISTRACIÓN DE MAPAS ==========
+
+class RutaMapaConfigForm(forms.ModelForm):
+    """Formulario para configurar el mapa de una ruta"""
+    class Meta:
+        model = Ruta
+        fields = ['mapa_configuracion']
+        widgets = {
+            'mapa_configuracion': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 10,
+                'placeholder': 'Configuración JSON del mapa'
+            })
+        }
+
+class PuntoRutaForm(forms.ModelForm):
+    """Formulario para crear/editar puntos de ruta"""
+    class Meta:
+        model = PuntoRuta
+        fields = [
+            'lugar_turistico', 'nombre', 'descripcion', 'orden',
+            'latitud', 'longitud', 'tiempo_estancia', 
+            'icono_personalizado', 'color_marcador', 'mostrar_en_mapa'
+        ]
+        widgets = {
+            'lugar_turistico': forms.Select(attrs={'class': 'form-control'}),
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'orden': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
+            'latitud': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': 'any',
+                'placeholder': 'Ej: 2.2446'
+            }),
+            'longitud': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': 'any',
+                'placeholder': 'Ej: -75.5905'
+            }),
+            'tiempo_estancia': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: 30 min, 2 horas'
+            }),
+            'icono_personalizado': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Nombre del icono'
+            }),
+            'color_marcador': forms.TextInput(attrs={
+                'class': 'form-control',
+                'type': 'color'
+            }),
+            'mostrar_en_mapa': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+# ========== FORMULARIOS PARA CATEGORÍAS DINÁMICAS ==========
+
+class CategoriaArtesaniaForm(forms.ModelForm):
+    """Formulario para crear categorías de artesanías"""
+    class Meta:
+        model = CategoriaArtesania
+        fields = ['nombre', 'descripcion', 'icono', 'orden']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'icono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: fas fa-pottery'
+            }),
+            'orden': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+        }
+
+class CategoriaActividadFisicaForm(forms.ModelForm):
+    """Formulario para crear categorías de actividades físicas"""
+    class Meta:
+        model = CategoriaActividadFisica
+        fields = ['nombre', 'descripcion', 'icono', 'color_tema', 'orden']
+        widgets = {
+            'nombre': forms.TextInput(attrs={'class': 'form-control'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'icono': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ej: fas fa-hiking'
+            }),
+            'color_tema': forms.TextInput(attrs={
+                'class': 'form-control',
+                'type': 'color'
+            }),
+            'orden': forms.NumberInput(attrs={'class': 'form-control', 'min': 0}),
+        }
+
+# ========== FORMULARIOS DE BÚSQUEDA AVANZADA ==========
+
+class BusquedaAvanzadaForm(forms.Form):
+    """Formulario para búsqueda avanzada en todo el sitio"""
+    query = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Buscar en todo el sitio...'
+        })
+    )
+    
+    # Filtros por tipo de contenido
+    incluir_lugares = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_establecimientos = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_rutas = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_eventos = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_transportes = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_artesanias = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    incluir_actividades = forms.BooleanField(
+        required=False, 
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    
+    # Filtros adicionales
+    solo_destacados = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    
+    orden = forms.ChoiceField(
+        choices=[
+            ('relevancia', 'Relevancia'),
+            ('nombre', 'Nombre A-Z'),
+            ('nombre_desc', 'Nombre Z-A'),
+            ('fecha_desc', 'Más recientes'),
+            ('fecha_asc', 'Más antiguos'),
+        ],
+        required=False,
+        initial='relevancia',
+        widget=forms.Select(attrs={'class': 'form-control'})
     )

@@ -5,6 +5,10 @@
 
 {% block meta_description %}Explora las mejores rutas turísticas de Garzón, Huila. Descubre recorridos únicos, senderos naturales y experiencias inolvidables en nuestra tierra cafetera.{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/route_maps.css' %}">
+{% endblock %}
+
 {% block breadcrumb %}
 <section class="breadcrumb-section">
     <div class="container">
@@ -19,13 +23,59 @@
 {% endblock %}
 
 {% block content %}
-<!-- Header de Rutas -->
-<section class="section section-light py-5">
+<!-- Hero de Rutas -->
+<section class="section hero-routes text-white py-5">
     <div class="container">
-        <div class="section-header text-center" data-aos="fade-up">
-                                <div class="section-subtitle fw-semibold mb-2" style="color: #5DAD47;">Aventura y Descubrimiento</div>
-            <h1 class="section-title display-4 fw-bold mb-4">Rutas Turísticas de Garzón</h1>
-            <p class="section-text lead text-muted mx-auto" style="max-width: 700px;">Embárcate en increíbles aventuras a través de nuestras rutas cuidadosamente diseñadas. Desde caminatas familiares hasta desafíos para expertos, encuentra la ruta perfecta para tu próxima aventura.</p>
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="hero-content" data-aos="fade-up">
+                    <div class="section-subtitle fw-semibold mb-2" style="color: rgba(255,255,255,0.9);">Aventura y Descubrimiento</div>
+                    <h1 class="display-3 fw-bold mb-4">Rutas Turísticas de Garzón</h1>
+                    <p class="lead mb-4" style="max-width: 600px;">Embárcate en increíbles aventuras a través de nuestras rutas cuidadosamente diseñadas. Desde caminatas familiares hasta desafíos para expertos, encuentra la ruta perfecta para tu próxima aventura.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="#rutas" class="btn btn-light btn-lg px-4 py-3">
+                            <i class="ph-compass me-2"></i> Explorar Rutas
+                        </a>
+                        <a href="{% url 'turismo:mapa' %}" class="btn btn-outline-light btn-lg px-4 py-3">
+                            <i class="ph-map-trifold me-2"></i> Ver Mapa General
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="floating-stats p-4 mt-4 mt-lg-0" data-aos="fade-left">
+                    <h5 class="fw-bold mb-3" style="color: #2c3e50;">
+                        <i class="ph-chart-bar me-2" style="color: #5DAD47;"></i>
+                        Estadísticas
+                    </h5>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <div class="stat-number h3 fw-bold mb-1" style="color: #5DAD47;">{{ contadores.rutas }}</div>
+                                <div class="stat-label small text-muted">Rutas Disponibles</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <div class="stat-number h3 fw-bold mb-1" style="color: #5DAD47;">{{ contadores.destinos }}</div>
+                                <div class="stat-label small text-muted">Destinos</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <div class="stat-number h3 fw-bold mb-1" style="color: #5DAD47;">{{ contadores.experiencias }}</div>
+                                <div class="stat-label small text-muted">Experiencias</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box text-center">
+                                <div class="stat-number h3 fw-bold mb-1" style="color: #5DAD47;">365</div>
+                                <div class="stat-label small text-muted">Días al Año</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
@@ -60,13 +110,14 @@
 </section>
 
 <!-- Lista de Rutas -->
-<section class="section py-5">
+<section class="section py-5" id="rutas">
     <div class="container">
         <div class="row g-4" id="routesGrid">
             {% for ruta in rutas %}
             <div class="col-lg-6 col-xl-4 route-item dificultad-{{ ruta.dificultad }}" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:1|stringformat:'d' }}00">
-                <div class="card route-card h-100 shadow-sm border-0">
-                    <!-- Imagen de la ruta con altura fija -->
+                <div class="card route-card route-card-enhanced h-100 shadow-sm border-0">
+                    
+                    <!-- Imagen de la ruta -->
                     <div class="route-img position-relative" style="height: 220px; overflow: hidden;">
                         {% if ruta.imagen_principal %}
                             <img src="{{ ruta.imagen_principal.url }}" alt="{{ ruta.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
@@ -74,8 +125,27 @@
                             <img src="{% static 'img/placeholder.jpg' %}" alt="{{ ruta.nombre }}" class="card-img-top h-100 w-100" style="object-fit: cover;">
                         {% endif %}
                         
+                        <!-- Badge de tipo de ruta -->
+                        <div class="route-type-badge">
+                            <span class="badge route-type-{{ ruta.slug }} px-3 py-2 rounded-pill text-white fw-bold">
+                                {% if ruta.slug == 'city-tour-patrimonial' %}
+                                    <i class="ph-buildings me-1"></i> Patrimonial
+                                {% elif ruta.slug == 'magica-ancestral' %}
+                                    <i class="ph-sparkle me-1"></i> Ancestral
+                                {% elif ruta.slug == 'paraiso-natural' %}
+                                    <i class="ph-tree me-1"></i> Natural
+                                {% elif ruta.slug == 'gastronomica' %}
+                                    <i class="ph-fork-knife me-1"></i> Gastronómica
+                                {% elif ruta.slug == 'magica-cafe' %}
+                                    <i class="ph-coffee me-1"></i> Café
+                                {% else %}
+                                    <i class="ph-path me-1"></i> Ruta
+                                {% endif %}
+                            </span>
+                        </div>
+                        
                         <!-- Badge de dificultad -->
-                        <div class="position-absolute top-0 start-0 m-3">
+                        <div class="position-absolute top-0 end-0 m-3">
                             <span class="badge bg-{{ ruta.get_color_dificultad }} px-3 py-2 rounded-pill">
                                 {{ ruta.get_dificultad_display }}
                             </span>
@@ -169,8 +239,17 @@
                         </div>
                         {% endif %}
                         
+                        <!-- Mini mapa de vista previa (placeholder) -->
+                        <div class="route-preview-map">
+                            <div class="text-center">
+                                <i class="ph-map-trifold mb-1" style="font-size: 24px;"></i>
+                                <div>Vista previa del mapa</div>
+                                <small class="text-muted">{{ ruta.get_puntos_ordenados.count }} puntos de interés</small>
+                            </div>
+                        </div>
+                        
                         <!-- Acciones -->
-                        <div class="route-actions d-flex gap-2 mt-auto">
+                        <div class="route-actions d-flex gap-2 mt-3">
                             <a href="{{ ruta.get_absolute_url }}" class="btn flex-grow-1" style="background-color: #5DAD47; color: white; border-color: #5DAD47;">
                                 <i class="ph-arrow-right me-1"></i> Explorar
                             </a>
@@ -269,208 +348,6 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Filtros de rutas
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const routeItems = document.querySelectorAll('.route-item');
-    
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Remover clase active de todos los botones
-            filterBtns.forEach(b => {
-                b.classList.remove('active');
-                b.style.backgroundColor = 'transparent';
-                b.style.color = '#5DAD47';
-                b.style.borderColor = '#5DAD47';
-            });
-            
-            // Agregar clase active al botón clickeado
-            this.classList.add('active');
-            this.style.backgroundColor = '#5DAD47';
-            this.style.color = 'white';
-            this.style.borderColor = '#5DAD47';
-            
-            const filter = this.getAttribute('data-filter');
-            
-            routeItems.forEach((item, index) => {
-                if (filter === '*' || item.classList.contains(filter.substring(1))) {
-                    item.style.display = 'block';
-                    item.style.opacity = '0';
-                    // Animación escalonada
-                    setTimeout(() => {
-                        item.style.transition = 'opacity 0.3s ease';
-                        item.style.opacity = '1';
-                        item.classList.add('aos-animate');
-                    }, index * 50);
-                } else {
-                    item.style.transition = 'opacity 0.2s ease';
-                    item.style.opacity = '0';
-                    setTimeout(() => {
-                        item.style.display = 'none';
-                    }, 200);
-                }
-            });
-        });
-    });
-    
-    // Botones de favoritos
-    document.querySelectorAll('.btn-favorite').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const heart = this.querySelector('.ph-heart');
-            const isLiked = heart.classList.contains('ph-heart-fill');
-            
-            // Animación de click
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = 'scale(1)';
-            }, 100);
-            
-            if (isLiked) {
-                heart.className = 'ph-heart';
-                this.classList.remove('btn-danger');
-                this.classList.add('btn-outline-secondary');
-            } else {
-                heart.className = 'ph-heart-fill';
-                this.classList.remove('btn-outline-secondary');
-                this.style.backgroundColor = '#5DAD47';
-                this.style.borderColor = '#5DAD47';
-                this.style.color = 'white';
-                
-                // Efecto de partículas simple
-                createHeartEffect(this);
-            }
-        });
-    });
-    
-    // Botones de compartir
-    document.querySelectorAll('.btn-share').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const routeCard = this.closest('.route-card');
-            const routeTitle = routeCard.querySelector('.card-title a').textContent;
-            const routeUrl = routeCard.querySelector('.card-title a').href;
-            
-            if (navigator.share && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                navigator.share({
-                    title: routeTitle,
-                    text: `Descubre esta increíble ruta turística en Garzón: ${routeTitle}`,
-                    url: routeUrl
-                }).catch(console.error);
-            } else {
-                // Fallback: copiar al portapapeles
-                navigator.clipboard.writeText(routeUrl).then(() => {
-                    // Feedback visual mejorado
-                    const originalIcon = this.querySelector('i');
-                    const originalClass = originalIcon.className;
-                    const originalText = this.getAttribute('title');
-                    
-                    originalIcon.className = 'ph-check text-success';
-                    this.setAttribute('title', '¡Enlace copiado!');
-                    this.style.backgroundColor = '#5DAD47';
-                    this.style.borderColor = '#5DAD47';
-                    this.style.color = 'white';
-                    
-                    setTimeout(() => {
-                        originalIcon.className = originalClass;
-                        this.setAttribute('title', originalText);
-                        this.style.backgroundColor = 'transparent';
-                        this.style.borderColor = '#6c757d';
-                        this.style.color = '#6c757d';
-                    }, 2000);
-                }).catch(() => {
-                    // Si falla el clipboard, mostrar modal con el enlace
-                    showShareModal(routeTitle, routeUrl);
-                });
-            }
-        });
-    });
-    
-    // Hover effects en las tarjetas
-    document.querySelectorAll('.route-card').forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-5px)';
-            this.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-            this.classList.add('shadow-lg');
-        });
-        
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0)';
-            this.classList.remove('shadow-lg');
-        });
-    });
-    
-    // Función para crear efecto de corazón
-    function createHeartEffect(button) {
-        const rect = button.getBoundingClientRect();
-        const heart = document.createElement('div');
-        heart.innerHTML = '♥';
-        heart.style.position = 'fixed';
-        heart.style.left = rect.left + rect.width / 2 + 'px';
-        heart.style.top = rect.top + 'px';
-        heart.style.color = '#5DAD47';
-        heart.style.fontSize = '20px';
-        heart.style.pointerEvents = 'none';
-        heart.style.zIndex = '9999';
-        heart.style.transition = 'all 0.8s ease-out';
-        
-        document.body.appendChild(heart);
-        
-        setTimeout(() => {
-            heart.style.transform = 'translateY(-30px)';
-            heart.style.opacity = '0';
-        }, 10);
-        
-        setTimeout(() => {
-            document.body.removeChild(heart);
-        }, 800);
-    }
-    
-    // Función para mostrar modal de compartir (fallback)
-    function showShareModal(title, url) {
-        const modal = document.createElement('div');
-        modal.className = 'modal fade';
-        modal.innerHTML = `
-            <div class="modal-dialog modal-sm">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Compartir Ruta</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="small mb-2">${title}</p>
-                        <div class="input-group">
-                            <input type="text" class="form-control" value="${url}" readonly>
-                            <button class="btn btn-outline-secondary copy-url-btn" type="button">
-                                <i class="ph-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(modal);
-        const bsModal = new bootstrap.Modal(modal);
-        bsModal.show();
-        
-        // Botón copiar del modal
-        modal.querySelector('.copy-url-btn').addEventListener('click', function() {
-            const input = modal.querySelector('input');
-            input.select();
-            navigator.clipboard.writeText(input.value);
-            this.innerHTML = '<i class="ph-check"></i>';
-            setTimeout(() => {
-                this.innerHTML = '<i class="ph-copy"></i>';
-            }, 1000);
-        });
-        
-        // Limpiar modal cuando se cierre
-        modal.addEventListener('hidden.bs.modal', function() {
-            document.body.removeChild(modal);
-        });
-    }
-});
-</script>
+<script src="{% static 'js/route_maps.js' %}"></script>
+<script src="{% static 'js/route_list.js' %}"></script>
 {% endblock %}
