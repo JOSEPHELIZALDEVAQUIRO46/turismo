@@ -83,4 +83,33 @@ urlpatterns = [
     
     # Categorías de actividades físicas
     path('actividades-fisicas/categorias/', views.CategoriaActividadFisicaListView.as_view(), name='categorias_actividades'),
+
+     # ========== URLs PARA GALERÍA FOTOGRÁFICA ==========
+    
+    # Galería principal
+    path('galeria/', views.GaleriaFotograficaView.as_view(), name='galeria'),
+    
+    # Detalle de fotografía
+    path('galeria/foto/<slug:slug>/', views.FotografiaDetailView.as_view(), name='fotografia_detail'),
+    
+    # Fotografías por categoría
+    path('galeria/categoria/<slug:slug>/', views.GaleriaCategoriaView.as_view(), name='galeria_categoria'),
+    
+    # Fotografías por tag
+    path('galeria/tag/<slug:slug>/', views.GaleriaTagView.as_view(), name='galeria_tag'),
+    
+    # Fotografías por fotógrafo
+    path('galeria/fotografo/<str:fotografo>/', views.GaleriaFotografoView.as_view(), name='galeria_fotografo'),
+    
+    # ========== APIs PARA GALERÍA ==========
+    
+    # API de fotografías con filtros
+    path('api/galeria/fotografias/', views.api_galeria_fotografias, name='api_galeria_fotografias'),
+    
+    # API de categorías
+    path('api/galeria/categorias/', views.api_galeria_categorias, name='api_galeria_categorias'),
+    
+    # API de búsqueda rápida
+    path('api/galeria/busqueda/', views.api_galeria_busqueda, name='api_galeria_busqueda'),
+   
 ]   

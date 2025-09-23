@@ -816,3 +816,203 @@ class ImagenActividadFisica(models.Model):
     
     class Meta:
         ordering = ['orden', 'id']
+
+    # turismo/models.py - AGREGAR AL FINAL DEL ARCHIVO EXISTENTE
+
+class CategoriaFotografia(TimeStampedModel):
+    """Categorías específicas para la galería fotográfica"""
+    nombre = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+    descripcion = models.TextField(blank=True)
+    icono = models.CharField(
+        max_length=50, 
+        blank=True,
+        help_text="Clase CSS del icono (ej: ph-mountains)"
+    )
+    color_tema = models.CharField(
+        max_length=7, 
+        blank=True,
+        help_text="Color hexadecimal para esta categoría (ej: #FF5733)"
+    )
+    orden = models.PositiveSmallIntegerField(default=0)
+    activa = models.BooleanField(default=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.nombre
+    
+    def get_absolute_url(self):
+        return reverse('turismo:galeria_categoria', kwargs={'slug': self.slug})
+    
+    def get_total_fotos(self):
+        return self.fotografias.filter(activa=True).count()
+    
+    class Meta:
+        verbose_name = "Categoría de Fotografía"
+        verbose_name_plural = "Categorías de Fotografías"
+        ordering = ['orden', 'nombre']
+
+
+class Fotografia(TimeStampedModel):
+    """Modelo principal para la galería fotográfica"""
+    titulo = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True, blank=True)
+    descripcion = models.TextField(blank=True)
+    imagen = models.ImageField(
+        upload_to='galeria/',
+        help_text="Imagen principal de la fotografía"
+    )
+    categoria = models.ForeignKey(
+        CategoriaFotografia,
+        on_delete=models.CASCADE,
+        related_name='fotografias'
+    )
+    
+    # Metadatos de la fotografía
+    fotografo = models.CharField(
+        max_length=200,
+        blank=True,
+        help_text="Nombre del fotógrafo"
+    )
+    fecha_captura = models.DateField(
+        blank=True,
+        null=True,
+        help_text="Fecha en que se tomó la fotografía"
+    )
+    ubicacion = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Ubicación donde se tomó la foto"
+    )
+    
+    # Datos técnicos (opcionales)
+    camara = models.CharField(max_length=100, blank=True)
+    lente = models.CharField(max_length=100, blank=True)
+    iso = models.CharField(max_length=50, blank=True)
+    apertura = models.CharField(max_length=50, blank=True)
+    velocidad = models.CharField(max_length=50, blank=True)
+    
+    # Estado y configuración
+    destacada = models.BooleanField(
+        default=False,
+        help_text="Marcar si es una fotografía destacada"
+    )
+    activa = models.BooleanField(default=True)
+    orden = models.PositiveSmallIntegerField(default=0)
+    
+    # Interacción
+    vistas = models.PositiveIntegerField(default=0)
+    
+    # Relación con lugares turísticos (opcional)
+    lugar_relacionado = models.ForeignKey(
+        'LugarTuristico',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='fotografias_galeria',
+        help_text="Lugar turístico relacionado (opcional)"
+    )
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.titulo}-{timezone.now().strftime('%Y%m%d')}")
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.titulo} - {self.categoria.nombre}"
+    
+    def get_absolute_url(self):
+        return reverse('turismo:fotografia_detail', kwargs={'slug': self.slug})
+    
+    def incrementar_vistas(self):
+        """Incrementa el contador de vistas"""
+        self.vistas += 1
+        self.save(update_fields=['vistas'])
+    
+    def get_imagen_url(self):
+        """Retorna la URL de la imagen"""
+        if self.imagen:
+            return self.imagen.url
+        return '/static/img/placeholder.jpg'
+    
+    def get_datos_tecnicos(self):
+        """Retorna datos técnicos si están disponibles"""
+        datos = {}
+        if self.camara:
+            datos['Cámara'] = self.camara
+        if self.lente:
+            datos['Lente'] = self.lente
+        if self.iso:
+            datos['ISO'] = self.iso
+        if self.apertura:
+            datos['Apertura'] = self.apertura
+        if self.velocidad:
+            datos['Velocidad'] = self.velocidad
+        return datos
+    
+    def get_fotografias_relacionadas(self):
+        """Obtiene fotografías relacionadas de la misma categoría"""
+        return Fotografia.objects.filter(
+            categoria=self.categoria,
+            activa=True
+        ).exclude(id=self.id)[:4]
+    
+    class Meta:
+        verbose_name = "Fotografía"
+        verbose_name_plural = "Fotografías"
+        ordering = ['-destacada', 'orden', '-created']
+
+
+class TagFotografia(models.Model):
+    """Tags para etiquetar fotografías"""
+    nombre = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(unique=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.nombre
+    
+    def get_total_fotos(self):
+        return self.fotografias.filter(activa=True).count()
+    
+    class Meta:
+        verbose_name = "Etiqueta de Fotografía"
+        verbose_name_plural = "Etiquetas de Fotografías"
+        ordering = ['nombre']
+
+
+# Tabla intermedia para tags
+class FotografiaTag(models.Model):
+    fotografia = models.ForeignKey(
+        Fotografia,
+        on_delete=models.CASCADE,
+        related_name='tags'
+    )
+    tag = models.ForeignKey(
+        TagFotografia,
+        on_delete=models.CASCADE,
+        related_name='fotografias'
+    )
+    
+    class Meta:
+        unique_together = ['fotografia', 'tag']
+
+
+class FavoritesFotografia(models.Model):
+    """Sistema de favoritos para fotografías (futuro)"""
+    fotografia = models.ForeignKey(Fotografia, on_delete=models.CASCADE)
+    ip_address = models.GenericIPAddressField()
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ['fotografia', 'ip_address']
+        verbose_name = "Fotografía Favorita"
+        verbose_name_plural = "Fotografías Favoritas"

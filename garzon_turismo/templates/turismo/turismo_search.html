@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if query %}
+    Resultados para "{{ query }}" - {{ block.super }}
+{% else %}
+    Búsqueda - {{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bg-light py-3">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if query %}Resultados: "{{ query }}"{% else %}Búsqueda{% endif %}
+            </li>
+        </ol>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            {% if query %}
+                <h1 class="h3 mb-2">Resultados para: <span class="text-primary">"{{ query }}"</span></h1>
+                <p class="text-muted">Se encontraron {{ total_resultados }} resultado{{ total_resultados|pluralize }} para tu búsqueda</p>
+            {% else %}
+                <h1 class="h3 mb-2">Realizar Búsqueda</h1>
+                <p class="text-muted">Busca lugares, establecimientos, eventos y más en Garzón</p>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <!-- Formulario de búsqueda -->
+            <form action="{% url 'turismo:turismo_search' %}" method="get">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" 
+                           placeholder="¿Qué buscas?" 
+                           value="{{ query }}" required minlength="3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ph-magnifying-glass"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if query %}
+        {% if resultados %}
+            <!-- Filtros -->
+            {% if tipos_count %}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="d-flex flex-wrap gap-2">
+                        <button class="btn btn-primary btn-sm filter-btn active" data-filter="all">
+                            Todos ({{ total_resultados }})
+                        </button>
+                        {% for tipo, count in tipos_count.items %}
+                        <button class="btn btn-outline-secondary btn-sm filter-btn" data-filter="{{ tipo }}">
+                            {% if tipo == 'lugar' %}
+                                Lugares ({{ count }})
+                            {% elif tipo == 'establecimiento' %}
+                                Establecimientos ({{ count }})
+                            {% elif tipo == 'evento' %}
+                                Eventos ({{ count }})
+                            {% elif tipo == 'ruta' %}
+                                Rutas ({{ count }})
+                            {% elif tipo == 'transporte' %}
+                                Transporte ({{ count }})
+                            {% elif tipo == 'artesania' %}
+                                Artesanías ({{ count }})
+                            {% elif tipo == 'actividad' %}
+                                Actividades ({{ count }})
+                            {% else %}
+                                {{ tipo|title }} ({{ count }})
+                            {% endif %}
+                        </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Resultados -->
+            <div class="row">
+                {% for resultado in resultados %}
+                <div class="col-lg-6 col-xl-4 mb-4 result-item" data-tipo="{{ resultado.tipo }}">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if resultado.imagen %}
+                        <img src="{{ resultado.imagen.url }}" class="card-img-top" alt="{{ resultado.nombre }}" style="height: 200px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                            <i class="ph-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="card-body d-flex flex-column">
+                            <!-- Badge del tipo -->
+                            <div class="mb-2">
+                                {% if resultado.tipo == 'lugar' %}
+                                    <span class="badge bg-primary"><i class="ph-mountains me-1"></i>Lugar Turístico</span>
+                                {% elif resultado.tipo == 'establecimiento' %}
+                                    <span class="badge bg-success"><i class="ph-buildings me-1"></i>Establecimiento</span>
+                                {% elif resultado.tipo == 'evento' %}
+                                    <span class="badge bg-warning text-dark"><i class="ph-calendar-plus me-1"></i>Evento</span>
+                                {% elif resultado.tipo == 'ruta' %}
+                                    <span class="badge bg-info"><i class="ph-map-trifold me-1"></i>Ruta</span>
+                                {% elif resultado.tipo == 'transporte' %}
+                                    <span class="badge bg-secondary"><i class="ph-bus me-1"></i>Transporte</span>
+                                {% elif resultado.tipo == 'artesania' %}
+                                    <span class="badge bg-danger"><i class="ph-palette me-1"></i>Artesanía</span>
+                                {% elif resultado.tipo == 'actividad' %}
+                                    <span class="badge bg-dark"><i class="ph-bicycle me-1"></i>Actividad</span>
+                                {% endif %}
+                            </div>
+
+                            <!-- Título -->
+                            <h5 class="card-title">{{ resultado.nombre }}</h5>
+
+                            <!-- Descripción -->
+                            <p class="card-text text-muted">
+                                {{ resultado.descripcion|truncatewords:20 }}
+                            </p>
+
+                            <!-- Categoría -->
+                            {% if resultado.categoria %}
+                            <small class="text-muted mb-3 d-block">{{ resultado.categoria }}</small>
+                            {% endif %}
+
+                            <!-- Botón (al final) -->
+                            <div class="mt-auto">
+                                <a href="{{ resultado.url }}" class="btn btn-outline-primary btn-sm w-100">
+                                    Ver detalles <i class="ph-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Sin resultados -->
+            <div class="text-center py-5">
+                <i class="ph-magnifying-glass text-muted mb-3" style="font-size: 4rem;"></i>
+                <h3 class="h4 mb-3">No se encontraron resultados</h3>
+                <p class="text-muted mb-4">
+                    No pudimos encontrar nada que coincida con "<strong>{{ query }}</strong>".
+                </p>
+                
+                <!-- Sugerencias -->
+                <div class="mt-4">
+                    <h5 class="mb-3">Prueba buscando:</h5>
+                    <div class="d-flex flex-wrap justify-content-center gap-2">
+                        <a href="{% url 'turismo:turismo_search' %}?q=café" class="btn btn-outline-primary btn-sm">Café</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=hotel" class="btn btn-outline-success btn-sm">Hotel</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=senderismo" class="btn btn-outline-info btn-sm">Senderismo</a>
+                        <a href="{% url 'turismo:turismo_search' %}?q=artesanía" class="btn btn-outline-warning btn-sm">Artesanía</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Sin query -->
+        <div class="text-center py-5">
+            <i class="ph-binoculars text-primary mb-3" style="font-size: 4rem;"></i>
+            <h3 class="h4 mb-3">Descubre Garzón</h3>
+            <p class="text-muted mb-4">
+                Usa el buscador para encontrar lugares turísticos, establecimientos, eventos y más.
+            </p>
+            
+            <!-- Enlaces rápidos -->
+            <div class="row g-3 mt-4">
+                <div class="col-6 col-md-3">
+                    <a href="{% url 'turismo:lugar_list' %}" class="btn btn-outline-primary w-100 py-3">
+                        <i class="ph-mountains d-block mb-2" style="font-size: 2rem;"></i>
+                        <small>Lugares</small>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="{% url 'turismo:establecimiento_list' %}" class="btn btn-outline-success w-100 py-3">
+                        <i class="ph-buildings d-block mb-2" style="font-size: 2rem;"></i>
+                        <small>Alojamiento</small>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="{% url 'turismo:evento_list' %}" class="btn btn-outline-warning w-100 py-3">
+                        <i class="ph-calendar-plus d-block mb-2" style="font-size: 2rem;"></i>
+                        <small>Eventos</small>
+                    </a>
+                </div>
+                <div class="col-6 col-md-3">
+                    <a href="{% url 'turismo:ruta_list' %}" class="btn btn-outline-info w-100 py-3">
+                        <i class="ph-map-trifold d-block mb-2" style="font-size: 2rem;"></i>
+                        <small>Rutas</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Filtros
+    $('.filter-btn').on('click', function() {
+        const filter = $(this).data('filter');
+        
+        // Actualizar botones
+        $('.filter-btn').removeClass('active btn-primary').addClass('btn-outline-secondary');
+        $(this).removeClass('btn-outline-secondary').addClass('active btn-primary');
+        
+        // Filtrar resultados
+        if (filter === 'all') {
+            $('.result-item').show();
+        } else {
+            $('.result-item').hide();
+            $(`.result-item[data-tipo="${filter}"]`).show();
+        }
+    });
+
+    // Resaltar términos de búsqueda
+    const query = '{{ query|escapejs }}';
+    if (query && query.length > 0) {
+        $('.card-title, .card-text').each(function() {
+            const text = $(this).text();
+            const regex = new RegExp(`(${query})`, 'gi');
+            const highlighted = text.replace(regex, '<mark class="bg-warning bg-opacity-50 px-1 rounded">$1</mark>');
+            $(this).html(highlighted);
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,840 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ fotografia.titulo }} - Galería Fotográfica - {{ block.super }}{% endblock %}
+
+{% block meta_description %}{{ fotografia.descripcion|default:"Fotografía de Garzón, Huila"|truncatewords:20 }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ========== DETALLE DE FOTOGRAFÍA CON GARZAS ========== */
+:root {
+    --garza-primary: #5DAD47;
+    --garza-secondary: #F4DC26;
+}
+
+/* Animaciones de garzas para detalle */
+@keyframes garza-detail-float {
+    0%, 100% { 
+        transform: translateY(0px) rotate(0deg); 
+        opacity: 0.6;
+    }
+    50% { 
+        transform: translateY(-20px) rotate(3deg); 
+        opacity: 0.8;
+    }
+}
+
+@keyframes garza-zoom-effect {
+    0% { 
+        transform: scale(1) rotate(0deg); 
+        opacity: 0.4;
+    }
+    50% { 
+        transform: scale(1.1) rotate(2deg); 
+        opacity: 0.7;
+    }
+    100% { 
+        transform: scale(1) rotate(0deg); 
+        opacity: 0.4;
+    }
+}
+
+/* Contenedor principal */
+.foto-detail-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Garzas decorativas para detalle */
+.detail-garzas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.detail-garza {
+    position: absolute;
+    animation: garza-detail-float 8s ease-in-out infinite;
+}
+
+.detail-garza-1 {
+    top: 15%;
+    right: 5%;
+    animation-delay: 0s;
+}
+
+.detail-garza-2 {
+    bottom: 20%;
+    left: 3%;
+    animation-delay: 3s;
+}
+
+.detail-garza-3 {
+    top: 60%;
+    right: 10%;
+    animation-delay: 6s;
+    animation-name: garza-zoom-effect;
+}
+
+/* Imagen principal */
+.foto-principal {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    margin-bottom: 3rem;
+}
+
+.foto-imagen {
+    width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    background: #f8f9fa;
+}
+
+.foto-toolbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.8));
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.foto-principal:hover .foto-toolbar {
+    opacity: 1;
+}
+
+.foto-info-quick {
+    color: white;
+}
+
+.foto-titulo-overlay {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.foto-meta-overlay {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.foto-acciones-overlay {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 45px;
+    height: 45px;
+    background: rgba(255,255,255,0.9);
+    border: none;
+    border-radius: 50%;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+}
+
+.action-btn:hover {
+    background: var(--garza-primary);
+    color: white;
+    transform: scale(1.1);
+}
+
+/* Información de la fotografía */
+.foto-info-section {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 10;
+}
+
+.categoria-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--garza-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.foto-titulo-main {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.foto-meta-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.meta-item i {
+    color: var(--garza-primary);
+    font-size: 1.1rem;
+}
+
+.meta-label {
+    font-weight: 600;
+    color: #666;
+}
+
+.meta-value {
+    color: #333;
+}
+
+/* Datos técnicos */
+.datos-tecnicos {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.datos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.dato-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.dato-item:hover {
+    transform: translateY(-3px);
+}
+
+.dato-label {
+    font-size: 0.8rem;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.dato-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: var(--garza-primary);
+}
+
+/* Tags */
+.tags-section {
+    margin: 2rem 0;
+}
+
+.tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: #e9ecef;
+    color: #666;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    margin: 0.2rem;
+    transition: all 0.3s ease;
+}
+
+.tag-item:hover {
+    background: var(--garza-primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Navegación anterior/siguiente */
+.foto-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 3rem 0;
+}
+
+.nav-foto {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 1rem;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.nav-foto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    color: #333;
+}
+
+.nav-foto.prev {
+    justify-content: flex-start;
+}
+
+.nav-foto.next {
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.nav-foto-img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.nav-foto.prev .nav-foto-img {
+    margin-right: 1rem;
+}
+
+.nav-foto.next .nav-foto-img {
+    margin-left: 1rem;
+}
+
+.nav-foto-info h6 {
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.nav-foto-title {
+    font-weight: bold;
+    color: var(--garza-primary);
+}
+
+/* Fotografías relacionadas */
+.relacionadas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.relacionada-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.relacionada-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.relacionada-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.relacionada-card:hover .relacionada-img {
+    transform: scale(1.05);
+}
+
+.relacionada-content {
+    padding: 1rem;
+}
+
+.relacionada-titulo {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.relacionada-meta {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Efectos especiales para garzas en hover */
+.garza-hover-effect {
+    transition: all 0.5s ease;
+}
+
+.garza-hover-effect:hover {
+    animation: garza-zoom-effect 2s ease-in-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .foto-detail-container {
+        padding: 1rem 0;
+    }
+    
+    .foto-titulo-main {
+        font-size: 1.8rem;
+    }
+    
+    .foto-meta-detail {
+        grid-template-columns: 1fr;
+    }
+    
+    .datos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .foto-navigation {
+        flex-direction: column;
+    }
+    
+    .relacionadas-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .foto-toolbar {
+        position: static;
+        opacity: 1;
+        background: rgba(0,0,0,0.8);
+        padding: 1rem;
+    }
+    
+    .foto-info-quick {
+        width: 100%;
+    }
+    
+    .foto-titulo-overlay {
+        font-size: 1.2rem;
+    }
+    
+    .foto-acciones-overlay {
+        margin-top: 1rem;
+        justify-content: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="foto-detail-container">
+    <!-- Garzas decorativas -->
+    <div class="detail-garzas">
+        <div class="detail-garza detail-garza-1 garza-hover-effect">
+            <svg width="80" height="60" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 60 Q35 25 50 50 Q65 15 80 40" stroke="#5DAD47" stroke-width="2" fill="none" opacity="0.4"/>
+                <circle cx="22" cy="58" r="3" fill="#F4DC26" opacity="0.6"/>
+                <circle cx="78" cy="38" r="2" fill="#5DAD47" opacity="0.5"/>
+            </svg>
+        </div>
+        
+        <div class="detail-garza detail-garza-2 garza-hover-effect">
+            <svg width="90" height="70" viewBox="0 0 110 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 65 Q35 28 55 55 Q75 18 95 45" stroke="#5DAD47" stroke-width="3" fill="none" opacity="0.3"/>
+                <circle cx="17" cy="63" r="4" fill="#F4DC26" opacity="0.5"/>
+                <circle cx="93" cy="43" r="3" fill="#5DAD47" opacity="0.4"/>
+            </svg>
+        </div>
+        
+        <div class="detail-garza detail-garza-3 garza-hover-effect">
+            <svg width="70" height="50" viewBox="0 0 90 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 55 Q28 25 38 45 Q48 15 58 35 Q68 10 78 30" stroke="#5DAD47" stroke-width="2" fill="none" opacity="0.5"/>
+                <circle cx="20" cy="53" r="3" fill="#F4DC26" opacity="0.7"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="container position-relative" style="z-index: 10;">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="py-3">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'core:home' %}">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'turismo:galeria' %}">Galería</a></li>
+                {% if fotografia.categoria %}
+                <li class="breadcrumb-item">
+                    <a href="{% url 'turismo:galeria_categoria' fotografia.categoria.slug %}">
+                        {{ fotografia.categoria.nombre }}
+                    </a>
+                </li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">{{ fotografia.titulo }}</li>
+            </ol>
+        </nav>
+
+        <div class="row">
+            <!-- Imagen principal -->
+            <div class="col-lg-8">
+                <div class="foto-principal" data-aos="fade-up">
+                    <img src="{{ fotografia.get_imagen_url }}" 
+                         alt="{{ fotografia.titulo }}" 
+                         class="foto-imagen">
+                    
+                    <div class="foto-toolbar">
+                        <div class="foto-info-quick">
+                            <h3 class="foto-titulo-overlay">{{ fotografia.titulo }}</h3>
+                            <div class="foto-meta-overlay">
+                                {% if fotografia.fotografo %}
+                                <span><i class="ph-camera me-1"></i>{{ fotografia.fotografo }}</span>
+                                {% endif %}
+                                {% if fotografia.ubicacion %}
+                                <span><i class="ph-map-pin me-1"></i>{{ fotografia.ubicacion }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="foto-acciones-overlay">
+                            <button class="action-btn" onclick="compartirFoto()" title="Compartir">
+                                <i class="ph-share-network"></i>
+                            </button>
+                            <button class="action-btn" onclick="descargarFoto()" title="Descargar">
+                                <i class="ph-download-simple"></i>
+                            </button>
+                            <button class="action-btn" onclick="toggleFavorito()" title="Favorito">
+                                <i class="ph-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información de la fotografía -->
+            <div class="col-lg-4">
+                <div class="foto-info-section" data-aos="fade-left">
+                    <!-- Categoría -->
+                    <div class="categoria-badge" style="{% if fotografia.categoria.color_tema %}background-color: {{ fotografia.categoria.color_tema }};{% endif %}">
+                        {% if fotografia.categoria.icono %}
+                        <i class="{{ fotografia.categoria.icono }}"></i>
+                        {% endif %}
+                        {{ fotografia.categoria.nombre }}
+                    </div>
+
+                    <!-- Título -->
+                    <h1 class="foto-titulo-main">{{ fotografia.titulo }}</h1>
+
+                    <!-- Descripción -->
+                    {% if fotografia.descripcion %}
+                    <div class="foto-descripcion mb-4">
+                        <p class="text-muted">{{ fotografia.descripcion }}</p>
+                    </div>
+                    {% endif %}
+
+                    <!-- Metadatos principales -->
+                    <div class="foto-meta-detail">
+                        {% if fotografia.fotografo %}
+                        <div class="meta-item">
+                            <i class="ph-camera"></i>
+                            <span class="meta-label">Fotógrafo:</span>
+                            <span class="meta-value">{{ fotografia.fotografo }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if fotografia.fecha_captura %}
+                        <div class="meta-item">
+                            <i class="ph-calendar"></i>
+                            <span class="meta-label">Fecha:</span>
+                            <span class="meta-value">{{ fotografia.fecha_captura|date:"d M Y" }}</span>
+                        </div>
+                        {% endif %}
+
+                        {% if fotografia.ubicacion %}
+                        <div class="meta-item">
+                            <i class="ph-map-pin"></i>
+                            <span class="meta-label">Ubicación:</span>
+                            <span class="meta-value">{{ fotografia.ubicacion }}</span>
+                        </div>
+                        {% endif %}
+
+                        <div class="meta-item">
+                            <i class="ph-eye"></i>
+                            <span class="meta-label">Vistas:</span>
+                            <span class="meta-value">{{ fotografia.vistas }}</span>
+                        </div>
+
+                        {% if fotografia.lugar_relacionado %}
+                        <div class="meta-item">
+                            <i class="ph-map-trifold"></i>
+                            <span class="meta-label">Lugar:</span>
+                            <a href="{{ fotografia.lugar_relacionado.get_absolute_url }}" class="meta-value text-primary">
+                                {{ fotografia.lugar_relacionado.nombre }}
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tags -->
+                    {% if tags %}
+                    <div class="tags-section">
+                        <h6 class="fw-bold mb-3">Etiquetas</h6>
+                        {% for tag in tags %}
+                        <a href="{% url 'turismo:galeria_tag' tag.slug %}" class="tag-item">
+                            <i class="ph-tag-simple"></i>
+                            {{ tag.nombre }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Datos técnicos -->
+                {% if datos_tecnicos %}
+                <div class="datos-tecnicos" data-aos="fade-left" data-aos-delay="200">
+                    <h5 class="fw-bold mb-3">
+                        <i class="ph-gear me-2 text-primary"></i>
+                        Datos Técnicos
+                    </h5>
+                    <div class="datos-grid">
+                        {% for label, value in datos_tecnicos.items %}
+                        <div class="dato-item">
+                            <div class="dato-label">{{ label }}</div>
+                            <div class="dato-value">{{ value }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Navegación anterior/siguiente -->
+        {% if foto_anterior or foto_siguiente %}
+        <div class="foto-navigation" data-aos="fade-up">
+            {% if foto_anterior %}
+            <a href="{{ foto_anterior.get_absolute_url }}" class="nav-foto prev">
+                <img src="{{ foto_anterior.get_imagen_url }}" alt="{{ foto_anterior.titulo }}" class="nav-foto-img">
+                <div class="nav-foto-info">
+                    <h6 class="text-muted mb-0">
+                        <i class="ph-caret-left me-1"></i>
+                        Anterior
+                    </h6>
+                    <div class="nav-foto-title">{{ foto_anterior.titulo }}</div>
+                </div>
+            </a>
+            {% else %}
+            <div></div>
+            {% endif %}
+
+            {% if foto_siguiente %}
+            <a href="{{ foto_siguiente.get_absolute_url }}" class="nav-foto next">
+                <div class="nav-foto-info">
+                    <h6 class="text-muted mb-0">
+                        Siguiente
+                        <i class="ph-caret-right ms-1"></i>
+                    </h6>
+                    <div class="nav-foto-title">{{ foto_siguiente.titulo }}</div>
+                </div>
+                <img src="{{ foto_siguiente.get_imagen_url }}" alt="{{ foto_siguiente.titulo }}" class="nav-foto-img">
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Fotografías relacionadas -->
+        {% if fotografias_relacionadas %}
+        <section class="py-5" data-aos="fade-up">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="fw-bold">
+                    <i class="ph-images me-2 text-primary"></i>
+                    Fotografías Relacionadas
+                </h3>
+                <a href="{% url 'turismo:galeria_categoria' fotografia.categoria.slug %}" 
+                   class="btn btn-outline-primary">
+                    Ver todas de {{ fotografia.categoria.nombre }}
+                </a>
+            </div>
+
+            <div class="relacionadas-grid">
+                {% for relacionada in fotografias_relacionadas %}
+                <a href="{{ relacionada.get_absolute_url }}" class="relacionada-card text-decoration-none">
+                    <img src="{{ relacionada.get_imagen_url }}" 
+                         alt="{{ relacionada.titulo }}" 
+                         class="relacionada-img">
+                    <div class="relacionada-content">
+                        <h6 class="relacionada-titulo">{{ relacionada.titulo }}</h6>
+                        <div class="relacionada-meta">
+                            {% if relacionada.fotografo %}
+                            <i class="ph-camera me-1"></i>{{ relacionada.fotografo }}
+                            {% endif %}
+                            {% if relacionada.vistas %}
+                            <span class="ms-3">
+                                <i class="ph-eye me-1"></i>{{ relacionada.vistas }} vistas
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- CTA para volver a la galería -->
+        <section class="py-5 text-center" data-aos="fade-up">
+            <div class="position-relative">
+                <!-- Garza decorativa para CTA -->
+                <div class="position-absolute top-50 start-50 translate-middle" style="z-index: 1; opacity: 0.1;">
+                    <svg width="200" height="150" viewBox="0 0 240 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M40 130 Q80 50 120 110 Q160 30 200 90" stroke="#5DAD47" stroke-width="4" fill="none"/>
+                        <circle cx="45" cy="125" r="8" fill="#F4DC26"/>
+                        <circle cx="195" cy="85" r="6" fill="#5DAD47"/>
+                    </svg>
+                </div>
+                
+                <div class="position-relative" style="z-index: 10;">
+                    <h4 class="fw-bold mb-3">¿Te gustó esta fotografía?</h4>
+                    <p class="text-muted mb-4">Descubre más imágenes increíbles de Garzón en nuestra galería completa</p>
+                    <a href="{% url 'turismo:galeria' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="ph-images me-2"></i>
+                        Explorar Galería
+                    </a>
+                    <a href="{% url 'turismo:galeria_categoria' fotografia.categoria.slug %}" class="btn btn-outline-primary btn-lg">
+                        <i class="ph-folder me-2"></i>
+                        Más de {{ fotografia.categoria.nombre }}
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Efectos de garzas al hover
+    const garzasHover = document.querySelectorAll('.garza-hover-effect');
+    garzasHover.forEach(garza => {
+        garza.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.2) rotate(10deg)';
+            this.style.filter = 'drop-shadow(0 10px 20px rgba(93, 173, 71, 0.4))';
+        });
+        
+        garza.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1) rotate(0deg)';
+            this.style.filter = 'none';
+        });
+    });
+
+    // Zoom de imagen al hacer clic
+    const fotoImagen = document.querySelector('.foto-imagen');
+    if (fotoImagen) {
+        fotoImagen.addEventListener('click', function() {
+            this.style.transform = this.style.transform === 'scale(1.5)' ? 'scale(1)' : 'scale(1.5)';
+            this.style.cursor = this.style.transform === 'scale(1.5)' ? 'zoom-out' : 'zoom-in';
+        });
+    }
+
+    // Efectos de parallax suave para garzas
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const garzasDetail = document.querySelectorAll('.detail-garza');
+        
+        garzasDetail.forEach((garza, index) => {
+            const speed = 0.2 + (index * 0.1);
+            garza.style.transform = `translateY(${scrolled * speed}px) rotate(${scrolled * 0.02}deg)`;
+        });
+    });
+});
+
+// Función para compartir fotografía
+function compartirFoto() {
+    const titulo = '{{ fotografia.titulo|escapejs }}';
+    const url = window.location.href;
+    const texto = `Mira esta increíble fotografía de Garzón: ${titulo}`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: titulo,
+            text: texto,
+            url: url
+        });
+    } else {
+        navigator.clipboard.writeText(`${texto} - ${url}`)
+            .then(() => {
+                alert('Enlace copiado al portapapeles');
+            });
+    }
+}
+
+// Función para descargar fotografía (simulada)
+function descargarFoto() {
+    const link = document.createElement('a');
+    link.href = '{{ fotografia.get_imagen_url }}';
+    link.download = '{{ fotografia.slug }}.jpg';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Función para toggle de favorito
+function toggleFavorito() {
+    const btn = event.target.closest('.action-btn');
+    const icon = btn.querySelector('i');
+    
+    if (icon.classList.contains('ph-heart')) {
+        icon.className = 'ph-heart-fill';
+        btn.style.background = '#e74c3c';
+        btn.style.color = 'white';
+        
+        // Animación de corazón
+        btn.style.animation = 'heartBeat 0.6s ease';
+        setTimeout(() => {
+            btn.style.animation = '';
+        }, 600);
+    } else {
+        icon.className = 'ph-heart';
+        btn.style.background = 'rgba(255,255,255,0.9)';
+        btn.style.color = '#333';
+    }
+}
+
+// Agregar animación CSS para el heartBeat
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes heartBeat {
+        0% { transform: scale(1); }
+        25% { transform: scale(1.3); }
+        50% { transform: scale(1); }
+        75% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

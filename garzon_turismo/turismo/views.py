@@ -14,7 +14,7 @@ from .models import (
     PuntoRuta, Establecimiento, Evento,
     Transporte, Artesania, ActividadFisica,
     CategoriaArtesania, CategoriaActividadFisica,
-    ImagenArtesania, ImagenActividadFisica
+    ImagenArtesania, ImagenActividadFisica,  Fotografia, CategoriaFotografia, TagFotografia, FotografiaTag
 )
 from .forms import (
     ValoracionForm, ComentarioForm, 
@@ -1859,3 +1859,557 @@ class MantenimientoView(TemplateView):
             # como SITIO_EN_MANTENIMIENTO = True
             pass
         return super().dispatch(request, *args, **kwargs)
+
+       # REEMPLAZA tu clase TurismoSearchViewActualizada en turismo/views.py con esta versión:
+
+class TurismoSearchViewActualizada(ListView):
+    """Búsqueda actualizada que incluye todos los modelos"""
+    template_name = 'turismo/turismo_search.html'
+    context_object_name = 'resultados'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        query = self.request.GET.get('q', '').strip()
+        if not query:
+            return []
+        
+        resultados = []
+        
+        # 1. Buscar en LUGARES TURÍSTICOS
+        try:
+            lugares = LugarTuristico.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query)
+            )
+            
+            for lugar in lugares:
+                resultados.append({
+                    'tipo': 'lugar',
+                    'objeto': lugar,
+                    'nombre': lugar.nombre,
+                    'descripcion': lugar.descripcion,
+                    'imagen': lugar.imagen_principal,
+                    'url': lugar.get_absolute_url(),
+                    'categoria': lugar.categoria.nombre
+                })
+        except Exception as e:
+            print(f"Error buscando lugares: {e}")
+        
+        # 2. Buscar en ESTABLECIMIENTOS
+        try:
+            establecimientos = Establecimiento.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query) | 
+                Q(servicios__icontains=query)
+            )
+            
+            for estab in establecimientos:
+                resultados.append({
+                    'tipo': 'establecimiento',
+                    'objeto': estab,
+                    'nombre': estab.nombre,
+                    'descripcion': estab.descripcion,
+                    'imagen': estab.imagen,
+                    'url': estab.get_absolute_url(),
+                    'categoria': estab.get_tipo_display()
+                })
+        except Exception as e:
+            print(f"Error buscando establecimientos: {e}")
+        
+        # 3. Buscar en EVENTOS
+        try:
+            eventos = Evento.objects.filter(
+                Q(titulo__icontains=query) | 
+                Q(descripcion__icontains=query) | 
+                Q(lugar__icontains=query)
+            )
+            
+            for evento in eventos:
+                resultados.append({
+                    'tipo': 'evento',
+                    'objeto': evento,
+                    'nombre': evento.titulo,
+                    'descripcion': evento.descripcion,
+                    'imagen': evento.imagen,
+                    'url': evento.get_absolute_url(),
+                    'categoria': 'Evento'
+                })
+        except Exception as e:
+            print(f"Error buscando eventos: {e}")
+        
+        # 4. Buscar en RUTAS
+        try:
+            rutas = Ruta.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query)
+            )
+            
+            for ruta in rutas:
+                resultados.append({
+                    'tipo': 'ruta',
+                    'objeto': ruta,
+                    'nombre': ruta.nombre,
+                    'descripcion': ruta.descripcion,
+                    'imagen': ruta.imagen_principal,
+                    'url': ruta.get_absolute_url(),
+                    'categoria': f"Ruta ({ruta.get_dificultad_display()})"
+                })
+        except Exception as e:
+            print(f"Error buscando rutas: {e}")
+        
+        # 5. Buscar en TRANSPORTES
+        try:
+            transportes = Transporte.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query) |
+                Q(origen__icontains=query) | 
+                Q(destino__icontains=query),
+                disponible=True
+            )
+            
+            for transporte in transportes:
+                resultados.append({
+                    'tipo': 'transporte',
+                    'objeto': transporte,
+                    'nombre': transporte.nombre,
+                    'descripcion': transporte.descripcion,
+                    'imagen': getattr(transporte, 'imagen', None),
+                    'url': transporte.get_absolute_url(),
+                    'categoria': f"Transporte ({transporte.get_tipo_display()})"
+                })
+        except Exception as e:
+            print(f"Error buscando transportes: {e}")
+        
+        # 6. Buscar en ARTESANÍAS
+        try:
+            artesanias = Artesania.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query) |
+                Q(artesano__icontains=query) | 
+                Q(lugar_origen__icontains=query),
+                disponible_venta=True
+            )
+            
+            for artesania in artesanias:
+                categoria_nombre = "Sin categoría"
+                if hasattr(artesania, 'categoria') and artesania.categoria:
+                    categoria_nombre = artesania.categoria.nombre
+                
+                resultados.append({
+                    'tipo': 'artesania',
+                    'objeto': artesania,
+                    'nombre': artesania.nombre,
+                    'descripcion': artesania.descripcion,
+                    'imagen': artesania.imagen_principal,
+                    'url': artesania.get_absolute_url(),
+                    'categoria': f"Artesanía ({categoria_nombre})"
+                })
+        except Exception as e:
+            print(f"Error buscando artesanías: {e}")
+        
+        # 7. Buscar en ACTIVIDADES FÍSICAS
+        try:
+            actividades = ActividadFisica.objects.filter(
+                Q(nombre__icontains=query) | 
+                Q(descripcion__icontains=query) |
+                Q(ubicacion__icontains=query) | 
+                Q(instructor_guia__icontains=query),
+                disponible=True
+            )
+            
+            for actividad in actividades:
+                categoria_nombre = "Sin categoría"
+                if hasattr(actividad, 'categoria') and actividad.categoria:
+                    categoria_nombre = actividad.categoria.nombre
+                
+                resultados.append({
+                    'tipo': 'actividad',
+                    'objeto': actividad,
+                    'nombre': actividad.nombre,
+                    'descripcion': actividad.descripcion,
+                    'imagen': actividad.imagen_principal,
+                    'url': actividad.get_absolute_url(),
+                    'categoria': f"Actividad ({categoria_nombre})"
+                })
+        except Exception as e:
+            print(f"Error buscando actividades físicas: {e}")
+        
+        # Debug: mostrar cuántos resultados encontramos por tipo
+        tipos_count = {}
+        for resultado in resultados:
+            tipo = resultado['tipo']
+            tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
+        
+        print(f"Búsqueda para '{query}': {tipos_count}")
+        print(f"Total resultados: {len(resultados)}")
+        
+        return resultados
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        
+        # Contar resultados por tipo
+        resultados = context['resultados']
+        context['total_resultados'] = len(resultados)
+        
+        # Agrupar por tipo para los filtros
+        tipos_count = {}
+        for resultado in resultados:
+            tipo = resultado['tipo']
+            if tipo not in tipos_count:
+                tipos_count[tipo] = 0
+            tipos_count[tipo] += 1
+        
+        context['tipos_count'] = tipos_count
+        
+        return context
+    
+    # ========== VISTAS PARA GALERÍA FOTOGRÁFICA ==========
+
+class GaleriaFotograficaView(ListView):
+    """Vista principal de la galería fotográfica"""
+    model = Fotografia
+    template_name = 'turismo/galeria.html'
+    context_object_name = 'fotografias'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = Fotografia.objects.filter(activa=True).select_related('categoria')
+        
+        # Filtrar por categoría si se especifica
+        categoria_slug = self.request.GET.get('categoria')
+        if categoria_slug:
+            queryset = queryset.filter(categoria__slug=categoria_slug)
+        
+        # Filtrar por tag si se especifica
+        tag_slug = self.request.GET.get('tag')
+        if tag_slug:
+            queryset = queryset.filter(tags__tag__slug=tag_slug)
+        
+        # Búsqueda por título o descripción
+        search = self.request.GET.get('q')
+        if search:
+            queryset = queryset.filter(
+                Q(titulo__icontains=search) |
+                Q(descripcion__icontains=search) |
+                Q(ubicacion__icontains=search) |
+                Q(fotografo__icontains=search)
+            )
+        
+        # Ordenamiento
+        orden = self.request.GET.get('orden', 'recientes')
+        if orden == 'destacadas':
+            queryset = queryset.order_by('-destacada', '-created')
+        elif orden == 'populares':
+            queryset = queryset.order_by('-vistas', '-created')
+        elif orden == 'alfabetico':
+            queryset = queryset.order_by('titulo')
+        else:  # recientes por defecto
+            queryset = queryset.order_by('-created')
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Categorías con conteo de fotos
+        context['categorias'] = CategoriaFotografia.objects.filter(
+            activa=True
+        ).annotate(
+            total_fotos=Count('fotografias', filter=Q(fotografias__activa=True))
+        ).order_by('orden', 'nombre')
+        
+        # Tags populares
+        context['tags_populares'] = TagFotografia.objects.annotate(
+            total_fotos=Count('fotografias', filter=Q(fotografias__activa=True))
+        ).filter(total_fotos__gt=0).order_by('-total_fotos')[:10]
+        
+        # Fotografías destacadas para hero
+        context['fotografias_destacadas'] = Fotografia.objects.filter(
+            destacada=True, activa=True
+        ).order_by('-created')[:3]
+        
+        # Estadísticas generales
+        context['stats'] = {
+            'total_fotografias': Fotografia.objects.filter(activa=True).count(),
+            'total_categorias': CategoriaFotografia.objects.filter(activa=True).count(),
+            'total_fotografos': Fotografia.objects.filter(activa=True).values('fotografo').distinct().count(),
+        }
+        
+        # Filtros actuales
+        context['filtros_actuales'] = {
+            'categoria': self.request.GET.get('categoria', ''),
+            'tag': self.request.GET.get('tag', ''),
+            'q': self.request.GET.get('q', ''),
+            'orden': self.request.GET.get('orden', 'recientes'),
+        }
+        
+        return context
+
+
+class FotografiaDetailView(DetailView):
+    """Vista de detalle de una fotografía"""
+    model = Fotografia
+    template_name = 'turismo/fotografia_detail.html'
+    context_object_name = 'fotografia'
+    slug_field = 'slug'
+    
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # Incrementar vistas
+        obj.incrementar_vistas()
+        return obj
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Fotografías relacionadas
+        context['fotografias_relacionadas'] = self.object.get_fotografias_relacionadas()
+        
+        # Tags de esta fotografía
+        context['tags'] = TagFotografia.objects.filter(
+            fotografias__fotografia=self.object
+        )
+        
+        # Datos técnicos
+        context['datos_tecnicos'] = self.object.get_datos_tecnicos()
+        
+        # Navegación anterior/siguiente
+        categoria_fotos = Fotografia.objects.filter(
+            categoria=self.object.categoria,
+            activa=True
+        ).order_by('id')
+        
+        try:
+            context['foto_anterior'] = categoria_fotos.filter(
+                id__lt=self.object.id
+            ).last()
+        except Fotografia.DoesNotExist:
+            context['foto_anterior'] = None
+        
+        try:
+            context['foto_siguiente'] = categoria_fotos.filter(
+                id__gt=self.object.id
+            ).first()
+        except Fotografia.DoesNotExist:
+            context['foto_siguiente'] = None
+        
+        return context
+
+
+class GaleriaCategoriaView(ListView):
+    """Vista de fotografías por categoría"""
+    model = Fotografia
+    template_name = 'turismo/categoria.html'
+    context_object_name = 'fotografias'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        self.categoria = get_object_or_404(
+            CategoriaFotografia,
+            slug=self.kwargs['slug'],
+            activa=True
+        )
+        
+        queryset = Fotografia.objects.filter(
+            categoria=self.categoria,
+            activa=True
+        ).select_related('categoria')
+        
+        # Ordenamiento
+        orden = self.request.GET.get('orden', 'recientes')
+        if orden == 'destacadas':
+            queryset = queryset.order_by('-destacada', '-created')
+        elif orden == 'populares':
+            queryset = queryset.order_by('-vistas', '-created')
+        elif orden == 'alfabetico':
+            queryset = queryset.order_by('titulo')
+        else:
+            queryset = queryset.order_by('-created')
+        
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['categoria'] = self.categoria
+        
+        # Otras categorías
+        context['otras_categorias'] = CategoriaFotografia.objects.filter(
+            activa=True
+        ).exclude(id=self.categoria.id).annotate(
+            total_fotos=Count('fotografias', filter=Q(fotografias__activa=True))
+        ).order_by('orden', 'nombre')
+        
+        # Filtros actuales
+        context['filtros_actuales'] = {
+            'orden': self.request.GET.get('orden', 'recientes'),
+        }
+        
+        return context
+
+
+class GaleriaTagView(ListView):
+    """Vista de fotografías por tag"""
+    model = Fotografia
+    template_name = 'turismo/tag.html'
+    context_object_name = 'fotografias'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        self.tag = get_object_or_404(TagFotografia, slug=self.kwargs['slug'])
+        
+        return Fotografia.objects.filter(
+            tags__tag=self.tag,
+            activa=True
+        ).select_related('categoria').order_by('-created')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        
+        # Tags relacionados
+        context['tags_relacionados'] = TagFotografia.objects.exclude(
+            id=self.tag.id
+        ).annotate(
+            total_fotos=Count('fotografias', filter=Q(fotografias__activa=True))
+        ).filter(total_fotos__gt=0).order_by('-total_fotos')[:10]
+        
+        return context
+
+
+class GaleriaFotografoView(ListView):
+    """Vista de fotografías por fotógrafo"""
+    model = Fotografia
+    template_name = 'turismo/fotografo.html'
+    context_object_name = 'fotografias'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        self.fotografo = self.kwargs['fotografo']
+        
+        return Fotografia.objects.filter(
+            fotografo=self.fotografo,
+            activa=True
+        ).select_related('categoria').order_by('-created')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['fotografo'] = self.fotografo
+        
+        # Estadísticas del fotógrafo
+        context['stats_fotografo'] = {
+            'total_fotos': self.get_queryset().count(),
+            'categorias_cubiertas': self.get_queryset().values('categoria').distinct().count(),
+            'total_vistas': self.get_queryset().aggregate(Sum('vistas'))['vistas__sum'] or 0,
+        }
+        
+        # Otros fotógrafos
+        context['otros_fotografos'] = Fotografia.objects.filter(
+            activa=True
+        ).exclude(fotografo='').values('fotografo').annotate(
+            total_fotos=Count('id')
+        ).order_by('-total_fotos')[:10]
+        
+        return context
+
+
+# ========== API PARA GALERÍA ==========
+
+def api_galeria_fotografias(request):
+    """API para obtener fotografías con filtros"""
+    fotografias = Fotografia.objects.filter(activa=True).select_related('categoria')
+    
+    # Filtros
+    categoria = request.GET.get('categoria')
+    if categoria:
+        fotografias = fotografias.filter(categoria__slug=categoria)
+    
+    tag = request.GET.get('tag')
+    if tag:
+        fotografias = fotografias.filter(tags__tag__slug=tag)
+    
+    # Paginación
+    page = int(request.GET.get('page', 1))
+    per_page = int(request.GET.get('per_page', 12))
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    
+    fotografias_page = fotografias[start:end]
+    
+    # Serializar datos
+    data = []
+    for foto in fotografias_page:
+        data.append({
+            'id': foto.id,
+            'titulo': foto.titulo,
+            'descripcion': foto.descripcion,
+            'imagen': foto.get_imagen_url(),
+            'categoria': foto.categoria.nombre,
+            'categoria_color': foto.categoria.color_tema,
+            'fotografo': foto.fotografo,
+            'ubicacion': foto.ubicacion,
+            'vistas': foto.vistas,
+            'destacada': foto.destacada,
+            'url': foto.get_absolute_url(),
+            'tags': [tag.tag.nombre for tag in foto.tags.all()]
+        })
+    
+    return JsonResponse({
+        'fotografias': data,
+        'page': page,
+        'per_page': per_page,
+        'total': fotografias.count(),
+        'has_next': end < fotografias.count(),
+        'has_prev': page > 1
+    })
+
+
+def api_galeria_categorias(request):
+    """API para obtener categorías con conteo"""
+    categorias = CategoriaFotografia.objects.filter(activa=True).annotate(
+        total_fotos=Count('fotografias', filter=Q(fotografias__activa=True))
+    ).order_by('orden', 'nombre')
+    
+    data = []
+    for categoria in categorias:
+        data.append({
+            'id': categoria.id,
+            'nombre': categoria.nombre,
+            'slug': categoria.slug,
+            'descripcion': categoria.descripcion,
+            'icono': categoria.icono,
+            'color_tema': categoria.color_tema,
+            'total_fotos': categoria.total_fotos
+        })
+    
+    return JsonResponse({'categorias': data})
+
+
+def api_galeria_busqueda(request):
+    """API para búsqueda rápida en la galería"""
+    query = request.GET.get('q', '').strip()
+    
+    if len(query) < 3:
+        return JsonResponse({'fotografias': []})
+    
+    fotografias = Fotografia.objects.filter(
+        Q(titulo__icontains=query) |
+        Q(descripcion__icontains=query) |
+        Q(ubicacion__icontains=query) |
+        Q(fotografo__icontains=query),
+        activa=True
+    ).select_related('categoria')[:8]
+    
+    data = []
+    for foto in fotografias:
+        data.append({
+            'titulo': foto.titulo,
+            'categoria': foto.categoria.nombre,
+            'fotografo': foto.fotografo,
+            'imagen': foto.get_imagen_url(),
+            'url': foto.get_absolute_url()
+        })
+    
+    return JsonResponse({'fotografias': data})

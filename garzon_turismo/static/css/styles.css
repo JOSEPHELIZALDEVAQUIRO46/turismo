@@ -12,6 +12,7 @@
 ======================================== */
 :root {
     /* Colores institucionales */
+    --bs-primary: #4A9639;
     --color-primary: #5DAD47; /* Verde Garzón */
     --color-primary-dark: #4A9639;
     --color-primary-light: #7BC168;
@@ -92,6 +93,7 @@
     --header-height: 80px;
     --header-height-mobile: 70px;
 }
+
 
 /* ========================================
    RESET & BASE STYLES

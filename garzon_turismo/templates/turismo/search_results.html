@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if query %}
+    Resultados para "{{ query }}" - {{ block.super }}
+{% else %}
+    Búsqueda - {{ block.super }}
+{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+{% if query %}
+    Resultados de búsqueda para "{{ query }}" en Alma del Huila - Garzón
+{% else %}
+    Búsqueda en el portal turístico de Garzón, Huila
+{% endif %}
+{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'core:home' %}"><i class="ph-house"></i> Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if query %}Resultados: "{{ query }}"{% else %}Búsqueda{% endif %}
+            </li>
+        </ol>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<section class="search-results-section py-5">
+    <div class="container">
+        <!-- Encabezado de Búsqueda -->
+        <div class="search-header mb-5">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    {% if query %}
+                        <h1 class="h2 mb-3">Resultados para: <span class="text-primary">"{{ query }}"</span></h1>
+                        <p class="text-muted">Se encontraron {{ object_list|length }} resultado{{ object_list|length|pluralize }} para tu búsqueda</p>
+                    {% else %}
+                        <h1 class="h2 mb-3">Realizar Búsqueda</h1>
+                        <p class="text-muted">Usa el formulario para buscar lugares, establecimientos, eventos y más en Garzón</p>
+                    {% endif %}
+                </div>
+                <div class="col-md-4">
+                    <!-- Formulario de búsqueda -->
+                    <form action="{% url 'turismo:turismo_search' %}" method="get" class="search-form-page">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control" 
+                                   placeholder="¿Qué quieres encontrar?" 
+                                   value="{{ query }}" required minlength="3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ph-magnifying-glass"></i> Buscar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {% if query %}
+            {% if object_list %}
+                <!-- Filtros de Resultados -->
+                <div class="search-filters mb-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="filter-buttons">
+                                <button class="btn btn-outline-primary btn-sm filter-btn active" data-filter="all">
+                                    Todos ({{ object_list|length }})
+                                </button>
+                                {% comment %} Contadores por tipo {% endcomment %}
+                                {% regroup object_list by tipo as grouped_results %}
+                                {% for group in grouped_results %}
+                                <button class="btn btn-outline-secondary btn-sm filter-btn" data-filter="{{ group.grouper }}">
+                                    {% if group.grouper == 'lugar' %}
+                                        Lugares ({{ group.list|length }})
+                                    {% elif group.grouper == 'establecimiento' %}
+                                        Establecimientos ({{ group.list|length }})
+                                    {% elif group.grouper == 'evento' %}
+                                        Eventos ({{ group.list|length }})
+                                    {% elif group.grouper == 'ruta' %}
+                                        Rutas ({{ group.list|length }})
+                                    {% elif group.grouper == 'transporte' %}
+                                        Transporte ({{ group.list|length }})
+                                    {% elif group.grouper == 'artesania' %}
+                                        Artesanías ({{ group.list|length }})
+                                    {% elif group.grouper == 'actividad' %}
+                                        Actividades ({{ group.list|length }})
+                                    {% else %}
+                                        {{ group.grouper|title }} ({{ group.list|length }})
+                                    {% endif %}
+                                </button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resultados de Búsqueda -->
+                <div class="search-results-grid">
+                    {% for resultado in object_list %}
+                    <div class="search-result-card mb-4" data-tipo="{{ resultado.tipo }}">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="row g-0 h-100">
+                                <div class="col-md-4">
+                                    {% if resultado.imagen %}
+                                    <img src="{{ resultado.imagen.url }}" class="img-fluid h-100 object-cover rounded-start" alt="{{ resultado.nombre }}">
+                                    {% else %}
+                                    <div class="placeholder-image d-flex align-items-center justify-content-center h-100 bg-light rounded-start">
+                                        <i class="ph-image text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="card-body d-flex flex-column h-100">
+                                        <div class="flex-grow-1">
+                                            <!-- Tipo y Categoría -->
+                                            <div class="mb-2">
+                                                <span class="badge bg-{{ resultado.tipo|get_tipo_color }} text-white me-2">
+                                                    <i class="ph-{{ resultado.tipo|get_tipo_icon }} me-1"></i>
+                                                    {% if resultado.tipo == 'lugar' %}Lugar Turístico
+                                                    {% elif resultado.tipo == 'establecimiento' %}Establecimiento
+                                                    {% elif resultado.tipo == 'evento' %}Evento
+                                                    {% elif resultado.tipo == 'ruta' %}Ruta
+                                                    {% elif resultado.tipo == 'transporte' %}Transporte
+                                                    {% elif resultado.tipo == 'artesania' %}Artesanía
+                                                    {% elif resultado.tipo == 'actividad' %}Actividad
+                                                    {% else %}{{ resultado.tipo|title }}
+                                                    {% endif %}
+                                                </span>
+                                                {% if resultado.categoria %}
+                                                <small class="text-muted">{{ resultado.categoria }}</small>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Título -->
+                                            <h5 class="card-title mb-3">
+                                                <a href="{{ resultado.url }}" class="text-decoration-none">
+                                                    {{ resultado.nombre }}
+                                                </a>
+                                            </h5>
+                                            
+                                            <!-- Descripción -->
+                                            <p class="card-text text-muted">
+                                                {{ resultado.descripcion|truncatewords:25 }}
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Información adicional según el tipo -->
+                                        <div class="result-extra-info mb-3">
+                                            {% if resultado.tipo == 'establecimiento' %}
+                                                {% if resultado.objeto.direccion %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-map-pin me-1"></i> {{ resultado.objeto.direccion }}
+                                                </small>
+                                                {% endif %}
+                                                {% if resultado.objeto.telefono %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-phone me-1"></i> {{ resultado.objeto.telefono }}
+                                                </small>
+                                                {% endif %}
+                                            {% elif resultado.tipo == 'evento' %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-calendar me-1"></i> {{ resultado.objeto.fecha_inicio|date:"d/m/Y" }}
+                                                </small>
+                                                {% if resultado.objeto.lugar %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-map-pin me-1"></i> {{ resultado.objeto.lugar }}
+                                                </small>
+                                                {% endif %}
+                                            {% elif resultado.tipo == 'ruta' %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-path me-1"></i> {{ resultado.objeto.distancia }} km - {{ resultado.objeto.duracion_estimada }}
+                                                </small>
+                                            {% elif resultado.tipo == 'transporte' %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-arrow-right me-1"></i> {{ resultado.objeto.origen }} → {{ resultado.objeto.destino }}
+                                                </small>
+                                            {% elif resultado.tipo == 'artesania' %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-user me-1"></i> {{ resultado.objeto.artesano }}
+                                                </small>
+                                            {% elif resultado.tipo == 'actividad' %}
+                                                <small class="text-muted d-block">
+                                                    <i class="ph-target me-1"></i> {{ resultado.objeto.get_dificultad_display }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Botón Ver Más -->
+                                        <div class="mt-auto">
+                                            <a href="{{ resultado.url }}" class="btn btn-outline-primary btn-sm">
+                                                Ver detalles <i class="ph-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                <!-- No hay resultados -->
+                <div class="no-results text-center py-5">
+                    <div class="mb-4">
+                        <i class="ph-magnifying-glass text-muted" style="font-size: 4rem;"></i>
+                    </div>
+                    <h3 class="h4 mb-3">No se encontraron resultados</h3>
+                    <p class="text-muted mb-4">
+                        No pudimos encontrar nada que coincida con "<strong>{{ query }}</strong>". 
+                        Prueba con términos diferentes o revisa la ortografía.
+                    </p>
+                    
+                    <!-- Sugerencias de búsqueda -->
+                    <div class="search-suggestions">
+                        <h5 class="mb-3">Prueba buscando:</h5>
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="{% url 'turismo:turismo_search' %}?q=senderismo" class="btn btn-outline-secondary btn-sm">Senderismo</a>
+                            <a href="{% url 'turismo:turismo_search' %}?q=café" class="btn btn-outline-secondary btn-sm">Café</a>
+                            <a href="{% url 'turismo:turismo_search' %}?q=hotel" class="btn btn-outline-secondary btn-sm">Hotel</a>
+                            <a href="{% url 'turismo:turismo_search' %}?q=restaurante" class="btn btn-outline-secondary btn-sm">Restaurante</a>
+                            <a href="{% url 'turismo:turismo_search' %}?q=artesanía" class="btn btn-outline-secondary btn-sm">Artesanía</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            <!-- Página inicial de búsqueda -->
+            <div class="search-intro text-center py-5">
+                <div class="mb-4">
+                    <i class="ph-binoculars text-primary" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="h4 mb-3">Descubre Garzón</h3>
+                <p class="text-muted mb-4">
+                    Usa el buscador para encontrar lugares turísticos, establecimientos, eventos, 
+                    rutas, artesanías y actividades en Garzón, Huila.
+                </p>
+                
+                <!-- Enlaces rápidos -->
+                <div class="quick-links">
+                    <h5 class="mb-3">Explorar por categorías:</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3 col-6">
+                            <a href="{% url 'turismo:lugar_list' %}" class="btn btn-outline-primary w-100">
+                                <i class="ph-mountains d-block mb-2" style="font-size: 2rem;"></i>
+                                Lugares Turísticos
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{% url 'turismo:establecimiento_list' %}" class="btn btn-outline-success w-100">
+                                <i class="ph-buildings d-block mb-2" style="font-size: 2rem;"></i>
+                                Alojamiento
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{% url 'turismo:evento_list' %}" class="btn btn-outline-warning w-100">
+                                <i class="ph-calendar-plus d-block mb-2" style="font-size: 2rem;"></i>
+                                Eventos
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6">
+                            <a href="{% url 'turismo:ruta_list' %}" class="btn btn-outline-info w-100">
+                                <i class="ph-map-trifold d-block mb-2" style="font-size: 2rem;"></i>
+                                Rutas
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos específicos para la página de resultados de búsqueda */
+.search-results-section {
+    min-height: 60vh;
+}
+
+.search-form-page .input-group {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-form-page .form-control {
+    border: none;
+    padding: 12px 16px;
+}
+
+.search-form-page .btn {
+    border: none;
+    padding: 12px 20px;
+}
+
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-btn {
+    transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: white;
+}
+
+.search-result-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.search-result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.search-result-card .card {
+    height: 100%;
+}
+
+.object-cover {
+    object-fit: cover;
+    height: 200px;
+}
+
+.placeholder-image {
+    height: 200px;
+}
+
+.result-extra-info small {
+    line-height: 1.6;
+}
+
+.quick-links .btn {
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.quick-links .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.search-suggestions .btn {
+    margin: 4px;
+}
+
+/* Animaciones */
+.search-result-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.search-result-card:nth-child(even) {
+    animation-delay: 0.1s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-header .col-md-4 {
+        margin-top: 1rem;
+    }
+    
+    .filter-buttons {
+        justify-content: center;
+    }
+    
+    .object-cover,
+    .placeholder-image {
+        height: 150px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Filtrado de resultados por tipo
+    $('.filter-btn').on('click', function() {
+        const filter = $(this).data('filter');
+        
+        // Actualizar botones activos
+        $('.filter-btn').removeClass('active');
+        $(this).addClass('active');
+        
+        // Mostrar/ocultar resultados
+        if (filter === 'all') {
+            $('.search-result-card').show();
+        } else {
+            $('.search-result-card').hide();
+            $(`.search-result-card[data-tipo="${filter}"]`).show();
+        }
+        
+        // Efecto de animación
+        $('.search-result-card:visible').each(function(index) {
+            $(this).css('animation-delay', (index * 0.1) + 's');
+            $(this).removeClass('fadeInUp').addClass('fadeInUp');
+        });
+    });
+    
+    // Resaltar términos de búsqueda (opcional)
+    const query = '{{ query|escapejs }}';
+    if (query && query.length > 0) {
+        $('.card-title, .card-text').each(function() {
+            const text = $(this).html();
+            const regex = new RegExp(`(${query})`, 'gi');
+            const highlighted = text.replace(regex, '<mark>$1</mark>');
+            $(this).html(highlighted);
+        });
+    }
+});
+
+// Función helper para obtener colores por tipo (para uso en template tags personalizados)
+function getTipoColor(tipo) {
+    const colors = {
+        'lugar': 'primary',
+        'establecimiento': 'success',
+        'evento': 'warning',
+        'ruta': 'info',
+        'transporte': 'secondary',
+        'artesania': 'danger',
+        'actividad': 'dark'
+    };
+    return colors[tipo] || 'primary';
+}
+
+function getTipoIcon(tipo) {
+    const icons = {
+        'lugar': 'mountains',
+        'establecimiento': 'buildings',
+        'evento': 'calendar-plus',
+        'ruta': 'map-trifold',
+        'transporte': 'bus',
+        'artesania': 'palette',
+        'actividad': 'bicycle'
+    };
+    return icons[tipo] || 'circle';
+}
+</script>
+{% endblock %}
